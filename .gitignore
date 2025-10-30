@@ -1,0 +1,57 @@
+# Build artifacts
+Binaries/
+Build/
+DerivedDataCache/
+Intermediate/
+Saved/
+
+# Configuration
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.VC.db
+*.VC.VC.opendb
+*.opensdf
+*.sdf
+
+# OS specific
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs and crashes
+*.log
+*.vspscc
+*.pdb
+*.idb
+
+# Backup / temp files
+*.bak
+*.tmp
+*.swp
+*.swn
+*.swo
+*.swn
+*.sublime-workspace
+*.sublime-project
+
+# Generated project files
+*.xcodeproj
+*.xcworkspace
+*.xcconfig
+*.xcuserdata/
+*.xcuserstate
+*.xcsettings
+
+# Plugins (if you use third-party ones, keep source only)
+Plugins/*/Intermediate/
+Plugins/*/Binaries/
+Plugins/*/DerivedDataCache/
+Plugins/*/Saved/
+
+# Gemini CLI
+.gemini/
+
+# Ignore Visual Studio cache and settings
+.vs/
