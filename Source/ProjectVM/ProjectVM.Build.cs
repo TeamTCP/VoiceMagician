@@ -1,6 +1,7 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+﻿// Copyright Epic Games, Inc. All Rights Reserved.
 
 using UnrealBuildTool;
+using UnrealBuildTool.Rules;
 
 public class ProjectVM : ModuleRules
 {
@@ -8,6 +9,13 @@ public class ProjectVM : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
+		// 폴더
+		PublicIncludePaths.AddRange(new[] { "ProjectVM" });
+
+		// 기존 모듈 목록
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
-	}
+
+		// 새로운 모듈 추가
+		PublicDependencyModuleNames.AddRange(new string[] { "AIModule", "NavigationSystem"});
+    }
 }
