@@ -1,7 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Hero/AVMCharacterHeroBase.h"
+#include "Hero/VMCharacterHeroBase.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -12,7 +12,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 
-AAVMCharacterHeroBase::AAVMCharacterHeroBase()
+AVMCharacterHeroBase::AVMCharacterHeroBase()
 {
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
@@ -86,7 +86,7 @@ AAVMCharacterHeroBase::AAVMCharacterHeroBase()
 	}
 }
 
-void AAVMCharacterHeroBase::BeginPlay()
+void AVMCharacterHeroBase::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -97,7 +97,7 @@ void AAVMCharacterHeroBase::BeginPlay()
 	}
 }
 
-void AAVMCharacterHeroBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void AVMCharacterHeroBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
@@ -105,13 +105,13 @@ void AAVMCharacterHeroBase::SetupPlayerInputComponent(UInputComponent* PlayerInp
 
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
-	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AAVMCharacterHeroBase::Move);
-	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AAVMCharacterHeroBase::Look);
+	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AVMCharacterHeroBase::Move);
+	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AVMCharacterHeroBase::Look);
 
-	EnhancedInputComponent->BindAction(LeftMouseSkillAction, ETriggerEvent::Triggered, this, &AAVMCharacterHeroBase::BasicSkill);
+	EnhancedInputComponent->BindAction(LeftMouseSkillAction, ETriggerEvent::Triggered, this, &AVMCharacterHeroBase::BasicSkill);
 }
 
-void AAVMCharacterHeroBase::Move(const FInputActionValue& Value)
+void AVMCharacterHeroBase::Move(const FInputActionValue& Value)
 {
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
@@ -125,7 +125,7 @@ void AAVMCharacterHeroBase::Move(const FInputActionValue& Value)
 	AddMovementInput(RightDirection, MovementVector.X);
 }
 
-void AAVMCharacterHeroBase::Look(const FInputActionValue& Value)
+void AVMCharacterHeroBase::Look(const FInputActionValue& Value)
 {
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 
@@ -133,7 +133,7 @@ void AAVMCharacterHeroBase::Look(const FInputActionValue& Value)
 	AddControllerPitchInput(LookAxisVector.Y);
 }
 
-void AAVMCharacterHeroBase::BasicSkill(const FInputActionValue& Value)
+void AVMCharacterHeroBase::BasicSkill(const FInputActionValue& Value)
 {
 	UE_LOG(LogTemp, Log, TEXT("Left Mouse Skill !"));
 }

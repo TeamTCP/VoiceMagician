@@ -5,15 +5,15 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
-#include "AVMCharacterHeroBase.generated.h"
+#include "VMCharacterHeroBase.generated.h"
 
 UCLASS()
-class PROJECTVM_API AAVMCharacterHeroBase : public ACharacter
+class PROJECTVM_API AVMCharacterHeroBase : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
-	AAVMCharacterHeroBase();
+	AVMCharacterHeroBase();
 
 protected:
 	virtual void BeginPlay() override;
