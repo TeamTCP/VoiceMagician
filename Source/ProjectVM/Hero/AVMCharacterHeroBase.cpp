@@ -78,6 +78,12 @@ AAVMCharacterHeroBase::AAVMCharacterHeroBase()
 	{
 		JumpAction = JumpActionRef.Object;
 	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> LeftMouseSkillActionRef(TEXT("/Game/Project/Input/Actions/IA_LeftMouseSkill.IA_LeftMouseSkill"));
+	if (LeftMouseSkillActionRef.Succeeded())
+	{
+		LeftMouseSkillAction = LeftMouseSkillActionRef.Object;
+	}
 }
 
 void AAVMCharacterHeroBase::BeginPlay()
@@ -101,6 +107,8 @@ void AAVMCharacterHeroBase::SetupPlayerInputComponent(UInputComponent* PlayerInp
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AAVMCharacterHeroBase::Move);
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AAVMCharacterHeroBase::Look);
+
+	EnhancedInputComponent->BindAction(LeftMouseSkillAction, ETriggerEvent::Triggered, this, &AAVMCharacterHeroBase::BasicSkill);
 }
 
 void AAVMCharacterHeroBase::Move(const FInputActionValue& Value)
@@ -123,4 +131,9 @@ void AAVMCharacterHeroBase::Look(const FInputActionValue& Value)
 
 	AddControllerYawInput(LookAxisVector.X);
 	AddControllerPitchInput(LookAxisVector.Y);
+}
+
+void AAVMCharacterHeroBase::BasicSkill(const FInputActionValue& Value)
+{
+	UE_LOG(LogTemp, Log, TEXT("Left Mouse Skill !"));
 }
