@@ -24,6 +24,8 @@ public:
 
 	float ApplyDamage(float InDamage);
 
+	FORCEINLINE FHeroStat GetStat() { return CurStat; }
+
 protected:
 	virtual void BeginPlay() override;
 

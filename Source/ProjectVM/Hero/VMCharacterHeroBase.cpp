@@ -13,6 +13,7 @@
 #include "EnhancedInputSubsystems.h"
 
 #include "Hero/VMHeroStatComponent.h"
+#include "Hero/VMHeroSkillComponent.h"
 
 AVMCharacterHeroBase::AVMCharacterHeroBase()
 {
@@ -88,6 +89,7 @@ AVMCharacterHeroBase::AVMCharacterHeroBase()
 	}
 
 	Stat = CreateDefaultSubobject<UVMHeroStatComponent>(TEXT("Stat"));
+	Skills = CreateDefaultSubobject<UVMHeroSkillComponent>(TEXT("Skills"));
 }
 
 void AVMCharacterHeroBase::BeginPlay()
@@ -140,4 +142,10 @@ void AVMCharacterHeroBase::Look(const FInputActionValue& Value)
 void AVMCharacterHeroBase::BasicSkill(const FInputActionValue& Value)
 {
 	UE_LOG(LogTemp, Log, TEXT("Left Mouse Skill !"));
+	
+	if (Stat == nullptr) return;
+	if (Skills == nullptr) return;
+
+	FHeroStat CurStat = Stat->GetStat();
+	Skills->ExecuteBasicSkill(CurStat);
 }
