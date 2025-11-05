@@ -89,7 +89,6 @@ void AVMHomingProjectile::BeginPlay()
 	
 	if (Collider)
 	{
-		UE_LOG(LogTemp, Log, TEXT("BeginPlay Name:%s"), *GetOwner()->GetName());
 		Collider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 		// 2️⃣ 다음 프레임(한 틱 뒤)에 충돌 다시 켜고 Ignore 설정

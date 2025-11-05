@@ -5,6 +5,8 @@ DerivedDataCache/
 Intermediate/
 Saved/
 
+Content/
+
 # Configuration
 *.suo
 *.user
