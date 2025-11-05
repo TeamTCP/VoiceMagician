@@ -11,7 +11,7 @@
  * 
  */
 
-class UVMEquipoment;
+class UVMEquipment;
 
 UCLASS()
 class PROJECTVM_API UItemFactorySubsystem : public UGameInstanceSubsystem
@@ -19,19 +19,19 @@ class PROJECTVM_API UItemFactorySubsystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 
 public:
-	UVMEquipoment* CreateRandomBaseEquipment();
-	UVMEquipoment* CreateItemByName(FString Name);
-	UVMEquipoment* CraftEquipment();
+	UVMEquipment* CreateRandomBaseEquipment();
+	UVMEquipment* CreateEquipmentByName(FName Name);
+	UVMEquipment* CraftEquipment(UVMEquipment* BaseEquipment1, UVMEquipment* BaseEquipment2);
 
 protected:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipment")
-	TArray<FVMEquipmentInfo> AllEquipment;
+	TArray<FVMEquipmentInfo> AllEquipmentInfo;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipment")
-	TArray<FVMEquipmentInfo> BaseEquipment;
+	TArray<FVMEquipmentInfo> BaseEquipmentInfo;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Equipment")
 	TMap<FName, FVMEquipmentInfo> EquipmentInfoByName;

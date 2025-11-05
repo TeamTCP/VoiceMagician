@@ -10,6 +10,7 @@
 /**
  * 
  */
+
 UCLASS()
 class PROJECTVM_API UVMEquipment : public UObject
 {
@@ -17,7 +18,12 @@ class PROJECTVM_API UVMEquipment : public UObject
 
 public:
 	void EquipEffect(class AVMCharacterHeroBase* Owner);
+	FORCEINLINE FVMEquipmentInfo GetEquipmentInfo() { return EquipmentInfo; }
 	
+protected:
+	friend class UItemFactorySubsystem;
+	FORCEINLINE void SetEquipmentInfo(FVMEquipmentInfo InEquipmentInfo) { EquipmentInfo = InEquipmentInfo; }
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Item)
 	FVMEquipmentInfo EquipmentInfo;
