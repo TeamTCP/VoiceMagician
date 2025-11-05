@@ -44,11 +44,30 @@ class AProjectVMCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
 
+#pragma region PawnSensing_Section
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Noise, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UPawnNoiseEmitterComponent> PawnNoiseEmitter;
 
 	virtual void Jump() override;
+#pragma endregion 
 
+#pragma region Attack_Section
+	UFUNCTION()
+	void LeftAttack();
+
+	UFUNCTION()
+	void RightAttack();
+
+	/** LeftMouseButton Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* LeftMouseAction;
+
+	/** RightMouseButton Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* RightMouseAction;
+
+	AActor* FindClosestEnemy();
+#pragma endregion 
 public:
 	UFUNCTION()
 	FORCEINLINE void SetCurrentHP(float InCurrentHp) { CurrentHp = InCurrentHp; }

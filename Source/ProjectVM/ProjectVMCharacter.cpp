@@ -11,20 +11,17 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "Components/PawnNoiseEmitterComponent.h"
+#include "Components/BoxComponent.h"
+
+#include "Projectile/VMStraightProjectile.h"
+#include "Projectile/VMHomingProjectile.h"
+#include "AI/VMEnemyBase.h"
+#include "EngineUtils.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 //////////////////////////////////////////////////////////////////////////
 // AProjectVMCharacter
-
-void AProjectVMCharacter::Jump()
-{
-	Super::Jump();
-
-	UE_LOG(LogTemp, Log, TEXT("(%f, %f, %f)"), GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z);
-	MakeNoise(1.0f, this, GetActorLocation());  // 점프할 때 소리 발생
-}
-
 AProjectVMCharacter::AProjectVMCharacter()
 {
 	// Set size for collision capsule
@@ -73,6 +70,20 @@ AProjectVMCharacter::AProjectVMCharacter()
 #pragma region StatSection
 	SetCurrentHP(100.0f);
 #pragma endregion 
+
+#pragma region InputActionSection
+	ConstructorHelpers::FObjectFinder<UInputAction> LeftRef(TEXT("/Script/EnhancedInput.InputAction'/Game/ThirdPerson/Input/Actions/IA_LeftButton.IA_LeftButton'"));
+	if (LeftRef.Object)
+	{
+		LeftMouseAction = LeftRef.Object;
+	}
+
+	ConstructorHelpers::FObjectFinder<UInputAction> RightRef(TEXT("/Script/EnhancedInput.InputAction'/Game/ThirdPerson/Input/Actions/IA_RightButton.IA_RightButton'"));
+	if (RightRef.Object)
+	{
+		RightMouseAction = RightRef.Object;
+	}
+#pragma endregion 
 }
 
 void AProjectVMCharacter::BeginPlay()
@@ -107,6 +118,12 @@ void AProjectVMCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AProjectVMCharacter::Look);
+
+		// LeftAttack
+		EnhancedInputComponent->BindAction(LeftMouseAction, ETriggerEvent::Triggered, this, &AProjectVMCharacter::LeftAttack);
+		
+		// RightAttack
+		EnhancedInputComponent->BindAction(RightMouseAction, ETriggerEvent::Triggered, this, &AProjectVMCharacter::RightAttack);
 	}
 	else
 	{
@@ -148,4 +165,67 @@ void AProjectVMCharacter::Look(const FInputActionValue& Value)
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+
+void AProjectVMCharacter::Jump()
+{
+	Super::Jump();
+
+	UE_LOG(LogTemp, Log, TEXT("(%f, %f, %f)"), GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z);
+	MakeNoise(1.0f, this, GetActorLocation());  // 점프할 때 소리 발생
+}
+
+
+void AProjectVMCharacter::LeftAttack()
+{
+	UE_LOG(LogTemp, Log, TEXT("LeftAttack"));
+
+	FTransform spawnTransform = GetActorTransform();
+
+	AVMStraightProjectile* Projectile = GetWorld()->SpawnActor<AVMStraightProjectile>(AVMStraightProjectile::StaticClass(), spawnTransform);
+}
+
+void AProjectVMCharacter::RightAttack()
+{
+	UE_LOG(LogTemp, Log, TEXT("RightAttack"));
+
+	FTransform spawnTransform = GetActorTransform();
+
+
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;               // <<-- 중요: 소유자 미리 지정
+	SpawnParams.Instigator = GetInstigator();
+
+	AVMHomingProjectile* Projectile = GetWorld()->SpawnActor<AVMHomingProjectile>(
+		AVMHomingProjectile::StaticClass(),
+		spawnTransform,
+		SpawnParams
+	);
+	if (Projectile)
+	{
+		AActor* TargetEnemy = FindClosestEnemy(); // 직접 구현 필요
+		if (TargetEnemy)
+		{
+			Projectile->SetTarget(TargetEnemy);
+		}
+	}
+}
+
+AActor* AProjectVMCharacter::FindClosestEnemy()
+{
+	AActor* ClosestEnemy = nullptr;
+	float MinDistance = FLT_MAX;
+
+	for (TActorIterator<AVMEnemyBase> It(GetWorld()); It; ++It)
+	{
+		float Distance = FVector::Dist(GetActorLocation(), It->GetActorLocation());
+		if (Distance < MinDistance)
+		{
+			MinDistance = Distance;
+			ClosestEnemy = *It;
+		}
+	}
+
+	return ClosestEnemy;
 }
