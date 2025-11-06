@@ -48,4 +48,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UVMHeroStatComponent> Stat;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Skill, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UVMHeroSkillComponent> Skills;
 };
