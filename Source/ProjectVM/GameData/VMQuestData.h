@@ -12,7 +12,8 @@ struct FVMQuestData : public FTableRowBase
 
 public:
 	FVMQuestData()
-		: QuestGiver(NAME_None)
+		: QuestId(NAME_None)
+		, QuestGiver(NAME_None)
 		, NextQuestId(NAME_None)
 		, QuestCategory(NAME_None)
 		, QuestTitle(FText::GetEmpty())
@@ -26,6 +27,10 @@ public:
 	}
 
 public:
+	// 퀘스트 고유 ID
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Quest")
+	FName QuestId;
+
 	// 퀘스트 제공자 (NPC 등)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest")
 	FName QuestGiver;

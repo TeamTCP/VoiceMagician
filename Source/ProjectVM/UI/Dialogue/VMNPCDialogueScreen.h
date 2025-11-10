@@ -5,13 +5,13 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/TextBlock.h"
-#include "VMNPCDialogue.generated.h"
+#include "VMNPCDialogueScreen.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECTVM_API UVMNPCDialogue : public UUserWidget
+class PROJECTVM_API UVMNPCDialogueScreen : public UUserWidget
 {
 	GENERATED_BODY()
 
