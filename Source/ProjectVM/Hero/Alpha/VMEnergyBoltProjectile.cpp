@@ -18,7 +18,7 @@ AVMEnergyBoltProjectile::AVMEnergyBoltProjectile()
 	SplinePath = CreateDefaultSubobject<USplineComponent>(TEXT("SplinePath"));
 	RootComponent = SplinePath;
 
-	SphereCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("SphereCollision"));
+	SphereCollision = CreateDefaultSubobject<USphereComponent>(TEXT("SphereCollision"));
 	SphereCollision->SetupAttachment(RootComponent);
 	SphereCollision->SetSphereRadius(10.f);
 
@@ -69,7 +69,7 @@ void AVMEnergyBoltProjectile::Tick(float DeltaTime)
 	float TargetLength = SplineLength * Progress;
 	
 	FVector Pos = SplinePath->GetLocationAtDistanceAlongSpline(TargetLength, ESplineCoordinateSpace::World);
-	BoxCollision->SetWorldLocation(Pos);
+	SphereCollision->SetWorldLocation(Pos);
 
 	if (Progress > 1.0f) Destroy();
 }
