@@ -8,6 +8,8 @@
 #include "Engine/OverlapResult.h"
 #include "DrawDebugHelpers.h"
 
+#include "CollisionQueryParams.h"
+
 UEnergyBolt::UEnergyBolt(const FObjectInitializer& ObjectInitializer)
 {
 	SkillName = TEXT("EnergyBolt");
@@ -26,8 +28,9 @@ void UEnergyBolt::ActivateSkill(AVMCharacterHeroBase* Owner, FHeroStat& CurStat)
 	TArray<FOverlapResult> Targets;
 	FVector Center = Owner->GetActorLocation();
 	FCollisionShape CollisionShape = FCollisionShape::MakeSphere(1000.0f);
+	// FCollisionQueryParams FCQP(SCENE_QUERY_STAT(Attack), false, this);
 
-	bool HitDetected = Owner->GetWorld()->OverlapMultiByChannel(Targets, Center, FQuat::Identity, ECC_Pawn, CollisionShape);
+	bool HitDetected = Owner->GetWorld()->OverlapMultiByChannel(Targets, Center, FQuat::Identity, ECC_GameTraceChannel2, CollisionShape);
 	
 	FColor DrawDebugColor = FColor::Green;
 	if (HitDetected) DrawDebugColor = FColor::Red;

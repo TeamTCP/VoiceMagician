@@ -15,6 +15,7 @@ AAlpha::AAlpha()
 	if (CharacterMeshRef.Object)
 	{
 		GetMesh()->SetSkeletalMesh(CharacterMeshRef.Object);
+		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> HairMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/EchoContent/Characters/Echo/Meshes/Echo_Hair.Echo_Hair'"));
