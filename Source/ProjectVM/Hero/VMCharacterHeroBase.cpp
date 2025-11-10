@@ -15,6 +15,8 @@
 #include "Hero/VMHeroStatComponent.h"
 #include "Hero/VMHeroSkillComponent.h"
 
+#include "NPC/VMNPC.h"
+
 AVMCharacterHeroBase::AVMCharacterHeroBase()
 {
 	bUseControllerRotationPitch = false;
@@ -68,6 +70,12 @@ AVMCharacterHeroBase::AVMCharacterHeroBase()
 		InputMappingContext = InputMappingContextRef.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UInputMappingContext> DialogueMappingContextRef(TEXT("/Game/Project/Input/IMC_Dialogue.IMC_Dialogue"));
+	if (DialogueMappingContextRef.Succeeded())
+	{
+		DialogueMappingContext = DialogueMappingContextRef.Object;
+	}
+
 	static ConstructorHelpers::FObjectFinder<UInputAction> MoveActionRef(TEXT("/Game/Project/Input/Actions/IA_Move.IA_Move"));
 	if (MoveActionRef.Succeeded())
 	{
@@ -92,8 +100,52 @@ AVMCharacterHeroBase::AVMCharacterHeroBase()
 		LeftMouseSkillAction = LeftMouseSkillActionRef.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UInputAction> InteractActionRef(TEXT("/Game/Project/Input/Actions/IA_Interact.IA_Interact"));
+	if (InteractActionRef.Succeeded())
+	{
+		InteractAction = InteractActionRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> NextTalkActionRef(TEXT("/Game/Project/Input/Actions/IA_NextTalk.IA_NextTalk"));
+	if (NextTalkActionRef.Succeeded())
+	{
+		NextTalkAction = NextTalkActionRef.Object;
+	}
+
 	Stat = CreateDefaultSubobject<UVMHeroStatComponent>(TEXT("Stat"));
 	Skills = CreateDefaultSubobject<UVMHeroSkillComponent>(TEXT("Skills"));
+}
+
+void AVMCharacterHeroBase::ChangeInputMode(EInputMode NewMode)
+{
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	if (PC)
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem =
+			ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
+		{
+			// 현재 등록된 모든 매핑 제거
+			Subsystem->ClearAllMappings();
+
+			// 새로운 Context 추가
+			switch (NewMode)
+			{
+			case EInputMode::Default:
+				Subsystem->AddMappingContext(InputMappingContext, 0);
+				break;
+			case EInputMode::Dialogue:
+				Subsystem->AddMappingContext(DialogueMappingContext, 0);
+				break;
+			default:
+				break;
+			}
+		}
+	}
+}
+
+void AVMCharacterHeroBase::SetInteractNPC(AVMNPC* NewInteractNPC)
+{
+	CurrentNPC = NewInteractNPC;
 }
 
 void AVMCharacterHeroBase::BeginPlay()
@@ -117,8 +169,11 @@ void AVMCharacterHeroBase::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AVMCharacterHeroBase::Move);
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AVMCharacterHeroBase::Look);
-
+	EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AVMCharacterHeroBase::Interact);
 	EnhancedInputComponent->BindAction(LeftMouseSkillAction, ETriggerEvent::Triggered, this, &AVMCharacterHeroBase::BasicSkill);
+
+	//다이얼로그
+	EnhancedInputComponent->BindAction(NextTalkAction, ETriggerEvent::Triggered, this, &AVMCharacterHeroBase::NextTalk);
 }
 
 void AVMCharacterHeroBase::Move(const FInputActionValue& Value)
@@ -152,4 +207,37 @@ void AVMCharacterHeroBase::BasicSkill(const FInputActionValue& Value)
 
 	FHeroStat CurStat = Stat->GetStat();
 	Skills->ExecuteBasicSkill(CurStat);
+}
+
+void AVMCharacterHeroBase::Interact(const FInputActionValue& Value)
+{
+	if (CurrentNPC != nullptr)
+	{
+		UE_LOG(LogTemp, Log, TEXT("input E, show ui : %s"), *CurrentNPC->GetName());
+		CurrentNPC->Interact();
+
+		ChangeInputMode(EInputMode::Dialogue);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("input E, cannot interact"));
+	}
+}
+
+void AVMCharacterHeroBase::NextTalk(const FInputActionValue& Value)
+{
+	if (CurrentNPC != nullptr)
+	{
+		UE_LOG(LogTemp, Log, TEXT("input Space, next dialogue : %s"), *CurrentNPC->GetName());
+
+		//다음 대화 불러오기, 없으면 대화 모드 종료
+		if (!CurrentNPC->NextDialogue())
+		{
+			ChangeInputMode(EInputMode::Default);
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("input A, cannot interact"));
+	}
 }

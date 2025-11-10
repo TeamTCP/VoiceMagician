@@ -15,7 +15,10 @@ public class ProjectVM : ModuleRules
 		// 기존 모듈 목록
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
 
-		// 새로운 모듈 추가
-		PublicDependencyModuleNames.AddRange(new string[] { "AIModule", "NavigationSystem"});
+		// 모듈 추가 (작업자: 나희영)
+		PublicDependencyModuleNames.AddRange(new string[] { "AIModule", "NavigationSystem", "Niagara"});
+
+		// 모듈 추가 (작업자: 이상윤)
+        PublicDependencyModuleNames.AddRange(new string[] { "UMG", "Slate", "SlateCore" });
     }
 }
