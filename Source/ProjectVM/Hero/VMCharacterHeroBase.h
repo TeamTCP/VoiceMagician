@@ -6,16 +6,18 @@
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
 #include "Core/GameEnums.h"
+#include "Interface/VMStatChangeable.h"
 #include "VMCharacterHeroBase.generated.h"
 
 UCLASS()
-class PROJECTVM_API AVMCharacterHeroBase : public ACharacter
+class PROJECTVM_API AVMCharacterHeroBase : public ACharacter, public IVMStatChangeable
 {
 	GENERATED_BODY()
 
 public:
 	AVMCharacterHeroBase();
 
+	virtual void HealthPointChange(float Amount, AActor* Causer);
 	void ChangeInputMode(EInputMode NewMode);
 	void SetInteractNPC(class AVMNPC* NewInteractNPC);
 protected:

@@ -104,6 +104,14 @@ AVMCharacterHeroBase::AVMCharacterHeroBase()
 	Skills = CreateDefaultSubobject<UVMHeroSkillComponent>(TEXT("Skills"));
 }
 
+void AVMCharacterHeroBase::HealthPointChange(float Amount, AActor* Causer)
+{
+	if (Causer == nullptr || Causer->IsValidLowLevel() == false) return;
+
+	UE_LOG(LogTemp, Log, TEXT("%f, %s HealthPointChange() 적용됨"), Amount, *Causer->GetName());
+	Stat->ApplyDamage(Amount);
+}
+
 void AVMCharacterHeroBase::ChangeInputMode(EInputMode NewMode)
 {
 	APlayerController* PC = Cast<APlayerController>(GetController());
