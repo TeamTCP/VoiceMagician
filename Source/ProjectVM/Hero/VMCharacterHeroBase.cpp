@@ -37,8 +37,10 @@ AVMCharacterHeroBase::AVMCharacterHeroBase()
 	GetCharacterMovement()->BrakingFrictionFactor = 0.1f;
 	GetCharacterMovement()->GroundFriction = 8.f;
 
+	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -100.0f), FRotator(0.0f, -90.0f, 0.0f));
+	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
-	
+
 
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);

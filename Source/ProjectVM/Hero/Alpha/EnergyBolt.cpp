@@ -9,6 +9,8 @@
 #include "DrawDebugHelpers.h"
 
 #include "CollisionQueryParams.h"
+#include "Interface/VMStatChangeable.h"
+#include "Kismet/GameplayStatics.h"
 
 UEnergyBolt::UEnergyBolt(const FObjectInitializer& ObjectInitializer)
 {
@@ -28,9 +30,8 @@ void UEnergyBolt::ActivateSkill(AVMCharacterHeroBase* Owner, FHeroStat& CurStat)
 	TArray<FOverlapResult> Targets;
 	FVector Center = Owner->GetActorLocation();
 	FCollisionShape CollisionShape = FCollisionShape::MakeSphere(1000.0f);
-	// FCollisionQueryParams FCQP(SCENE_QUERY_STAT(Attack), false, this);
 
-	bool HitDetected = Owner->GetWorld()->OverlapMultiByChannel(Targets, Center, FQuat::Identity, ECC_GameTraceChannel2, CollisionShape);
+	bool HitDetected = Owner->GetWorld()->OverlapMultiByChannel(Targets, Center, FQuat::Identity, ECC_GameTraceChannel3, CollisionShape);
 	
 	FColor DrawDebugColor = FColor::Green;
 	if (HitDetected) DrawDebugColor = FColor::Red;
@@ -42,7 +43,17 @@ void UEnergyBolt::ActivateSkill(AVMCharacterHeroBase* Owner, FHeroStat& CurStat)
 	for (const FOverlapResult& Target : Targets)
 	{
 		UE_LOG(LogTemp, Log, TEXT("발견한 타겟 : %s"), *Target.GetActor()->GetName());
-		AVMEnergyBoltProjectile* Projectile = Owner->GetWorld()->SpawnActor<AVMEnergyBoltProjectile>(AVMEnergyBoltProjectile::StaticClass(), Owner->GetActorLocation(), FRotator::ZeroRotator);
-		Projectile->BindTarget(Target.GetActor());
+		
+		IVMStatChangeable* StatChangeable = Cast<IVMStatChangeable>(Target.GetActor());
+
+		if (StatChangeable)
+		{
+			UE_LOG(LogTemp, Log, TEXT("%s 충돌 !"), *Target.GetActor()->GetName());
+			
+			StatChangeable->HealthPointChange(10.f, UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+		}
+		
+		//AVMEnergyBoltProjectile* Projectile = Owner->GetWorld()->SpawnActor<AVMEnergyBoltProjectile>(AVMEnergyBoltProjectile::StaticClass(), Owner->GetActorLocation(), FRotator::ZeroRotator);
+		//Projectile->BindTarget(Target.GetActor());
 	}
 }
