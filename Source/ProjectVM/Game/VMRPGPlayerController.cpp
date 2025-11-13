@@ -4,21 +4,31 @@
 #include "Game/VMRPGPlayerController.h"
 #include "UI/Common/VMGameScreen.h"
 #include "UI/Dialogue/VMNPCDialogueScreen.h"
+#include "UI/Shop/VMShopScreen.h"
 
 AVMRPGPlayerController::AVMRPGPlayerController()
 {
+	//게임 스크린 로드
 	static ConstructorHelpers::FClassFinder<UVMGameScreen> VMGameScreenRef(TEXT("/Game/Project/UI/WBP_VMGameScreen.WBP_VMGameScreen_C"));
 	if (VMGameScreenRef.Succeeded())
 	{
 		VMGameScreenClass = VMGameScreenRef.Class;
 	}
 
-	//대화 위젯 클래스 로드
-	static ConstructorHelpers::FClassFinder<UVMNPCDialogueScreen> VMNPCDialogueRef(TEXT("/Game/Project/UI/WBP_VMNPCDialogueScreen.WBP_VMNPCDialogueScreen_C"));
+	//대화 스크린 로드
+	static ConstructorHelpers::FClassFinder<UVMNPCDialogueScreen> VMNPCDialogueScreenRef(TEXT("/Game/Project/UI/WBP_VMNPCDialogueScreen.WBP_VMNPCDialogueScreen_C"));
 
-	if (VMNPCDialogueRef.Succeeded())
+	if (VMNPCDialogueScreenRef.Succeeded())
 	{
-		VMNPCDialogueClass = VMNPCDialogueRef.Class;
+		VMNPCDialogueScreenClass = VMNPCDialogueScreenRef.Class;
+	}
+
+	//상점 스크린 로드
+	static ConstructorHelpers::FClassFinder<UVMShopScreen> VMShopScreenRef(TEXT("/Game/Project/UI/WBP_VMShopScreen.WBP_VMShopScreen_C"));
+
+	if (VMShopScreenRef.Succeeded())
+	{
+		VMShopScreenClass = VMShopScreenRef.Class;
 	}
 
 }
@@ -72,14 +82,25 @@ void AVMRPGPlayerController::BeginPlay()
 		}
 	}
 
-	if (VMNPCDialogueClass != nullptr)
+	if (VMNPCDialogueScreenClass != nullptr)
 	{
-		VMNPCDialogueScreen = CreateWidget<UVMNPCDialogueScreen>(this, VMNPCDialogueClass);
+		VMNPCDialogueScreen = CreateWidget<UVMNPCDialogueScreen>(this, VMNPCDialogueScreenClass);
 		if (VMNPCDialogueScreen != nullptr)
 		{
 			VMNPCDialogueScreen->AddToViewport();
 			VMNPCDialogueScreen->SetVisibility(ESlateVisibility::Hidden);
 			ScreenUIMap.Add(EScreenUIType::DialogueScreen, VMNPCDialogueScreen);
+		}
+	}
+
+	if (VMShopScreenClass != nullptr)
+	{
+		VMShopScreen = CreateWidget<UVMShopScreen>(this, VMShopScreenClass);
+		if (VMShopScreen != nullptr)
+		{
+			VMShopScreen->AddToViewport();
+			VMShopScreen->SetVisibility(ESlateVisibility::Hidden);
+			ScreenUIMap.Add(EScreenUIType::ShopScreen, VMShopScreen);
 		}
 	}
 }

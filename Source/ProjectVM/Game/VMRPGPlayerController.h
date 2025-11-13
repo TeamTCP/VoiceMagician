@@ -38,9 +38,15 @@ protected:
 
 	//NPC 대화 스크린
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
-	TSubclassOf<class UVMNPCDialogueScreen> VMNPCDialogueClass;
+	TSubclassOf<class UVMNPCDialogueScreen> VMNPCDialogueScreenClass;
 	UPROPERTY()
 	class UVMNPCDialogueScreen* VMNPCDialogueScreen;
+
+	//상점 스크린
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<class UVMShopScreen> VMShopScreenClass;
+	UPROPERTY()
+	class UVMShopScreen* VMShopScreen;
 
 	UPROPERTY()
 	TMap<EScreenUIType, UUserWidget*> ScreenUIMap;

@@ -48,6 +48,10 @@ void UVMDialogueOptionWidget::OnOptionButtonClicked()
 		break;
 	case ENPCOption::QuestClear:
 		Option->OwnerNPC->QuestCompleted();
+		break;
+	case ENPCOption::Shop:
+		Option->OwnerNPC->EnterShop();
+		break;
 	case ENPCOption::Exit:
 		Option->OwnerNPC->EndDialogue();
 		break;

@@ -23,6 +23,6 @@ UENUM(BlueprintType)
 enum class EScreenUIType : uint8
 {
 	GameScreen		UMETA(DisplayName = "GameScreen"),		// 게임 스크린
-	InventoryScreen UMETA(DisplayName = "InventoryScreen"),	// 인벤토리 스크린
-	DialogueScreen	UMETA(DisplayName = "DialogueScreen")	// 대화 스크린
+	DialogueScreen	UMETA(DisplayName = "DialogueScreen"),	// 대화 스크린
+	ShopScreen		UMETA(DisplayName = "ShopScreen")		// 상점 스크린
 };

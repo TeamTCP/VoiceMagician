@@ -27,7 +27,7 @@ AVMNPC::AVMNPC()
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	//초기 값 설정
-	NPCType = ENPCType::Bob;
+	NPCType = ENPCType::Buzz;
 
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
@@ -61,18 +61,6 @@ AVMNPC::AVMNPC()
 	{
 		InteractKey->SetWidgetClass(InterectWidgetRef.Class);
 	}
-
-	//대화 위젯 클래스 로드
-	//static ConstructorHelpers::FClassFinder<UVMNPCDialogueScreen> NPCDialogueRef(TEXT("/Game/Project/UI/WBP_VMNPCDialogueScreen.WBP_VMNPCDialogueScreen_C"));
-
-	//if (NPCDialogueRef.Succeeded())
-	//{
-	//	VMNPCDialogueClass = NPCDialogueRef.Class;
-	//}
-	//else
-	//{
-	//	UE_LOG(LogTemp, Log, TEXT("Not Class"));
-	//}
 }
 
 // Called when the game starts or when spawned
@@ -118,36 +106,6 @@ void AVMNPC::BeginPlay()
 	}
 }
 
-//void AVMNPC::SelectDialogueOption()
-//{
-//	AVMRPGPlayerController* PC = Cast<AVMRPGPlayerController>(GetWorld()->GetFirstPlayerController());
-//	if (PC == nullptr)
-//	{
-//		return;
-//	}
-//	UVMNPCDialogueScreen* Dialogue = Cast<UVMNPCDialogueScreen>(PC->GetScreen(EScreenUIType::DialogueScreen));
-//	if (Dialogue == nullptr)
-//	{
-//		return;
-//	}
-//
-//	Dialogue->DialogueOptionList->ClearListItems();
-//
-//	AddDialogueOption(ENPCOption::Talk);
-//	if (!AvailableQuests.IsEmpty())
-//	{
-//		AddDialogueOption(ENPCOption::Quest);
-//	}
-//	if (!CompletedQuests.IsEmpty())
-//	{
-//		AddDialogueOption(ENPCOption::QuestClear);
-//	}
-//	AddDialogueOption(ENPCOption::Exit);
-//
-//}
-
-
-
 void AVMNPC::AddDialogueOption(ENPCOption NewNPCOption)
 {
 	AVMRPGPlayerController* PC = Cast<AVMRPGPlayerController>(GetWorld()->GetFirstPlayerController());
@@ -169,6 +127,20 @@ void AVMNPC::AddDialogueOption(ENPCOption NewNPCOption)
 
 }
 
+void AVMNPC::SetDialogueOption()
+{
+	AddDialogueOption(ENPCOption::Talk);
+	if (!AvailableQuests.IsEmpty())
+	{
+		AddDialogueOption(ENPCOption::Quest);
+	}
+	if (!CompletedQuests.IsEmpty())
+	{
+		AddDialogueOption(ENPCOption::QuestClear);
+	}
+	AddDialogueOption(ENPCOption::Exit);
+}
+
 void AVMNPC::TalkSetting(FString TalkType)
 {
 	DialogueTexts.Empty();
@@ -186,6 +158,7 @@ void AVMNPC::TalkSetting(FString TalkType)
 		DialogueTexts.Add(VMNPCTalk);
 	} while (!VMNPCTalk->bIsLastLine);
 }
+
 
 // Called every frame
 void AVMNPC::Tick(float DeltaTime)
@@ -241,20 +214,14 @@ void AVMNPC::Interact()
 
 	Dialogue->SetNPCName(NPCData.GetNPCName());
 	Dialogue->DialogueOptionList->ClearListItems();
-	AddDialogueOption(ENPCOption::Talk);
-	if (!AvailableQuests.IsEmpty())
-	{
-		AddDialogueOption(ENPCOption::Quest);
-	}
-	if (!CompletedQuests.IsEmpty())
-	{
-		AddDialogueOption(ENPCOption::QuestClear);
-	}
-	AddDialogueOption(ENPCOption::Exit);
+
+	SetDialogueOption();
 
 	PC->ShowScreen(EScreenUIType::DialogueScreen);
-	//Dialogue->SetVisibility(ESlateVisibility::Visible);
+
+	CurrentDialogueIndex = 0;
 	NextDialogue();
+
 }
 
 bool AVMNPC::NextDialogue()
@@ -358,12 +325,14 @@ void AVMNPC::StartDailyTalk()
 	TalkSetting(NewTalkType);
 
 	Dialogue->DialogueOptionList->ClearListItems();
-	AddDialogueOption(ENPCOption::Talk);
-	if (!AvailableQuests.IsEmpty())
-	{
-		AddDialogueOption(ENPCOption::Quest);
-	}
-	AddDialogueOption(ENPCOption::Exit);
+
+	SetDialogueOption();
+	//AddDialogueOption(ENPCOption::Talk);
+	//if (!AvailableQuests.IsEmpty())
+	//{
+	//	AddDialogueOption(ENPCOption::Quest);
+	//}
+	//AddDialogueOption(ENPCOption::Exit);
 
 	NextDialogue();
 }
@@ -433,3 +402,7 @@ void AVMNPC::AcceptQuest()
 	GetGameInstance()->GetSubsystem<UVMQuestManager>()->AcceptQuest(*QuestData);
 }
 
+void AVMNPC::EnterShop()
+{
+	//자식에서 구현
+}

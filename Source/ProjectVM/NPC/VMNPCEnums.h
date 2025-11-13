@@ -7,11 +7,10 @@ UENUM(BlueprintType)
 enum class ENPCType : uint8
 {
     None  UMETA(DisplayName = "없음"),           // 기본값
-    Bob   UMETA(DisplayName = "마을 주민 밥"),   // 마을 주민 Bob
-    Sue   UMETA(DisplayName = "상점 주인 수"),   // 상점 주인 Sue
-    Tom   UMETA(DisplayName = "연구가 톰"),     // 연구가 NPC Tom
-    Anna  UMETA(DisplayName = "경비 안나"),     // 경비 Anna
-	Chicken UMETA(DisplayName = "애완용 닭")    // 닭 (동물 NPC)
+    Bob  UMETA(DisplayName = "마을 주민 밥"),   // 마을 주민 밥
+    Buzz  UMETA(DisplayName = "상점 주인 바즈"),  // 상점 주인 바즈
+    Anna  UMETA(DisplayName = "마법사 안나"),     // 마법사 안나
+	Chicken UMETA(DisplayName = "래퍼 치킨")    // 래퍼 치킨
 };
 
 //NPC 대화 옵션

@@ -43,18 +43,13 @@ public:
 	virtual void Interact();
 	bool NextDialogue();
 
-	UFUNCTION()
+	//옵션 호출 함수
 	void StartQuest();
-
-	UFUNCTION()
 	void QuestCompleted();
-
-	UFUNCTION()
 	void StartDailyTalk();
-	UFUNCTION()
 	void EndDialogue();
-	UFUNCTION()
 	void AcceptQuest();
+	virtual void EnterShop(); //상점 호출 함수, 자식에서 구현
 
 protected:
 	// Called when the game starts or when spawned
@@ -65,6 +60,7 @@ protected:
 
 	//다이얼로그에 옵션 추가하는 함수
 	void AddDialogueOption(ENPCOption NewNPCOption);
+	virtual void SetDialogueOption();
 
 	void TalkSetting(FString TalkType);
 
