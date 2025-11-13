@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AI/Enemies/VMEnemySpawnBase.h"
+#include "AI/VMEnemyBase.h"
 #include "VMEnemySpawnMelee.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECTVM_API AVMEnemySpawnMelee : public AVMEnemySpawnBase
+class PROJECTVM_API AVMEnemySpawnMelee : public AVMEnemyBase
 {
 	GENERATED_BODY()
 	

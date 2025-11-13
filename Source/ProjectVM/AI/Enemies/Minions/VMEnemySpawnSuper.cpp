@@ -1,9 +1,9 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "AI/Enemies/VMEnemySpawnMelee.h"
+#include "AI/Enemies/Minions/VMEnemySpawnSuper.h"
 
-AVMEnemySpawnMelee::AVMEnemySpawnMelee()
+AVMEnemySpawnSuper::AVMEnemySpawnSuper()
 {
 	GetMesh()->SetRelativeLocation(FVector(0, 0, -88));
 	GetMesh()->SetRelativeRotation(FRotator(0, -90, 0));
@@ -17,7 +17,7 @@ AVMEnemySpawnMelee::AVMEnemySpawnMelee()
 
 	// Skeletal Mesh 입히기
 #pragma region SkeletalMesh
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> MeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/ParagonMinions/Characters/Minions/Down_Minions/Meshes/Minion_Lane_Melee_Dawn.Minion_Lane_Melee_Dawn'"));
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> MeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/ParagonMinions/Characters/Minions/Dusk_Minions/Meshes/Minion_Lane_Super_Dusk.Minion_Lane_Super_Dusk'"));
 	ensureAlways(MeshRef.Object);
 	if (MeshRef.Object)
 	{

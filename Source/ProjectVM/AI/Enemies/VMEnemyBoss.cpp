@@ -6,7 +6,7 @@
 #include "AIController.h"
 #include "Components/CapsuleComponent.h"
 
-#include "AI/Enemies/VMEnemySpawnMelee.h"
+#include "AI/Enemies/Minions/VMEnemySpawnMelee.h"
 
 // Sets default values
 AVMEnemyBoss::AVMEnemyBoss()
