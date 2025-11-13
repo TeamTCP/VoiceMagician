@@ -43,19 +43,26 @@ public:
 	virtual void Interact();
 	bool NextDialogue();
 
-	UFUNCTION()
+	//옵션 호출 함수
 	void StartQuest();
-	UFUNCTION()
+	void QuestCompleted();
 	void StartDailyTalk();
-	UFUNCTION()
 	void EndDialogue();
+	void AcceptQuest();
+	virtual void EnterShop(); //상점 호출 함수, 자식에서 구현
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	//대화 다이얼로그에 아이템 추가하는 함수
+	//다이얼로그에 들어갈 옵션 정하는 함수
+	//virtual void SelectDialogueOption();
+
+	//다이얼로그에 옵션 추가하는 함수
 	void AddDialogueOption(ENPCOption NewNPCOption);
+	virtual void SetDialogueOption();
+
+	void TalkSetting(FString TalkType);
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Widget)
@@ -77,10 +84,16 @@ protected:
 	class UBoxComponent* InteractKeyBoxComponent;
 
 	//대화 위젯
-	class UVMNPCDialogue* VMNPCDialogue;
-	TSubclassOf<class UVMNPCDialogue> VMNPCDialogueClass;
+	//class UVMNPCDialogueScreen* VMNPCDialogue;
+	//TSubclassOf<class UVMNPCDialogueScreen> VMNPCDialogueClass;
 
 	//대화 데이터 포인터로 저장
 	TArray<struct FVMNPCTalkData*> DialogueTexts;
 	int32 CurrentDialogueIndex = 0;
+
+	//일상 대화 총 갯수 
+	static constexpr int32 DailyTalkCount = 5;
+
+	TQueue<const struct FVMQuestData*> AvailableQuests; //수락 가능한 퀘스트
+	TQueue< struct FVMQuestData> CompletedQuests; //완료된 퀘스트
 };
