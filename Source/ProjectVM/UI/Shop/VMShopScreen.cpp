@@ -67,6 +67,8 @@ void UVMShopScreen::SetShop(const TArray<FVMEquipmentInfo>& ShopItems)
 
         NewItemWidget->SetUp(Item);
         NewItemWidget->ShopScreen = this;
+
+        //그리드 5열
         int32 Row = Index / 5;
         int32 Col = Index % 5;
         ShopGridPanel->AddChildToUniformGrid(NewItemWidget, Row, Col);

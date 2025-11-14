@@ -22,7 +22,7 @@ public:
 	UVMEquipment* CreateRandomBaseEquipment();
 	UVMEquipment* CreateEquipmentByName(FName Name);
 	UVMEquipment* CraftEquipment(UVMEquipment* BaseEquipment1, UVMEquipment* BaseEquipment2);
-
+	   
 protected:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 

@@ -24,8 +24,8 @@ void UVMShopItemWidget::SetUp(const FVMEquipmentInfo& Info)
 	//머터리얼 파라미터 설정
 	if (ItemMaterialInstance)
 	{
-		ItemMaterialInstance->SetScalarParameterValue(TEXT("ColumnIndex"), 1);
-		ItemMaterialInstance->SetScalarParameterValue(TEXT("RowIndex"), 1);
+		ItemMaterialInstance->SetScalarParameterValue(TEXT("ColumnIndex"), Info.AtlasCol);
+		ItemMaterialInstance->SetScalarParameterValue(TEXT("RowIndex"), Info.AtlasRow);
 	}
 
 	EquipmentInfo = &Info; //복사 없이 주소만 저장한다.
