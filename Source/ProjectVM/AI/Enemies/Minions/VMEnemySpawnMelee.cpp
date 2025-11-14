@@ -37,5 +37,7 @@ AVMEnemySpawnMelee::AVMEnemySpawnMelee()
 
 void AVMEnemySpawnMelee::BeginPlay()
 {
+	Super::BeginPlay();
+
 	SetMonsterType(EMonsterName::MinionMelee);
 }
