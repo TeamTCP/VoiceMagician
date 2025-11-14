@@ -5,6 +5,7 @@
 #include "GameData/VMQuestData.h"
 #include "Core/GameEnums.h"
 #include "Game/VMRPGPlayerController.h"
+#include "Shop/VMShopComponent.h"
 
 AVMBuzzNPC::AVMBuzzNPC()
 {
@@ -29,6 +30,10 @@ AVMBuzzNPC::AVMBuzzNPC()
 
 	InteractKey->SetWorldLocation(FVector(40.0f, 0.0f, -20.0f));
 	InteractKeyBoxComponent->SetBoxExtent(FVector(200.0f, 200.0f, 320.0f));
+
+	ShopComponent = CreateDefaultSubobject<UVMShopComponent>(TEXT("ShopComponent"));
+	
+
 }
 
 void AVMBuzzNPC::EnterShop()
@@ -39,6 +44,7 @@ void AVMBuzzNPC::EnterShop()
 		return;
 	}
 
+	ShopComponent->SetShop();
 	PC->ShowScreen(EScreenUIType::ShopScreen);
 }
 

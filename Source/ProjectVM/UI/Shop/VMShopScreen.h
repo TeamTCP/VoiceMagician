@@ -1,9 +1,10 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Item/Equipment/VMEquipmentInfo.h"
 #include "VMShopScreen.generated.h"
 
 /**
@@ -14,8 +15,15 @@ class PROJECTVM_API UVMShopScreen : public UUserWidget
 {
 	GENERATED_BODY()
 public:
-	//Initialize´Â WBP À§Á¬°ú ¿¬µ¿ Àü¿¡ È£ÃâµÉ ¼ö ÀÖ´Ù. ¾ÈÀüÇÏ°Ô NativeConstruct()¿¡¼­ ÃÊ±âÈ­ ÁøÇà
+	UVMShopScreen(const FObjectInitializer& ObjectInitializer);
+	//InitializeëŠ” WBP ìœ„ì ¯ê³¼ ì—°ë™ ì „ì— í˜¸ì¶œë  ìˆ˜ ìˆë‹¤. ì•ˆì „í•˜ê²Œ NativeConstruct()ì—ì„œ ì´ˆê¸°í™” ì§„í–‰
 	virtual void NativeConstruct() override;
+
+public:
+	void SetShop(const TArray<FVMEquipmentInfo>& ShopItems);
+
+	UFUNCTION()
+	void OnGridItemButtonClicked(const FVMEquipmentInfo &ClickedItemInfo);
 
 private:
 	UFUNCTION()
@@ -27,10 +35,17 @@ private:
 	UFUNCTION()
 	void OnExitClicked();
 
-	//¹öÆ° ½ºÅ¸ÀÏ º¯°æ ÇÔ¼ö
+	//ë²„íŠ¼ ìŠ¤íƒ€ì¼ ë³€ê²½ í•¨ìˆ˜
 	void UpdateButtonStyle();
 
 public:
+	// ìœ ë‹ˆí¼ ê·¸ë¦¬ë“œ íŒ¨ë„ ì°¸ì¡°
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UUniformGridPanel> ShopGridPanel;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UListView> ShopListView;
+
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UButton> BuyButton;
 
@@ -42,4 +57,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Button")
 	bool bIsBuy = true;
+
+protected:
+	TSubclassOf<class UVMShopItemWidget> ShopItemWidgetClass;
 };
