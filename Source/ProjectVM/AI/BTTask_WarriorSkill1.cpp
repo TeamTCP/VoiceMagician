@@ -46,6 +46,7 @@ EBTNodeResult::Type UBTTask_WarriorSkill1::ExecuteTask(UBehaviorTreeComponent& O
 
 	return EBTNodeResult::Failed;
 }
+
 void UBTTask_WarriorSkill1::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
 	if (!bIsAttacking)

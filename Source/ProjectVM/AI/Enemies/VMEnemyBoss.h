@@ -65,4 +65,8 @@ public:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Anim, meta = (AllowPrivateAccess = true))
 	TObjectPtr<UAnimMontage> SummonMontage;
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Anim, meta = (AllowPrivateAccess = true))
+	TArray<TSubclassOf<class AVMEnemySpawnBase>> EnemySpawnArray;
 };

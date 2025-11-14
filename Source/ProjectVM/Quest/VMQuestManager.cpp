@@ -101,6 +101,8 @@ void UVMQuestManager::NotifyMonsterDeath(EMonsterName MonsterType)
 	UE_LOG(LogTemp, Log, TEXT("몬스터 죽음 : %s"), *UEnum::GetValueAsString(MonsterType));
 
 	FName Target;
+
+	// TODO: 상윤님 CSV 변경 부분
 	switch (MonsterType)
 	{
 	case EMonsterName::Warrior:
@@ -112,8 +114,17 @@ void UVMQuestManager::NotifyMonsterDeath(EMonsterName MonsterType)
 	case EMonsterName::Archer:
 		Target = "Archer";
 		break;
-	case EMonsterName::Minion:
-		Target = "Minion";
+	case EMonsterName::MinionMelee:
+		Target = "MinionMelee";
+		break;
+	case EMonsterName::MinionRanged:
+		Target = "MinionRanged";
+		break;
+	case EMonsterName::MinionSiege:
+		Target = "MinionSiege";
+		break;
+	case EMonsterName::MinionSuper:
+		Target = "MinionSuper";
 		break;
 	case EMonsterName::Boss:
 		Target = "Boss";

@@ -19,6 +19,8 @@ public:
 
 #pragma region 엔진_제공_함수
 protected:
+	virtual void BeginPlay() override;
+
 	// 컨트롤러가 폰에 빙의했을 때 실행되는 함수.
 	virtual void OnPossess(APawn* InPawn) override;
 

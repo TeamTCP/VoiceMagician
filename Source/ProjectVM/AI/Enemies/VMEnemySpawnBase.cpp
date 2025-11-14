@@ -3,6 +3,11 @@
 
 #include "AI/Enemies/VMEnemySpawnBase.h"
 
+#include "Components/CapsuleComponent.h"
+#include "Quest/VMQuestManager.h"
+
+#include "Macro/VMPhysics.h"
+
 // Sets default values
 AVMEnemySpawnBase::AVMEnemySpawnBase()
 {
@@ -11,8 +16,10 @@ AVMEnemySpawnBase::AVMEnemySpawnBase()
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
+	GetCapsuleComponent()->SetCollisionProfileName(VM_ENEMY_COLLISION);
+
 	GetMesh()->SetRelativeRotation(FRotator(0, -90, 0));
-	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
+	GetMesh()->SetCollisionProfileName(NOCOLLISION);
 
 	InitDefaultAssetSetting();
 }
@@ -36,6 +43,20 @@ void AVMEnemySpawnBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+void AVMEnemySpawnBase::HealthPointChange(float Amount, AActor* Causer)
+{
+	UE_LOG(LogTemp, Log, TEXT("AVMEnemySpawnBase::HealthPointChange Damage:%f Causer: %s"), Amount, *Causer->GetName());
+
+	SetCurrentHp(FMath::Clamp<float>(GetCurrentHp() - Amount, 0, GetMaxHp()));
+
+	if (GetCurrentHp() < KINDA_SMALL_NUMBER)
+	{
+		UE_LOG(LogTemp, Log, TEXT("몬스터가 죽었습니다"));
+		GetGameInstance()->GetSubsystem<UVMQuestManager>()->NotifyMonsterDeath(GetMonsterType());
+		Destroy();
+	}
 }
 
 void AVMEnemySpawnBase::OnHealHp(float HealGauge)

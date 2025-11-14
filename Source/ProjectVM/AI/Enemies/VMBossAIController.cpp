@@ -4,6 +4,8 @@
 #include "AI/Enemies/VMBossAIController.h"
 #include "VMBossAIController.h"
 
+#include "Interface/VMStatChangeable.h"
+
 #include "BehaviorTree/BlackboardData.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"

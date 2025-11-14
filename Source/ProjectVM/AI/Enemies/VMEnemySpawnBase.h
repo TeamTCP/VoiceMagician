@@ -6,12 +6,18 @@
 #include "GameFramework/Character.h"
 
 #include "Interface/EnemyHealInterface.h"
+#include "Interface/VMStatChangeable.h"
+
+#include "Quest/VMQuestManager.h"
+
+#include "Core/VMMonsterEnums.h"
 
 #include "VMEnemySpawnBase.generated.h"
 
 UCLASS()
 class PROJECTVM_API AVMEnemySpawnBase : public ACharacter
 	, public IEnemyHealInterface
+	, public IVMStatChangeable
 {
 	GENERATED_BODY()
 
@@ -30,6 +36,22 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	//virtual void HealthPointChange(float Amount, AActor* Causer) override;
+
+
+#pragma region EnemyStatComponent 임시용
+public: // Stat	
+	FORCEINLINE float	GetCurrentHp() { return CurrentHp; }
+	FORCEINLINE void	SetCurrentHp(float InCurrentHp) { CurrentHp = InCurrentHp; }
+	FORCEINLINE float	GetMaxHp() { return MaxHp; }
+	FORCEINLINE void	SetMaxHp(float InMaxHp) { MaxHp = InMaxHp; }
+#pragma endregion
+
+#pragma region IVMStatChangeable
+public:
+	virtual void HealthPointChange(float Amount, AActor* Causer) override;
+#pragma endregion 
+
 public:
 	virtual void OnHealHp(float HealGauge) override;
 
@@ -40,4 +62,10 @@ public:
 
 private:
 	void InitDefaultAssetSetting();
+
+public:
+	FORCEINLINE EMonsterName GetMonsterType() { return MonsterType; }
+	FORCEINLINE void SetMonsterType(EMonsterName InMonsterType) { MonsterType = InMonsterType; }
+private:
+	EMonsterName MonsterType = EMonsterName::None;
 };

@@ -6,7 +6,10 @@
 #include "AIController.h"
 #include "Components/CapsuleComponent.h"
 
-#include "AI/Enemies/VMEnemySpawnMelee.h"
+#include "AI/Enemies/Minions/VMEnemySpawnMelee.h"
+#include "AI/Enemies/Minions/VMEnemySpawnRanged.h"
+#include "AI/Enemies/Minions/VMEnemySpawnSiege.h"
+#include "AI/Enemies/Minions/VMEnemySpawnSuper.h"
 
 // Sets default values
 AVMEnemyBoss::AVMEnemyBoss()
@@ -21,6 +24,11 @@ AVMEnemyBoss::AVMEnemyBoss()
 	
 	// AI 세팅
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
+	EnemySpawnArray.Push(AVMEnemySpawnMelee::StaticClass());
+	EnemySpawnArray.Push(AVMEnemySpawnRanged::StaticClass());
+	EnemySpawnArray.Push(AVMEnemySpawnSiege::StaticClass());
+	EnemySpawnArray.Push(AVMEnemySpawnSuper::StaticClass());
 }
 
 void AVMEnemyBoss::InitDefaultSetting()
@@ -94,7 +102,11 @@ void AVMEnemyBoss::SummonMinion(FVector Pos)
 	//FVector CurretLocation = GetActorLocation();
 	FVector SummonLocation = Pos;
 	FTransform SummonTransform(SummonLocation);
-	AVMEnemySpawnMelee* SpawnActor = GetWorld()->SpawnActor<AVMEnemySpawnMelee>(AVMEnemySpawnMelee::StaticClass(), SummonTransform);
+	
+
+	int32 Index = FMath::RandRange(0, EnemySpawnArray.Num() - 1);
+	AVMEnemySpawnBase* SpawnActor = GetWorld()->SpawnActor<AVMEnemySpawnBase>(EnemySpawnArray[Index], SummonTransform);
+
 	if (SpawnActor == nullptr)
 	{
 		return;

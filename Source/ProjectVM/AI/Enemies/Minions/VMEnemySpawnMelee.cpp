@@ -1,7 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "AI/Enemies/VMEnemySpawnMelee.h"
+#include "AI/Enemies/Minions/VMEnemySpawnMelee.h"
 
 AVMEnemySpawnMelee::AVMEnemySpawnMelee()
 {
@@ -33,4 +33,9 @@ AVMEnemySpawnMelee::AVMEnemySpawnMelee()
 		AIControllerClass = AIControllerClassRef.Class;
 	}
 #pragma endregion
+}
+
+void AVMEnemySpawnMelee::BeginPlay()
+{
+	SetMonsterType(EMonsterName::MinionMelee);
 }

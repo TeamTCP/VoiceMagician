@@ -172,6 +172,8 @@ void AVMEnemyBase::HealthPointChange(float Amount, AActor* Causer)
 	if (GetCurrentHp() < KINDA_SMALL_NUMBER)
 	{
 		UE_LOG(LogTemp, Log, TEXT("몬스터가 죽었습니다"));
+
+		Destroy();
 	}
 }
 
@@ -202,8 +204,6 @@ void AVMEnemyBase::HealthPointChange(float Amount, AActor* Causer)
 //}
 
 #pragma endregion
-
-
 
 void AVMEnemyBase::LaserAttackHitCheck()
 {

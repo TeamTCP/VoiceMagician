@@ -10,7 +10,7 @@
 #include "AI/Enemies/VMEnemyBoss.h"
 UBTTask_HealAllMinionsAndBoss::UBTTask_HealAllMinionsAndBoss()
 {
-	NodeName = TEXT("SummonMinions");
+	NodeName = TEXT("HealMinions");
 	bNotifyTick = true;
 	bNotifyTaskFinished = true;
 }

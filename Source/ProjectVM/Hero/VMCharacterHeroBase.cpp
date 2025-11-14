@@ -48,6 +48,8 @@ AVMCharacterHeroBase::AVMCharacterHeroBase()
 	CameraBoom->TargetArmLength = 300.0f;
 	CameraBoom->bUsePawnControlRotation = true;
 
+	CameraBoom->bDoCollisionTest = false;
+
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, 200.0f), FRotator(-30.0f, 0.0f, 0.0f));
