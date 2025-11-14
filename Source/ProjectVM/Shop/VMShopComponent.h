@@ -29,4 +29,7 @@ public:
 private:
 	UPROPERTY()
 	TArray<struct FVMEquipmentInfo> ShopItems;
+
+	UPROPERTY()
+	TArray<struct FVMEquipmentInfo> InventoryItems;
 };

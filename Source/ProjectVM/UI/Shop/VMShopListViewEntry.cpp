@@ -41,8 +41,8 @@ void UVMShopListViewEntry::NativeOnListItemObjectSet(UObject* ListItemObject)
 
 	if (ItemMaterialInstance)
 	{
-		ItemMaterialInstance->SetScalarParameterValue(TEXT("ColumnIndex"), 1);
-		ItemMaterialInstance->SetScalarParameterValue(TEXT("RowIndex"), 1);
+		ItemMaterialInstance->SetScalarParameterValue(TEXT("ColumnIndex"), ShopItemDataObject->EquipmentInfo->AtlasCol);
+		ItemMaterialInstance->SetScalarParameterValue(TEXT("RowIndex"), ShopItemDataObject->EquipmentInfo->AtlasRow);
 	}
 
 	//아이템 변경사항 구독
