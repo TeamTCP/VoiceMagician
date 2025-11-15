@@ -17,9 +17,9 @@
 
 UCLASS()
 class PROJECTVM_API AVMEnemyBase : public ACharacter
-	, public IVMAIEnemyBaseInterface
 	, public IVMStatChangeable
 	, public IVMLaserAttackInterface
+	//, public IVMAIEnemyBaseInterface
 {
 	GENERATED_BODY()
 
@@ -38,12 +38,12 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 #pragma endregion
 
-#pragma region IVMAIEnemyBaseInterface
-	virtual float GetAIPatrolRadius() override;
-	virtual float GetAIDetectRange() override;
-	virtual float GetAIAttackRange() override;
-	virtual float GetAITurnSpeed() override;
-#pragma endregion
+//#pragma region IVMAIEnemyBaseInterface
+//	virtual float GetAIPatrolRadius() const override;
+//	virtual float GetAIDetectRange() override;
+//	virtual float GetAIAttackRange() override;
+//	virtual float GetAITurnSpeed() override;
+//#pragma endregion
 
 	
 
