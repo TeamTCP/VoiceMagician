@@ -23,7 +23,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-protected:
+public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Collision, Meta = (AllowPrivateAccess= true))
 	TObjectPtr<class UBoxComponent> Collider;
 
@@ -53,4 +53,7 @@ public:
 
 	UFUNCTION()
 	void HitAndDestroy(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+	void SetMaxSpeed(float InMaxSpeed);
+	void SetVelocity(float InWeight);
 };

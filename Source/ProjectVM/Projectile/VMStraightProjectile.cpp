@@ -14,6 +14,8 @@
 #include "ProjectVMCharacter.h"
 #include "AI/VMEnemyBase.h"
 
+#include "Interface/VMStatChangeable.h"
+
 // Sets default values
 AVMStraightProjectile::AVMStraightProjectile()
 {
@@ -78,10 +80,12 @@ AVMStraightProjectile::AVMStraightProjectile()
 	ProjectileMovement->ProjectileGravityScale = 0.0f;
 }
 
-// Called when the game starts or when spawned
 void AVMStraightProjectile::BeginPlay()
 {
 	Super::BeginPlay();
+
+	ProjectileMovement->InitialSpeed = InitialSpeed;
+	ProjectileMovement->MaxSpeed = MaxSpeed;
 
 	if (Collider)
 	{
@@ -89,7 +93,6 @@ void AVMStraightProjectile::BeginPlay()
 	}
 }
 
-// Called every frame
 void AVMStraightProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -107,18 +110,25 @@ void AVMStraightProjectile::HitAndDestroy(UPrimitiveComponent* HitComponent, AAc
 	UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, Hit.ImpactPoint);
 	
 
-	AProjectVMCharacter* Me = Cast<AProjectVMCharacter>(OtherActor);
+	IVMStatChangeable* PawnActor = Cast<IVMStatChangeable>(OtherActor);
 	// TODO: 데미지 주는 거 필요. 일단 Base에 넣는걸로 하자.
-	if (Me != nullptr)
+	if (PawnActor == nullptr)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Me 아야 ㅠㅠ"));
+		return;
 	}
-	AVMEnemyBase* Enemy = Cast<AVMEnemyBase>(OtherActor);
-	if (Enemy != nullptr)
-	{
-		UE_LOG(LogTemp, Log, TEXT("Enemy아야 ㅠㅠ"));
-	}
+
+	PawnActor->HealthPointChange(10, OtherActor);
 
 	// 객체 파괴
 	Destroy();
+}
+
+void AVMStraightProjectile::SetMaxSpeed(float InMaxSpeed)
+{ 
+	ProjectileMovement->MaxSpeed = MaxSpeed = InMaxSpeed;
+}
+
+void AVMStraightProjectile::SetVelocity(float InWeight)
+{
+	ProjectileMovement->Velocity = ProjectileMovement->Velocity.GetSafeNormal() * InWeight;
 }
