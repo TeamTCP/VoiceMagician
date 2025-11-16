@@ -3,14 +3,14 @@
 
 #include "Hero/Alpha/VMEnergyBoltProjectile.h"
 #include "Components/SplineComponent.h"
-
 #include "Components/SphereComponent.h"
-#include "Components/StaticMeshComponent.h"
 
 #include "Interface/VMStatChangeable.h"
 
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
+
+#include "Utils/VMMath.h"
 
 
 AVMEnergyBoltProjectile::AVMEnergyBoltProjectile()
@@ -19,64 +19,94 @@ AVMEnergyBoltProjectile::AVMEnergyBoltProjectile()
 
 	SplinePath = CreateDefaultSubobject<USplineComponent>(TEXT("SplinePath"));
 	RootComponent = SplinePath;
+	SplinePath->bDrawDebug = true;
 
 	SphereCollision = CreateDefaultSubobject<USphereComponent>(TEXT("SphereCollision"));
 	SphereCollision->SetupAttachment(RootComponent);
-	SphereCollision->SetSphereRadius(10.f);
-	SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &AVMEnergyBoltProjectile::HitTarget);
-	SphereCollision->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel2);
-
-	SphereMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SphereMesh"));
-	SphereMesh->SetupAttachment(SphereCollision);
-
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> SphereMeshAsset(TEXT("/Engine/BasicShapes/Sphere.Sphere"));
-	if (SphereMeshAsset.Succeeded())
-	{
-		SphereMesh->SetStaticMesh(SphereMeshAsset.Object);
-		SphereMesh->SetWorldScale3D(FVector(0.1f));
-	}
-
-	SphereMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SphereCollision->SetSphereRadius(1.f);
+	SphereCollision->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
 	SphereCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &AVMEnergyBoltProjectile::HitTarget);
+	
+	EnergyBoltEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("EnergyBoltEffect"));
+	EnergyBoltEffect->SetupAttachment(SphereCollision);
+	EnergyBoltEffect->SetAutoActivate(true);
+	EnergyBoltEffect->SetAutoDestroy(true);
 
-	/*EnergyBoltEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("EnergyBoltEffect"));
-	EnergyBoltEffect->SetupAttachment(RootComponent);
-	EnergyBoltEffect->bAutoActivate = true;
-	EnergyBoltEffect->SetAutoDestroy(true);*/
-
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> NiagaraSystemAsset(TEXT("/Game/_SplineVFX/NS/NS_Spline_EnergyLoop.NS_Spline_EnergyLoop"));
+	if (NiagaraSystemAsset.Succeeded())
+	{
+		EnergyBoltEffect->SetAsset(NiagaraSystemAsset.Object);
+		
+		EnergyBoltEffect->SetVariableFloat(TEXT("_ColorHue"), 0.5f);
+		EnergyBoltEffect->SetVariableFloat(TEXT("_Size"), 10.0f);
+		EnergyBoltEffect->SetVariableFloat(TEXT("_Speed"), 4.0f);
+		EnergyBoltEffect->SetVariableFloat(TEXT("Count"), 200.0f);
+		EnergyBoltEffect->SetVariableFloat(TEXT("Extent"), 10.0f);
+		EnergyBoltEffect->SetVariableFloat(TEXT("Noise"), 99.0f);
+		EnergyBoltEffect->SetVariableFloat(TEXT("Progress"), 1.0f);
+		
+		EnergyBoltEffect->SetVariableBool(TEXT("AddDetail"), true);
+		EnergyBoltEffect->SetVariableBool(TEXT("LightON"), false);
+		EnergyBoltEffect->SetVariableBool(TEXT("withHead"), false);
+	}
+	
 	Progress = 0.0f;
 }
 
-void AVMEnergyBoltProjectile::BindTarget(AActor* InTarget)
+void AVMEnergyBoltProjectile::BindOwnerAndTarget(AActor* InOwner, AActor* InTarget)
 {
-	if (InTarget == nullptr || InTarget->IsValidLowLevel() == false)
+	if (InOwner == nullptr || InOwner->IsValidLowLevel() == false)
 	{
-		UE_LOG(LogTemp, Log, TEXT("InTarget is nullptr"));
-		Destroy();
-
 		return;
 	}
 	
+	if (InTarget == nullptr || InTarget->IsValidLowLevel() == false)
+	{
+		return;
+	}
+	
+	SetOwner(InOwner);
 	Target = InTarget;
 
 	SplinePath->ClearSplinePoints();
-	SplinePath->AddSplinePoint(GetActorLocation(), ESplineCoordinateSpace::World);
-	SplinePath->AddSplinePoint(InTarget->GetActorLocation(), ESplineCoordinateSpace::World);
+
+	FVector StartLocation = InOwner->GetActorLocation();
+	FVector EndLocation = InTarget->GetActorLocation();
+
+	FVector CurveLocation = StartLocation + (EndLocation - StartLocation) * FMath::FRandRange(0.1f, 0.3f);
+	float RandomRadius = FMath::FRandRange(100.0f, 200.0f);
+	float RandomTheta = FMath::FRandRange(0.0f, HALF_PI);
+
+	FCircle3D Circle(CurveLocation, EndLocation - StartLocation, RandomRadius);
+	CurveLocation = Circle.GetLocation(RandomTheta);
+	DrawDebugCircle(GetWorld(), Circle.Center, Circle.Radius, 32, FColor::Green, false, 3.f, 0, 1.f, Circle.AxisX, Circle.AxisY, true);
+	
+	SplinePath->AddSplinePoint(StartLocation, ESplineCoordinateSpace::World);
+	SplinePath->SetSplinePointType(SplinePath->GetNumberOfSplinePoints(), ESplinePointType::Curve);
+	
+	SplinePath->AddSplinePoint(CurveLocation, ESplineCoordinateSpace::World);
+	SplinePath->SetSplinePointType(SplinePath->GetNumberOfSplinePoints(), ESplinePointType::Curve);
+	
+	SplinePath->AddSplinePoint(EndLocation, ESplineCoordinateSpace::World);
+	SplinePath->SetSplinePointType(SplinePath->GetNumberOfSplinePoints(), ESplinePointType::Linear);
+	
 	SplinePath->UpdateSpline();
 }
 
 void AVMEnergyBoltProjectile::HitTarget(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	// 몬스터 호출 로직
+	if (OtherActor != Target) return;
+	
 	IVMStatChangeable* StatChangeable = Cast<IVMStatChangeable>(OtherActor);
 
 	if (StatChangeable)
 	{
-		UE_LOG(LogTemp, Log, TEXT("%s 충돌 !"), *OtherActor->GetName());
+		UE_LOG(LogTemp, Log, TEXT("타겟 %s 충돌 !"), *OtherActor->GetName());
 		StatChangeable->HealthPointChange(10.f, this);
 	}
 
-	Destroy();
+	SphereCollision->SetActive(false);
 }
 
 void AVMEnergyBoltProjectile::BeginPlay()
@@ -88,15 +118,20 @@ void AVMEnergyBoltProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (Target == nullptr) return;
+	if (Target == nullptr)
+	{
+		Destroy();
+		return;
+	}
 
-	Progress += DeltaTime / 10 * 5;
+	Progress += DeltaTime * 2;
 	float SplineLength = SplinePath->GetSplineLength();
 	float TargetLength = SplineLength * Progress;
 	
 	FVector Pos = SplinePath->GetLocationAtDistanceAlongSpline(TargetLength, ESplineCoordinateSpace::World);
 	SphereCollision->SetWorldLocation(Pos);
 
-
-	if (Progress > 1.0f) Destroy();
+	EnergyBoltEffect->SetVariableVec3(TEXT("CollisionPos"), Pos);
+	
+	if (Progress > 3.0f) Destroy();
 }

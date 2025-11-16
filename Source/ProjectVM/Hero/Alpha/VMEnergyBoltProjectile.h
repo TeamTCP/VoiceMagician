@@ -14,8 +14,7 @@ class PROJECTVM_API AVMEnergyBoltProjectile : public AActor
 public:	
 	AVMEnergyBoltProjectile();
 
-public:
-	void BindTarget(AActor* InTarget);
+	void BindOwnerAndTarget(AActor* InOwner, AActor* InTarget);
 	UFUNCTION()
 	void HitTarget(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
@@ -30,15 +29,12 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Projectile, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class USphereComponent> SphereCollision;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Projectile, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UStaticMeshComponent> SphereMesh;
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Projectile, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UNiagaraComponent> EnergyBoltEffect;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Projectile, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class AActor> Target;
-
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Projectile, meta = (AllowPrivateAccess = "true"))
 	float Progress;
-
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Projectile, Meta = (AllowPrivateAccess = "true"))
-	//ObjectPtr<class UNiagaraComponent> EnergyBoltEffect;
 };

@@ -9,15 +9,14 @@
 #include "DrawDebugHelpers.h"
 
 #include "CollisionQueryParams.h"
-#include "Interface/VMStatChangeable.h"
-#include "Kismet/GameplayStatics.h"
+#include "Macro/VMPhysics.h"
 
 UEnergyBolt::UEnergyBolt(const FObjectInitializer& ObjectInitializer)
 {
 	SkillName = TEXT("EnergyBolt");
 	SkillDesc = TEXT("에너지 볼트를 발사합니다.");
 	ManaCost = 10;
-	Cooldown = 5;
+	Cooldown = 2;
 	RemainingCooldown = 0;
 }
 
@@ -25,13 +24,11 @@ void UEnergyBolt::ActivateSkill(AVMCharacterHeroBase* Owner, FHeroStat& CurStat)
 {
 	Super::ActivateSkill(Owner, CurStat);
 
-	UE_LOG(LogTemp, Log, TEXT("Skill : EnergyBolt !"));
-
 	TArray<FOverlapResult> Targets;
 	FVector Center = Owner->GetActorLocation();
 	FCollisionShape CollisionShape = FCollisionShape::MakeSphere(1000.0f);
 
-	bool HitDetected = Owner->GetWorld()->OverlapMultiByChannel(Targets, Center, FQuat::Identity, ECC_GameTraceChannel3, CollisionShape);
+	bool HitDetected = Owner->GetWorld()->OverlapMultiByChannel(Targets, Center, FQuat::Identity, VM_ENEMY_TARGET_ACTION, CollisionShape);
 	
 	FColor DrawDebugColor = FColor::Green;
 	if (HitDetected) DrawDebugColor = FColor::Red;
@@ -44,16 +41,10 @@ void UEnergyBolt::ActivateSkill(AVMCharacterHeroBase* Owner, FHeroStat& CurStat)
 	{
 		UE_LOG(LogTemp, Log, TEXT("발견한 타겟 : %s"), *Target.GetActor()->GetName());
 		
-		IVMStatChangeable* StatChangeable = Cast<IVMStatChangeable>(Target.GetActor());
-
-		if (StatChangeable)
+		AVMEnergyBoltProjectile* Projectile = Owner->GetWorld()->SpawnActor<AVMEnergyBoltProjectile>(AVMEnergyBoltProjectile::StaticClass(), Owner->GetActorLocation(), FRotator::ZeroRotator);
+		if (Projectile != nullptr && Projectile->IsValidLowLevel())
 		{
-			UE_LOG(LogTemp, Log, TEXT("%s 충돌 !"), *Target.GetActor()->GetName());
-			
-			StatChangeable->HealthPointChange(10.f, UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+			Projectile->BindOwnerAndTarget(Owner, Target.GetActor());
 		}
-		
-		//AVMEnergyBoltProjectile* Projectile = Owner->GetWorld()->SpawnActor<AVMEnergyBoltProjectile>(AVMEnergyBoltProjectile::StaticClass(), Owner->GetActorLocation(), FRotator::ZeroRotator);
-		//Projectile->BindTarget(Target.GetActor());
 	}
 }
