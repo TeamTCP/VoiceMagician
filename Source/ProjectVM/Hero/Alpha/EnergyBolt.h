@@ -17,5 +17,17 @@ class PROJECTVM_API UEnergyBolt : public USkillBase
 public:
 	UEnergyBolt(const FObjectInitializer& ObjectInitializer);
 
-	virtual void ActivateSkill(AVMCharacterHeroBase* Owner, struct FHeroStat& CurStat) override;
+	virtual void ActivateSkill(AVMCharacterHeroBase* InOwner, struct FHeroStat& CurStat) override;
+
+private:
+	void StartSpawnProjectile();
+	void SpawnProjectile();
+
+private:
+	TObjectPtr<class AActor> Owner;
+	TArray<AActor*> Targets;
+	
+	FTimerHandle ProjectileTimerHandle;
+	int32 ProjectileCountToSpawn;
+	int32 ProjectileCount;
 };

@@ -11,6 +11,9 @@
 #include "CollisionQueryParams.h"
 #include "Macro/VMPhysics.h"
 
+#include "Engine/World.h"
+#include "TimerManager.h"
+
 UEnergyBolt::UEnergyBolt(const FObjectInitializer& ObjectInitializer)
 {
 	SkillName = TEXT("EnergyBolt");
@@ -18,33 +21,79 @@ UEnergyBolt::UEnergyBolt(const FObjectInitializer& ObjectInitializer)
 	ManaCost = 10;
 	Cooldown = 2;
 	RemainingCooldown = 0;
+
+	ProjectileCount = 12;
 }
 
-void UEnergyBolt::ActivateSkill(AVMCharacterHeroBase* Owner, FHeroStat& CurStat)
+void UEnergyBolt::ActivateSkill(AVMCharacterHeroBase* InOwner, FHeroStat& CurStat)
 {
-	Super::ActivateSkill(Owner, CurStat);
+	Super::ActivateSkill(InOwner, CurStat);
 
-	TArray<FOverlapResult> Targets;
+	if (InOwner == nullptr)
+	{
+		return;
+	}
+
+	if (Owner == nullptr)
+	{
+		Owner = InOwner;
+	}
+
+	if (Owner != nullptr && Owner != InOwner)
+	{
+		return;
+	}
+	
 	FVector Center = Owner->GetActorLocation();
 	FCollisionShape CollisionShape = FCollisionShape::MakeSphere(1000.0f);
 
-	bool HitDetected = Owner->GetWorld()->OverlapMultiByChannel(Targets, Center, FQuat::Identity, VM_ENEMY_TARGET_ACTION, CollisionShape);
+	TArray<FOverlapResult> Overlaps;
+	bool HitDetected = Owner->GetWorld()->OverlapMultiByChannel(Overlaps, Center, FQuat::Identity, VM_ENEMY_TARGET_ACTION, CollisionShape);
 	
 	FColor DrawDebugColor = FColor::Green;
 	if (HitDetected) DrawDebugColor = FColor::Red;
 
 	DrawDebugSphere(Owner->GetWorld(), Center, 1000.0f, 32, DrawDebugColor, false, 2.f);
+	UE_LOG(LogTemp, Log, TEXT("타겟을 %d 개 찾았습니다."), Overlaps.Num());
+	for (const FOverlapResult& Target : Overlaps) UE_LOG(LogTemp, Log, TEXT("발견한 타겟 : %s"), *Target.GetActor()->GetName());
 
-	UE_LOG(LogTemp, Log, TEXT("타겟을 %d 개 찾았습니다."), Targets.Num());
-
-	for (const FOverlapResult& Target : Targets)
+	for (FOverlapResult& Target : Overlaps)
 	{
-		UE_LOG(LogTemp, Log, TEXT("발견한 타겟 : %s"), *Target.GetActor()->GetName());
-		
-		AVMEnergyBoltProjectile* Projectile = Owner->GetWorld()->SpawnActor<AVMEnergyBoltProjectile>(AVMEnergyBoltProjectile::StaticClass(), Owner->GetActorLocation(), FRotator::ZeroRotator);
-		if (Projectile != nullptr && Projectile->IsValidLowLevel())
-		{
-			Projectile->BindOwnerAndTarget(Owner, Target.GetActor());
-		}
+		Targets.Add(Target.GetActor());
+	}
+
+	if (Targets.IsEmpty())
+	{
+		return;
+	}
+
+	StartSpawnProjectile();
+}
+
+void UEnergyBolt::StartSpawnProjectile()
+{
+	ProjectileCountToSpawn += ProjectileCount;
+	GetWorld()->GetTimerManager().SetTimer(ProjectileTimerHandle, this, &UEnergyBolt::SpawnProjectile, 0.1f, true);
+}
+
+void UEnergyBolt::SpawnProjectile()
+{
+	static int32 TargetIndex = 0;
+	
+	if (ProjectileCountToSpawn <= 0)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(ProjectileTimerHandle);
+		TargetIndex = 0;
+		Targets.Empty();
+		return;
+	}
+
+	AActor* Target = Targets[TargetIndex % Targets.Num()];
+	AVMEnergyBoltProjectile* Projectile = Owner->GetWorld()->SpawnActor<AVMEnergyBoltProjectile>(AVMEnergyBoltProjectile::StaticClass(), Owner->GetActorLocation(), FRotator::ZeroRotator);
+	if (Projectile != nullptr && Projectile->IsValidLowLevel())
+	{
+		Projectile->BindOwnerAndTarget(Owner, Target);
+		--ProjectileCountToSpawn;
+		++TargetIndex;
 	}
 }

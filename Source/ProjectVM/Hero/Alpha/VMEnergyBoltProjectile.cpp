@@ -39,14 +39,14 @@ AVMEnergyBoltProjectile::AVMEnergyBoltProjectile()
 		EnergyBoltEffect->SetAsset(NiagaraSystemAsset.Object);
 		
 		EnergyBoltEffect->SetVariableFloat(TEXT("_ColorHue"), 0.5f);
-		EnergyBoltEffect->SetVariableFloat(TEXT("_Size"), 10.0f);
+		EnergyBoltEffect->SetVariableFloat(TEXT("_Size"), 3.0f);
 		EnergyBoltEffect->SetVariableFloat(TEXT("_Speed"), 4.0f);
-		EnergyBoltEffect->SetVariableFloat(TEXT("Count"), 200.0f);
+		EnergyBoltEffect->SetVariableFloat(TEXT("Count"), 100.0f);
 		EnergyBoltEffect->SetVariableFloat(TEXT("Extent"), 10.0f);
 		EnergyBoltEffect->SetVariableFloat(TEXT("Noise"), 99.0f);
 		EnergyBoltEffect->SetVariableFloat(TEXT("Progress"), 1.0f);
 		
-		EnergyBoltEffect->SetVariableBool(TEXT("AddDetail"), true);
+		EnergyBoltEffect->SetVariableBool(TEXT("AddDetail"), false);
 		EnergyBoltEffect->SetVariableBool(TEXT("LightON"), false);
 		EnergyBoltEffect->SetVariableBool(TEXT("withHead"), false);
 	}
@@ -76,11 +76,12 @@ void AVMEnergyBoltProjectile::BindOwnerAndTarget(AActor* InOwner, AActor* InTarg
 
 	FVector CurveLocation = StartLocation + (EndLocation - StartLocation) * FMath::FRandRange(0.1f, 0.3f);
 	float RandomRadius = FMath::FRandRange(100.0f, 200.0f);
-	float RandomTheta = FMath::FRandRange(0.0f, HALF_PI);
+	float RandomTheta = FMath::FRandRange(0.0f, PI);
 
 	FCircle3D Circle(CurveLocation, EndLocation - StartLocation, RandomRadius);
 	CurveLocation = Circle.GetLocation(RandomTheta);
-	DrawDebugCircle(GetWorld(), Circle.Center, Circle.Radius, 32, FColor::Green, false, 3.f, 0, 1.f, Circle.AxisX, Circle.AxisY, true);
+
+	// DrawDebugCircle(GetWorld(), Circle.Center, Circle.Radius, 32, FColor::Green, false, 3.f, 0, 1.f, Circle.AxisX, Circle.AxisY, true);
 	
 	SplinePath->AddSplinePoint(StartLocation, ESplineCoordinateSpace::World);
 	SplinePath->SetSplinePointType(SplinePath->GetNumberOfSplinePoints(), ESplinePointType::Curve);
