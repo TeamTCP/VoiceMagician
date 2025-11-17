@@ -1,7 +1,7 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Hero/Alpha/VMEnergyBoltProjectile.h"
+#include "Hero/Alpha/VMSparksFlyProjectile.h"
 #include "Components/SplineComponent.h"
 #include "Components/SphereComponent.h"
 
@@ -12,10 +12,9 @@
 
 #include "Utils/VMMath.h"
 
-
-AVMEnergyBoltProjectile::AVMEnergyBoltProjectile()
+AVMSparksFlyProjectile::AVMSparksFlyProjectile()
 {
- 	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = true;
 
 	SplinePath = CreateDefaultSubobject<USplineComponent>(TEXT("SplinePath"));
 	RootComponent = SplinePath;
@@ -26,35 +25,35 @@ AVMEnergyBoltProjectile::AVMEnergyBoltProjectile()
 	SphereCollision->SetSphereRadius(1.f);
 	SphereCollision->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
 	SphereCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &AVMEnergyBoltProjectile::HitTarget);
+	SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &AVMSparksFlyProjectile::HitTarget);
 	
-	EnergyBoltEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("EnergyBoltEffect"));
-	EnergyBoltEffect->SetupAttachment(SphereCollision);
-	EnergyBoltEffect->SetAutoActivate(true);
-	EnergyBoltEffect->SetAutoDestroy(true);
+	SparksFlyEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("SparksFlyEffect"));
+	SparksFlyEffect->SetupAttachment(SphereCollision);
+	SparksFlyEffect->SetAutoActivate(true);
+	SparksFlyEffect->SetAutoDestroy(true);
 
 	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> NiagaraSystemAsset(TEXT("/Game/_SplineVFX/NS/NS_Spline_EnergyLoop_Burning.NS_Spline_EnergyLoop_Burning"));
 	if (NiagaraSystemAsset.Succeeded())
 	{
-		EnergyBoltEffect->SetAsset(NiagaraSystemAsset.Object);
+		SparksFlyEffect->SetAsset(NiagaraSystemAsset.Object);
 		
-		EnergyBoltEffect->SetVariableFloat(TEXT("_ColorHue"), 0.1f);
-		EnergyBoltEffect->SetVariableFloat(TEXT("_Size"), 5.0f);
-		EnergyBoltEffect->SetVariableFloat(TEXT("_Speed"), 4.0f);
-		EnergyBoltEffect->SetVariableFloat(TEXT("Count"), 200.0f);
-		EnergyBoltEffect->SetVariableFloat(TEXT("Extent"), 10.0f);
-		EnergyBoltEffect->SetVariableFloat(TEXT("Noise"), 99.0f);
-		EnergyBoltEffect->SetVariableFloat(TEXT("Progress"), 1.0f);
+		SparksFlyEffect->SetVariableFloat(TEXT("_ColorHue"), 0.1f);
+		SparksFlyEffect->SetVariableFloat(TEXT("_Size"), 5.0f);
+		SparksFlyEffect->SetVariableFloat(TEXT("_Speed"), 4.0f);
+		SparksFlyEffect->SetVariableFloat(TEXT("Count"), 200.0f);
+		SparksFlyEffect->SetVariableFloat(TEXT("Extent"), 10.0f);
+		SparksFlyEffect->SetVariableFloat(TEXT("Noise"), 99.0f);
+		SparksFlyEffect->SetVariableFloat(TEXT("Progress"), 1.0f);
 		
-		EnergyBoltEffect->SetVariableBool(TEXT("AddDetail"), true);
-		EnergyBoltEffect->SetVariableBool(TEXT("LightON"), false);
-		EnergyBoltEffect->SetVariableBool(TEXT("withHead"), true);
+		SparksFlyEffect->SetVariableBool(TEXT("AddDetail"), true);
+		SparksFlyEffect->SetVariableBool(TEXT("LightON"), false);
+		SparksFlyEffect->SetVariableBool(TEXT("withHead"), true);
 	}
 	
 	Progress = 0.0f;
 }
 
-void AVMEnergyBoltProjectile::InitProjectile(AActor* InOwner, AActor* InTarget, int32 InDamage)
+void AVMSparksFlyProjectile::InitProjectile(AActor* InOwner, AActor* InTarget, int32 InDamage)
 {
 	if (InOwner == nullptr || InOwner->IsValidLowLevel() == false)
 	{
@@ -75,7 +74,7 @@ void AVMEnergyBoltProjectile::InitProjectile(AActor* InOwner, AActor* InTarget, 
 	CreateProjectilePath(InOwner, InTarget);
 }
 
-void AVMEnergyBoltProjectile::HitTarget(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AVMSparksFlyProjectile::HitTarget(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor != Target) return;
 	
@@ -96,12 +95,12 @@ void AVMEnergyBoltProjectile::HitTarget(UPrimitiveComponent* OverlappedComp, AAc
 #endif
 }
 
-void AVMEnergyBoltProjectile::BeginPlay()
+void AVMSparksFlyProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-void AVMEnergyBoltProjectile::Tick(float DeltaTime)
+void AVMSparksFlyProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
@@ -118,12 +117,12 @@ void AVMEnergyBoltProjectile::Tick(float DeltaTime)
 	FVector Pos = SplinePath->GetLocationAtDistanceAlongSpline(TargetLength, ESplineCoordinateSpace::World);
 	SphereCollision->SetWorldLocation(Pos);
 
-	EnergyBoltEffect->SetVariableVec3(TEXT("CollisionPos"), Pos);
+	SparksFlyEffect->SetVariableVec3(TEXT("CollisionPos"), Pos);
 	
 	if (Progress > 3.0f) Destroy();
 }
 
-void AVMEnergyBoltProjectile::CreateProjectilePath(AActor* InOwner, AActor* InTarget)
+void AVMSparksFlyProjectile::CreateProjectilePath(AActor* InOwner, AActor* InTarget)
 {
 	SplinePath->ClearSplinePoints();
 

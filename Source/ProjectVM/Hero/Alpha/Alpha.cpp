@@ -2,7 +2,10 @@
 
 
 #include "Hero/Alpha/Alpha.h"
-#include "Hero/Alpha/EnergyBolt.h"
+#include "Hero/Alpha/VMSparksFly.h"
+#include "Hero/Alpha/VMBurningFuse.h"
+#include "Hero/Alpha/VMFlamingLaunch.h"
+#include "Hero/Alpha/VMFireworks.h"
 #include "Hero/VMHeroSkillComponent.h"
 
 AAlpha::AAlpha()
@@ -36,6 +39,13 @@ void AAlpha::BeginPlay()
 {
 	Super::BeginPlay();
 
-	USkillBase* EnergyBolt = NewObject<UEnergyBolt>(this, UEnergyBolt::StaticClass());
-	Skills->BindBasicSkill(EnergyBolt);
+	USkillBase* SparksFly = NewObject<UVMSparksFly>(this, UVMSparksFly::StaticClass());
+	USkillBase* BurningFuse = NewObject<UVMBurningFuse>(this, UVMBurningFuse::StaticClass());
+	USkillBase* FlamingLaunch = NewObject<UVMFlamingLaunch>(this, UVMFlamingLaunch::StaticClass());
+	USkillBase* Fireworks = NewObject<UVMFireworks>(this, UVMFireworks::StaticClass());
+
+	Skills->BindBasicSkill(SparksFly);
+	Skills->BindAdvancedSkill(BurningFuse);
+	Skills->BindMovementSkill(FlamingLaunch);
+	Skills->BindUltimateSkill(Fireworks);
 }

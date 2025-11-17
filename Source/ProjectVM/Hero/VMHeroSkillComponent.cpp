@@ -25,28 +25,43 @@ void UVMHeroSkillComponent::ExecuteBasicSkill(AVMCharacterHeroBase* Owner, UVMHe
 	}
 }
 
-void UVMHeroSkillComponent::ExecuteAdvancedSkill(class UVMHeroStatComponent* StatComp)
+void UVMHeroSkillComponent::ExecuteAdvancedSkill(class AVMCharacterHeroBase* Owner, class UVMHeroStatComponent* StatComp)
 {
-	if (AdvancedSkill == nullptr) return;
-	if (AdvancedSkill->IsSkillValid(StatComp->GetStat()) == false) return;
-
-	//AdvancedSkill->ActivateSkill(CurStat);
+	if (AdvancedSkill == nullptr)
+	{
+		return;
+	}
+	
+	if (AdvancedSkill->IsSkillValid(StatComp->GetStat()))
+	{
+		AdvancedSkill->ActivateSkill(Owner, StatComp);
+	}
 }
 
-void UVMHeroSkillComponent::ExecuteMovementSkill(class UVMHeroStatComponent* StatComp)
+void UVMHeroSkillComponent::ExecuteMovementSkill(class AVMCharacterHeroBase* Owner, class UVMHeroStatComponent* StatComp)
 {
-	if (MovementSkill == nullptr) return;
-	if (MovementSkill->IsSkillValid(StatComp->GetStat()) == false) return;
-
-	//MovementSkill->ActivateSkill(CurStat);
+	if (MovementSkill == nullptr)
+	{
+		return;
+	}
+	
+	if (MovementSkill->IsSkillValid(StatComp->GetStat()))
+	{
+		MovementSkill->ActivateSkill(Owner, StatComp);
+	}
 }
 
-void UVMHeroSkillComponent::ExecuteUltimateSkill(class UVMHeroStatComponent* StatComp)
+void UVMHeroSkillComponent::ExecuteUltimateSkill(class AVMCharacterHeroBase* Owner, class UVMHeroStatComponent* StatComp)
 {
-	if (UltimateSkill == nullptr) return;
-	if (UltimateSkill->IsSkillValid(StatComp->GetStat()) == false) return;
-
-	//UltimateSkill->ActivateSkill(CurStat);
+	if (UltimateSkill == nullptr)
+	{
+		return;
+	}
+	
+	if (UltimateSkill->IsSkillValid(StatComp->GetStat()))
+	{
+		UltimateSkill->ActivateSkill(Owner, StatComp);
+	}
 }
 
 void UVMHeroSkillComponent::BindBasicSkill(USkillBase* InSkill)

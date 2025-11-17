@@ -1,11 +1,11 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Hero/Alpha/EnergyBolt.h"
+#include "Hero/Alpha/VMSparksFly.h"
 #include "Hero/VMCharacterHeroBase.h"
 #include "Hero/VMHeroStatComponent.h"
 #include "Hero/HeroStat.h"
-#include "Hero/Alpha/VMEnergyBoltProjectile.h"
+#include "Hero/Alpha/VMSparksFlyProjectile.h"
 #include "Engine/OverlapResult.h"
 #include "DrawDebugHelpers.h"
 
@@ -14,12 +14,12 @@
 
 #include "Engine/World.h"
 #include "TimerManager.h"
+#include "VMSparksFlyProjectile.h"
 
-
-UEnergyBolt::UEnergyBolt(const FObjectInitializer& ObjectInitializer)
+UVMSparksFly::UVMSparksFly(const FObjectInitializer& ObjectInitializer)
 {
-	SkillName = TEXT("EnergyBolt");
-	SkillDesc = TEXT("에너지 볼트를 발사합니다.");
+	SkillName = TEXT("SparksFly");
+	SkillDesc = TEXT("주변으로 튀는 불똥을 생성합니다.");
 	ManaCost = 30;
 	Cooldown = 2.0f;
 	RemainingCooldown = 0.0f;
@@ -27,7 +27,7 @@ UEnergyBolt::UEnergyBolt(const FObjectInitializer& ObjectInitializer)
 	ProjectileCount = 12;
 }
 
-void UEnergyBolt::ActivateSkill(AVMCharacterHeroBase* InOwner, UVMHeroStatComponent* StatComp)
+void UVMSparksFly::ActivateSkill(class AVMCharacterHeroBase* InOwner, class UVMHeroStatComponent* StatComp)
 {
 	Super::ActivateSkill(InOwner, StatComp);
 
@@ -78,13 +78,13 @@ void UEnergyBolt::ActivateSkill(AVMCharacterHeroBase* InOwner, UVMHeroStatCompon
 #endif
 }
 
-void UEnergyBolt::StartSpawnProjectile()
+void UVMSparksFly::StartSpawnProjectile()
 {
 	ProjectileCountToSpawn += ProjectileCount;
-	GetWorld()->GetTimerManager().SetTimer(ProjectileTimerHandle, this, &UEnergyBolt::SpawnProjectile, 0.1f, true);
+	GetWorld()->GetTimerManager().SetTimer(ProjectileTimerHandle, this, &UVMSparksFly::SpawnProjectile, 0.1f, true);
 }
 
-void UEnergyBolt::SpawnProjectile()
+void UVMSparksFly::SpawnProjectile()
 {
 	static int32 TargetIndex = 0;
 	
@@ -97,7 +97,7 @@ void UEnergyBolt::SpawnProjectile()
 	}
 
 	AActor* Target = Targets[TargetIndex % Targets.Num()];
-	AVMEnergyBoltProjectile* Projectile = Owner->GetWorld()->SpawnActor<AVMEnergyBoltProjectile>(AVMEnergyBoltProjectile::StaticClass(), Owner->GetActorLocation(), FRotator::ZeroRotator);
+	AVMSparksFlyProjectile* Projectile = Owner->GetWorld()->SpawnActor<AVMSparksFlyProjectile>(AVMSparksFlyProjectile::StaticClass(), Owner->GetActorLocation(), FRotator::ZeroRotator);
 	if (Projectile != nullptr && Projectile->IsValidLowLevel())
 	{
 		Projectile->InitProjectile(Owner, Target, ProjectileDamage);

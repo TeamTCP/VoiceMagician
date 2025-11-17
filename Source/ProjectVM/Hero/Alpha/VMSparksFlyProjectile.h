@@ -1,19 +1,19 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "VMEnergyBoltProjectile.generated.h"
+#include "VMSparksFlyProjectile.generated.h"
 
 UCLASS()
-class PROJECTVM_API AVMEnergyBoltProjectile : public AActor
+class PROJECTVM_API AVMSparksFlyProjectile : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
-	AVMEnergyBoltProjectile();
-
+	AVMSparksFlyProjectile();
+	
 	void InitProjectile(AActor* InOwner, AActor* InTarget, int32 InDamage);
 	UFUNCTION()
 	void HitTarget(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -32,7 +32,7 @@ protected:
 	TObjectPtr<class USphereComponent> SphereCollision;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Projectile, Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UNiagaraComponent> EnergyBoltEffect;
+	TObjectPtr<class UNiagaraComponent> SparksFlyEffect;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Projectile, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class AActor> Target;

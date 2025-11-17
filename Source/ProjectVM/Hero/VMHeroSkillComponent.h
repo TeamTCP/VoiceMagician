@@ -16,9 +16,9 @@ public:
 	UVMHeroSkillComponent();
 
 	void ExecuteBasicSkill(class AVMCharacterHeroBase* Owner, class UVMHeroStatComponent* StatComp);
-	void ExecuteAdvancedSkill(class UVMHeroStatComponent* StatComp);
-	void ExecuteMovementSkill(class UVMHeroStatComponent* StatComp);
-	void ExecuteUltimateSkill(class UVMHeroStatComponent* StatComp);
+	void ExecuteAdvancedSkill(class AVMCharacterHeroBase* Owner, class UVMHeroStatComponent* StatComp);
+	void ExecuteMovementSkill(class AVMCharacterHeroBase* Owner, class UVMHeroStatComponent* StatComp);
+	void ExecuteUltimateSkill(class AVMCharacterHeroBase* Owner, class UVMHeroStatComponent* StatComp);
 
 	void BindBasicSkill(class USkillBase* InSkill);
 	void BindAdvancedSkill(class USkillBase* InSkill);

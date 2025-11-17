@@ -33,6 +33,9 @@ protected:
 	void ApplySpeed(int32 SpeedStat);
 
 	void BasicSkill(const FInputActionValue& Value);
+	void AdvancedSkill(const FInputActionValue& Value);
+	void MovementSkill(const FInputActionValue& Value);
+	void UltimateSkill(const FInputActionValue& Value);
 
 	//상호작용
 	void Interact(const FInputActionValue& Value);
@@ -67,6 +70,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> LeftMouseSkillAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> RightMouseSkillAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> ShiftSkillAction;
 
 	//E 상호작용
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
