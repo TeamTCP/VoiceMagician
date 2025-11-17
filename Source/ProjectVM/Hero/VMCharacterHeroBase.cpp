@@ -18,6 +18,8 @@
 #include "NPC/VMNPC.h"
 #include "Quest/VMQuestManager.h"
 
+
+
 AVMCharacterHeroBase::AVMCharacterHeroBase()
 {
 	bUseControllerRotationPitch = false;
@@ -153,6 +155,14 @@ void AVMCharacterHeroBase::SetInteractNPC(AVMNPC* NewInteractNPC)
 	CurrentNPC = NewInteractNPC;
 }
 
+void AVMCharacterHeroBase::UpdateInteractionWidget() const
+{
+}
+
+void AVMCharacterHeroBase::DropItem(UVMEquipment* ItemToDrop, const int32 QuantityToDrop)
+{
+}
+
 void AVMCharacterHeroBase::BeginPlay()
 {
 	Super::BeginPlay();
@@ -254,4 +264,82 @@ void AVMCharacterHeroBase::DebuggingTest(const FInputActionValue& Value)
 
 	//FVMNPCData* LoadedData = GetGameInstance()->GetSubsystem<UVMLoadManager>()->GetNPCDataRow(NPCId);
 	GetGameInstance()->GetSubsystem<UVMQuestManager>()->NotifyMonsterDeath(EMonsterName::Warrior);
+}
+
+
+
+// 인벤토리
+void AVMCharacterHeroBase::PerformInteractionCheck()
+{
+	InteractionData.LastInteractionCheckTime = GetWorld()->GetTimeSeconds();
+
+	FVector TraceStart{ GetPawnViewLocation() };
+	FVector TraceEnd{ TraceStart + (GetViewRotation().Vector() * InteractionCheckDistance) };
+
+	float LookDirection = FVector::DotProduct(GetActorForwardVector(), GetViewRotation().Vector());
+
+	if (LookDirection > 0)
+	{
+
+		//DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 1.0f, 0, 2.0f);
+
+		FCollisionQueryParams QueryParams;
+		QueryParams.AddIgnoredActor(this);
+		FHitResult TraceHit;
+
+		if (GetWorld()->LineTraceSingleByChannel(TraceHit, TraceStart, TraceEnd, ECC_Visibility, QueryParams))
+		{
+			if (TraceHit.GetActor()->GetClass()->ImplementsInterface(UVMInteractionInterface::StaticClass()))
+			{
+				const float Distance = (TraceStart - TraceHit.ImpactPoint).Size();
+
+				if (TraceHit.GetActor() != InteractionData.CurrentInteractable && Distance <= InteractionCheckDistance)
+				{
+					FoundInteractable(TraceHit.GetActor());
+					return;
+				}
+
+				if (TraceHit.GetActor() == InteractionData.CurrentInteractable)
+				{
+					return;
+				}
+			}
+		}
+	}
+
+
+
+	NoInteractableFound();
+}
+
+void AVMCharacterHeroBase::FoundInteractable(AActor* NewInteractable)
+{
+
+}
+
+void AVMCharacterHeroBase::NoInteractableFound()
+{
+
+}
+
+
+void AVMCharacterHeroBase::BeginInteract()
+{
+
+}
+
+void AVMCharacterHeroBase::EndInteract()
+{
+
+}
+
+void AVMCharacterHeroBase::BeingInteract()
+{
+	GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
+
+	if (IsValid(TargetInteractable.GetObject()))
+	{
+		TargetInteractable->BeingInteract(this);
+	}
+
 }
