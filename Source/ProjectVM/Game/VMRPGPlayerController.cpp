@@ -34,12 +34,6 @@ AVMRPGPlayerController::AVMRPGPlayerController()
 	{
 		VMShopScreenClass = VMShopScreenRef.Class;
 	}
-
-	static ConstructorHelpers::FClassFinder<UVMHeroStatusWidget> VMHeroStatusWidgetRef(TEXT("/Game/Project/UI/Stat/WBP_HeroStatus.WBP_HeroStatus_C"));
-	if (VMHeroStatusWidgetRef.Succeeded())
-	{
-		VMHeroStatusWidgetClass = VMHeroStatusWidgetRef.Class;
-	}
 }
 
 void AVMRPGPlayerController::ShowScreen(EScreenUIType ScreenType)
@@ -88,6 +82,10 @@ void AVMRPGPlayerController::BeginPlay()
 			VMGameScreen->AddToViewport();
 			VMGameScreen->SetVisibility(ESlateVisibility::Visible);
 			ScreenUIMap.Add(EScreenUIType::GameScreen, VMGameScreen);
+
+			AVMCharacterHeroBase* Hero = Cast<AVMCharacterHeroBase>(GetPawn());
+			Hero->GetStatComponent()->OnHealthPointPercentageChanged.AddUObject(VMGameScreen->HeroStatus, &UVMHeroStatusWidget::RefreshHealthPointBar);
+			Hero->GetStatComponent()->OnManaPointPercentageChanged.AddUObject(VMGameScreen->HeroStatus, &UVMHeroStatusWidget::RefreshManaPointBar);
 		}
 	}
 
@@ -110,18 +108,6 @@ void AVMRPGPlayerController::BeginPlay()
 			VMShopScreen->AddToViewport();
 			VMShopScreen->SetVisibility(ESlateVisibility::Hidden);
 			ScreenUIMap.Add(EScreenUIType::ShopScreen, VMShopScreen);
-		}
-	}
-
-	if (VMHeroStatusWidgetClass != nullptr)
-	{
-		VMHeroStatusWidget = CreateWidget<UVMHeroStatusWidget>(this, VMHeroStatusWidgetClass);
-		if (VMHeroStatusWidget != nullptr)
-		{
-			VMHeroStatusWidget->AddToViewport();
-			AVMCharacterHeroBase* Hero = Cast<AVMCharacterHeroBase>(GetPawn());
-			Hero->GetStatComponent()->OnHealthPointPercentageChanged.AddUObject(VMHeroStatusWidget, &UVMHeroStatusWidget::RefreshHealthPointBar);
-			Hero->GetStatComponent()->OnManaPointPercentageChanged.AddUObject(VMHeroStatusWidget, &UVMHeroStatusWidget::RefreshManaPointBar);
 		}
 	}
 }

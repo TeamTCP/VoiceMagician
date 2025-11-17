@@ -13,5 +13,8 @@ class PROJECTVM_API UVMGameScreen : public UUserWidget
 	
 public:
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<class UVMQuestTracker> GmaeScreenQuestTracker;
+	TObjectPtr<class UVMQuestTracker> GameScreenQuestTracker;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UVMHeroStatusWidget> HeroStatus;
 };

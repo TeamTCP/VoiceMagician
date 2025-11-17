@@ -51,10 +51,4 @@ protected:
 
 	UPROPERTY()
 	TMap<EScreenUIType, UUserWidget*> ScreenUIMap;
-
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD")
-	TSubclassOf<class UVMHeroStatusWidget> VMHeroStatusWidgetClass;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "HUD")
-	TObjectPtr<class UVMHeroStatusWidget> VMHeroStatusWidget;
 };

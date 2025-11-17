@@ -40,7 +40,7 @@ void UVMQuestManager::AcceptQuest(FVMQuestData QuestData)
 
 	UVMQuestDataObject* NewQuestDataObject = NewObject<UVMQuestDataObject>(this);
 	NewQuestDataObject->QuestData = QuestData;
-	GameScreen->GmaeScreenQuestTracker->QuestTrackerListView->AddItem(NewQuestDataObject);
+	GameScreen->GameScreenQuestTracker->QuestTrackerListView->AddItem(NewQuestDataObject);
 
 
 	//타겟에 해당하는 TArray가 있는지 확인하고 데이터 추가 
@@ -65,7 +65,7 @@ void UVMQuestManager::ClearQuest(FVMQuestData QuestData)
 	{
 		return;
 	}
-	UListView* QuestListView = GameScreen->GmaeScreenQuestTracker->QuestTrackerListView;
+	UListView* QuestListView = GameScreen->GameScreenQuestTracker->QuestTrackerListView;
 	if (QuestListView == nullptr)
 	{
 		return;
