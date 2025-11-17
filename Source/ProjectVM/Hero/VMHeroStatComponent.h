@@ -44,8 +44,11 @@ public:
 	void RecoverHealth(int32 Amount);
 	void ConsumeMana(int32 Amount);
 	void RecoverMana(int32 Amount);
+	void ApplyDefaultStat(FHeroStat InStat);
 	void ApplyStat(FHeroStat InStat);
 	
+	void ApplyEquipmentStats(class UVMEquipment* Equipment);
+	void RemoveEquipmentStats(class UVMEquipment* Equipment);
 	FORCEINLINE FHeroStat GetStat() { return CurStat; }
 
 protected:

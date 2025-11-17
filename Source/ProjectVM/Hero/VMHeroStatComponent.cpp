@@ -2,6 +2,7 @@
 
 
 #include "Hero/VMHeroStatComponent.h"
+#include "Item/Equipment/VMEquipment.h"
 
 UVMHeroStatComponent::UVMHeroStatComponent()
 {
@@ -56,6 +57,23 @@ void UVMHeroStatComponent::RecoverMana(int32 Amount)
 	if (ActualAmount > 0) OnStatChanged.Broadcast(CurStat);
 }
 
+void UVMHeroStatComponent::ApplyDefaultStat(FHeroStat InStat)
+{
+	if (DefaultStat.HealthPoint != InStat.HealthPoint)
+	{
+		float HealthPercentage = static_cast<float>(InStat.HealthPoint) / DefaultStat.ManaPoint;
+		OnHealthPointPercentageChanged.Broadcast(HealthPercentage);
+	}
+	if (DefaultStat.ManaPoint != InStat.ManaPoint)
+	{
+		float ManaPercentage = static_cast<float>(InStat.ManaPoint) / DefaultStat.ManaPoint;
+		OnManaPointPercentageChanged.Broadcast(ManaPercentage);
+	}
+
+	DefaultStat = InStat;
+	OnStatChanged.Broadcast(CurStat);
+}
+
 void UVMHeroStatComponent::ApplyStat(FHeroStat InStat)
 {
 	if (CurStat.AttackPower != InStat.AttackPower)
@@ -93,6 +111,54 @@ void UVMHeroStatComponent::ApplyStat(FHeroStat InStat)
 	
 	CurStat = InStat;
 	OnStatChanged.Broadcast(CurStat);
+}
+
+void UVMHeroStatComponent::ApplyEquipmentStats(UVMEquipment* Equipment)
+{
+	FVMEquipmentInfo EquipmentInfo = Equipment->GetEquipmentInfo();
+	
+	FHeroStat NewDefaultStats;
+
+	NewDefaultStats.AttackPower = DefaultStat.AttackPower + EquipmentInfo.AttackPower;
+	NewDefaultStats.DefensivePower = DefaultStat.DefensivePower + EquipmentInfo.DefensivePower;
+	NewDefaultStats.HealthPoint = DefaultStat.HealthPoint + EquipmentInfo.HealthPoint;
+	NewDefaultStats.ManaPoint = DefaultStat.ManaPoint + EquipmentInfo.ManaPoint;
+	NewDefaultStats.ManaRegeneration = DefaultStat.ManaRegeneration + EquipmentInfo.ManaRegeneration;
+	NewDefaultStats.LifeSteal = DefaultStat.LifeSteal + EquipmentInfo.LifeSteal;
+
+	FHeroStat NewCurStats;
+
+	NewCurStats.AttackPower = CurStat.AttackPower + EquipmentInfo.AttackPower;
+	NewCurStats.DefensivePower = CurStat.DefensivePower + EquipmentInfo.DefensivePower;
+	NewCurStats.ManaRegeneration = CurStat.ManaRegeneration + EquipmentInfo.ManaRegeneration;
+	NewCurStats.LifeSteal = CurStat.LifeSteal + EquipmentInfo.LifeSteal;
+
+	ApplyDefaultStat(NewDefaultStats);
+	ApplyStat(NewCurStats);
+}
+
+void UVMHeroStatComponent::RemoveEquipmentStats(UVMEquipment* Equipment)
+{
+	FVMEquipmentInfo EquipmentInfo = Equipment->GetEquipmentInfo();
+
+	FHeroStat NewDefaultStats;
+
+	NewDefaultStats.AttackPower = DefaultStat.AttackPower - EquipmentInfo.AttackPower;
+	NewDefaultStats.DefensivePower = DefaultStat.DefensivePower - EquipmentInfo.DefensivePower;
+	NewDefaultStats.HealthPoint = DefaultStat.HealthPoint - EquipmentInfo.HealthPoint;
+	NewDefaultStats.ManaPoint = DefaultStat.ManaPoint - EquipmentInfo.ManaPoint;
+	NewDefaultStats.ManaRegeneration = DefaultStat.ManaRegeneration - EquipmentInfo.ManaRegeneration;
+	NewDefaultStats.LifeSteal = DefaultStat.LifeSteal - EquipmentInfo.LifeSteal;
+
+	FHeroStat NewCurStats;
+
+	NewCurStats.AttackPower = CurStat.AttackPower - EquipmentInfo.AttackPower;
+	NewCurStats.DefensivePower = CurStat.DefensivePower - EquipmentInfo.DefensivePower;
+	NewCurStats.ManaRegeneration = CurStat.ManaRegeneration - EquipmentInfo.ManaRegeneration;
+	NewCurStats.LifeSteal = CurStat.LifeSteal - EquipmentInfo.LifeSteal;
+
+	ApplyDefaultStat(NewDefaultStats);
+	ApplyStat(NewCurStats);
 }
 
 void UVMHeroStatComponent::InitializeComponent()
