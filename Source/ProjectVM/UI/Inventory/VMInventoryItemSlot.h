@@ -42,8 +42,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Inventory Slot", meta = (BindWidget))
 	UImage* ItemIcon;
 
-	UPROPERTY(VisibleAnywhere, Category = "Inventory Slot", meta = (BindWidget))
-	TObjectPtr<UTextBlock> ItemQuantity;
+	//UPROPERTY(VisibleAnywhere, Category = "Inventory Slot", meta = (BindWidget))
+	//TObjectPtr<UTextBlock> ItemQuantity;
 
 	virtual void NativeOnInitialized() override;
 	virtual void NativeConstruct() override;

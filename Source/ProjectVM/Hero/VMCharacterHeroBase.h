@@ -11,6 +11,7 @@
 #include "Interface/VMInteractionInterface.h"
 
 #include "Inventory/VMInventoryComponent.h"
+#include "UI/Character/VMCharacterHeroHUD.h"
 
 
 #include "VMCharacterHeroBase.generated.h"
@@ -61,7 +62,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	//virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
@@ -84,6 +85,10 @@ protected:
 	void BeginInteract();
 	void EndInteract();
 	void BeingInteract();
+	void ToggleMenu();
+
+	// APawn interface
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 
 
@@ -144,6 +149,22 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Character | Inventory")
 	//UVMInventoryComponent* PlayerInventory;
 	TObjectPtr<UVMInventoryComponent> PlayerInventory;
+
+	UPROPERTY()
+	TObjectPtr<AVMCharacterHeroHUD> HUD;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> ToggleAction;
+
+	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	//TObjectPtr<class UInputAction> BeginInteract;
+
+	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	//TObjectPtr<class UInputAction> EndInteract;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputMappingContext* DefaultMappingContext;
+
 
 	float InteractionCheckFrequency;
 	float InteractionCheckDistance;

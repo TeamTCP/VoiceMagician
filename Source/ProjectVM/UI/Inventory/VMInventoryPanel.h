@@ -32,16 +32,16 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	UWrapBox* InventoryWrapBox;
 
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> WeightInfoText;
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> WeightInfo;
+	//UPROPERTY(meta = (BindWidget))
+	//TObjectPtr<UTextBlock> WeightInfoText;
+	//UPROPERTY(meta = (BindWidget))
+	//TObjectPtr<UTextBlock> WeightInfo;
 
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> CapacityInfoText;
+	//UPROPERTY(meta = (BindWidget))
+	//TObjectPtr<UTextBlock> CapacityInfoText;
 
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> CapacityInfo;
+	//UPROPERTY(meta = (BindWidget))
+	//TObjectPtr<UTextBlock> CapacityInfo;
 
 	UPROPERTY()
 	AVMCharacterHeroBase* Character;
