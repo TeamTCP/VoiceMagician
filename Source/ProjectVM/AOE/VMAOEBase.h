@@ -76,9 +76,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Member)
 	FColor Color;
 
-	// Fire 사라지지 않아서 해결하려고 잠시 생성.
-	//FTimerHandle TimerHandle;
-
 public:
 	FORCEINLINE void SetRadius(float InRadius) { Radius = InRadius; }
 };

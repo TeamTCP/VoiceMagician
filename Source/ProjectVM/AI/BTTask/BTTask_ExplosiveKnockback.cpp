@@ -60,12 +60,11 @@ EBTNodeResult::Type UBTTask_ExplosiveKnockback::ExecuteTask(UBehaviorTreeCompone
         return EBTNodeResult::Failed;
     }
     // Hero가 AOE 이벤트를 구독하도록 등록
+    Explosion->OnAOEExplosionOverlapActor.RemoveDynamic(HeroChar, &AVMCharacterHeroBase::OnHitExplosionByAOE);
     Explosion->OnAOEExplosionOverlapActor.AddDynamic(HeroChar, &AVMCharacterHeroBase::OnHitExplosionByAOE);
-
 
     Explosion->SetRadius(1000);
     Explosion->TriggerSpawnAOESphere();
 
-    //Explosion->OnAOEExplosionOverlapActor.RemoveDynamic(HeroChar, &AVMCharacterHeroBase::OnHitExplosionByAOE);
 	return EBTNodeResult::Succeeded;
 }

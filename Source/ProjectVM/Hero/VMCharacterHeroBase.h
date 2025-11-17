@@ -42,6 +42,8 @@ public:
 	UFUNCTION()
 	void OnHitExplosionByAOE(AActor* Target, FVector ExplosionCenter);
 
+	FTimerHandle StunTimerHandle;
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class USpringArmComponent> CameraBoom;
