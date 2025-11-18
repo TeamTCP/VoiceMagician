@@ -136,5 +136,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Inventory")
 	TArray<TObjectPtr<UVMEquipment>> InventoryContents;
 
-		
+	
+
+
 };

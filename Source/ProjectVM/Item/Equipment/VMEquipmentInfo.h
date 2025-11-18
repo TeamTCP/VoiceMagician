@@ -6,12 +6,21 @@
 #include "Engine/DataTable.h"
 #include "VMEquipmentInfo.generated.h"
 
+
+
+
 USTRUCT(BlueprintType)
 struct FVMEquipmentInfo : public FTableRowBase
 {
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UStaticMesh> Mesh;
+
+	UPROPERTY(EditAnywhere)
+	UTexture2D* Icon;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	FString ItemName;
 

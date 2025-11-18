@@ -150,7 +150,7 @@ AVMCharacterHeroBase::AVMCharacterHeroBase()
 	PlayerInventory = CreateDefaultSubobject<UVMInventoryComponent>(TEXT("PlayerInventory"));
 
 	InteractionCheckFrequency = 0.1;
-	InteractionCheckDistance = 225.0f;
+	InteractionCheckDistance = 300.0f;
 
 	BaseEyeHeight = 74.0f;
 }
@@ -187,7 +187,11 @@ void AVMCharacterHeroBase::ChangeInputMode(EInputMode NewMode)
 				break;
 			}
 		}
+
+	
 	}
+
+
 }
 
 void AVMCharacterHeroBase::SetInteractNPC(AVMNPC* NewInteractNPC)
@@ -227,6 +231,20 @@ void AVMCharacterHeroBase::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		{
+			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+		}
+	}
+
+
+	//인벤토리
+	PlayerInputComponent->BindAction("Interaction", IE_Pressed, this, &AVMCharacterHeroBase::BeginInteract);
+	PlayerInputComponent->BindAction("Interaction", IE_Pressed, this, &AVMCharacterHeroBase::EndInteract);
+
+
 	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
@@ -248,9 +266,6 @@ void AVMCharacterHeroBase::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 
 	//다이얼로그
 	EnhancedInputComponent->BindAction(NextTalkAction, ETriggerEvent::Triggered, this, &AVMCharacterHeroBase::NextTalk);
-
-	//인벤토리
-
 
 }
 
@@ -370,7 +385,7 @@ void AVMCharacterHeroBase::PerformInteractionCheck()
 	if (LookDirection > 0)
 	{
 
-		//DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 1.0f, 0, 2.0f);
+		DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 1.0f, 0, 2.0f);
 
 		FCollisionQueryParams QueryParams;
 		QueryParams.AddIgnoredActor(this);
@@ -394,6 +409,29 @@ void AVMCharacterHeroBase::PerformInteractionCheck()
 				}
 			}
 		}
+
+	/*	if (GetWorld()->LineTraceSingleByChannel(TraceHit, TraceStart, TraceEnd, ECC_Visibility, QueryParams))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Hit: %s"), *TraceHit.GetActor()->GetName());
+
+			if (TraceHit.GetActor()->GetClass()->ImplementsInterface(UVMInteractionInterface::StaticClass()))
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Implements IVMInteractionInterface!"));
+
+				const float Distance = (TraceStart - TraceHit.ImpactPoint).Size();
+				UE_LOG(LogTemp, Warning, TEXT("Distance: %f"), Distance);
+
+
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Actor does NOT implement interface"));
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("LineTrace hit nothing"));
+		}*/
 	}
 
 
@@ -449,25 +487,61 @@ void AVMCharacterHeroBase::NoInteractableFound()
 
 void AVMCharacterHeroBase::BeginInteract()
 {
-	//verify nothing has changed with the interactable state since beginning interaction
+	////verify nothing has changed with the interactable state since beginning interaction
+	//PerformInteractionCheck();
+
+	//if (InteractionData.CurrentInteractable)
+	//{
+	//	if (IsValid(TargetInteractable.GetObject()))
+	//	{
+	//		TargetInteractable->BeginInteract();
+
+	//		if (FMath::IsNearlyZero(TargetInteractable->InteractableData.InteractionDuration, 0.1f))
+	//		{
+	//			BeingInteract();
+	//		}
+	//		else
+	//		{
+	//			GetWorldTimerManager().SetTimer(TimerHandle_Interaction, this, &AVMCharacterHeroBase::BeingInteract,
+	//				TargetInteractable->InteractableData.InteractionDuration, false);
+	//		}
+	//	}
+	//}
+	UE_LOG(LogTemp, Warning, TEXT("BeginInteract called"));
+
 	PerformInteractionCheck();
 
 	if (InteractionData.CurrentInteractable)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("CurrentInteractable is set: %s"),
+			*InteractionData.CurrentInteractable->GetName());
+
 		if (IsValid(TargetInteractable.GetObject()))
 		{
+			UE_LOG(LogTemp, Warning, TEXT("TargetInteractable is valid, calling BeginInteract on target"));
 			TargetInteractable->BeginInteract();
 
 			if (FMath::IsNearlyZero(TargetInteractable->InteractableData.InteractionDuration, 0.1f))
 			{
+				UE_LOG(LogTemp, Warning, TEXT("InteractionDuration ~ 0, calling BeingInteract immediately"));
 				BeingInteract();
 			}
 			else
 			{
-				GetWorldTimerManager().SetTimer(TimerHandle_Interaction, this, &AVMCharacterHeroBase::BeingInteract,
-					TargetInteractable->InteractableData.InteractionDuration, false);
+				UE_LOG(LogTemp, Warning, TEXT("Setting timer for BeingInteract, duration: %f"),
+					TargetInteractable->InteractableData.InteractionDuration);
+				GetWorldTimerManager().SetTimer(
+					TimerHandle_Interaction,
+					this,
+					&AVMCharacterHeroBase::BeingInteract,
+					TargetInteractable->InteractableData.InteractionDuration,
+					false);
 			}
 		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("BeginInteract: CurrentInteractable is nullptr"));
 	}
 }
 

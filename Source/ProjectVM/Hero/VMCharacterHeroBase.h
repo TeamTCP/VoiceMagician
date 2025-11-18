@@ -13,6 +13,9 @@
 #include "Inventory/VMInventoryComponent.h"
 #include "UI/Character/VMCharacterHeroHUD.h"
 
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+
 
 #include "VMCharacterHeroBase.generated.h"
 
@@ -80,7 +83,7 @@ protected:
 
 	//대화 넘기기
 	void NextTalk(const FInputActionValue& Value);
-
+	
 
 	void DebuggingTest(const FInputActionValue& Value);
 

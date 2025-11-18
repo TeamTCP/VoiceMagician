@@ -3,6 +3,7 @@
 
 #include "Inventory/VMInventoryComponent.h"
 #include "Item/Equipment/VMEquipment.h"
+#include "Inventory/VMPickup.h"
 
 // Sets default values for this component's properties
 UVMInventoryComponent::UVMInventoryComponent()
@@ -130,6 +131,8 @@ void UVMInventoryComponent::AddNewItem(UVMEquipment* Item, const int32 AmountTod
 	//InventoryTotalWeight += NewItem->GetItemStackWeight();
 	OnInventoryUpdated.Broadcast();
 }
+
+
 
 
 // Called every frame
