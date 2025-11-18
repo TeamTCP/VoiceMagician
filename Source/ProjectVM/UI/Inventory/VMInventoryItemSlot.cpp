@@ -63,14 +63,12 @@ void UVMInventoryItemSlot::NativeConstruct()
 	{
 		ItemBorder->SetBrushColor(FLinearColor::Transparent);
 	}
-	if (ItemIcon)
-	{
-		ItemIcon->SetBrushFromTexture(nullptr);
-	}
 }
 
 FReply UVMInventoryItemSlot::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Slot::OnMouseButtonDown"));
+
 	FReply Reply = Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
 
 	if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
@@ -107,6 +105,8 @@ void UVMInventoryItemSlot::NativeOnDragDetected(const FGeometry& InGeometry, con
 
 		OutOperation = DragItemOperation;
 	}*/
+	UE_LOG(LogTemp, Warning, TEXT("Slot::OnDragDetected"));
+
 	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
 
 	if (!ItemReference)
@@ -141,17 +141,52 @@ void UVMInventoryItemSlot::NativeOnDragDetected(const FGeometry& InGeometry, con
 	}
 }
 
+void UVMInventoryItemSlot::SetItemReference(UVMEquipment* ItemIn)
+	{ 
+		ItemReference = ItemIn;
+		const TCHAR* NameForLog = TEXT("NULL");
+		if (ItemReference)
+		{
+			// ItemName 이 FString 이라면 이렇게 TCHAR* 로 꺼내야 함
+			NameForLog = *ItemReference->GetEquipmentInfo().ItemName;
+		}
+
+		UE_LOG(LogTemp, Warning, TEXT("SetItemReference called, Item: %s"), NameForLog);
+
+		RefreshFromItem();
+
+		SetUp(ItemIn->GetEquipmentInfo());
+	};
+
+
+void UVMInventoryItemSlot::SetUp(const FVMEquipmentInfo& Info)
+{
+	// 다이나믹 머터리얼 생성
+	if (ItemIcon && ItemIcon->GetBrush().GetResourceObject())
+	{
+		UMaterialInterface* BaseMat = Cast<UMaterialInterface>(ItemIcon->GetBrush().GetResourceObject());
+		if (BaseMat != nullptr)
+		{
+			ItemMaterialInstance = UMaterialInstanceDynamic::Create(BaseMat, this);
+			ItemIcon->SetBrushFromMaterial(ItemMaterialInstance);
+		}
+	}
+	//머터리얼 파라미터 설정
+	if (ItemMaterialInstance)
+	{
+		ItemMaterialInstance->SetScalarParameterValue(TEXT("ColumnIndex"), Info.AtlasCol);
+		ItemMaterialInstance->SetScalarParameterValue(TEXT("RowIndex"), Info.AtlasRow);
+	}
+
+}
+
 void UVMInventoryItemSlot::RefreshFromItem()
 {
 	UE_LOG(LogTemp, Warning, TEXT("RefreshFromItem: ENTER"));
 
 	// 1) 위젯 바인딩이 제대로 되었는지 확인
-	if (!ItemIcon || !ItemBorder)
+	if (!ItemBorder)
 	{
-		UE_LOG(LogTemp, Warning,
-			TEXT("RefreshFromItem: ItemIcon or ItemBorder is NULL (Icon:%s, Border:%s)"),
-			ItemIcon ? TEXT("VALID") : TEXT("NULL"),
-			ItemBorder ? TEXT("VALID") : TEXT("NULL"));
 		return;
 	}
 
@@ -160,7 +195,7 @@ void UVMInventoryItemSlot::RefreshFromItem()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("RefreshFromItem: ItemReference is NULL"));
 		ItemBorder->SetBrushColor(FLinearColor::Transparent);
-		ItemIcon->SetBrushFromTexture(nullptr);
+		//ItemIcon->SetBrushFromTexture(nullptr);
 		return;
 	}
 
@@ -171,7 +206,7 @@ void UVMInventoryItemSlot::RefreshFromItem()
 	ItemBorder->SetBrushColor(FLinearColor::Gray);
 
 	// 4) 아이콘 세팅
-	if (Info.Icon)
+	/*if (Info.Icon)
 	{
 		ItemIcon->SetBrushFromTexture(Info.Icon);
 		UE_LOG(LogTemp, Warning, TEXT("RefreshFromItem: Icon %s set for %s"),
@@ -182,7 +217,7 @@ void UVMInventoryItemSlot::RefreshFromItem()
 		ItemIcon->SetBrushFromTexture(nullptr);
 		UE_LOG(LogTemp, Warning, TEXT("RefreshFromItem: Icon is NULL for %s"),
 			*Info.ItemName);
-	}
+	}*/
 
 }
 

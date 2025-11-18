@@ -82,6 +82,8 @@ void AVMRPGPlayerController::ToggleInteractKey(bool bIsVisible)
 	}
 }
 
+
+
 void AVMRPGPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -128,4 +130,41 @@ void AVMRPGPlayerController::BeginPlay()
 			ScreenUIMap.Add(EScreenUIType::ShopScreen, VMShopScreen);
 		}
 	}
+}
+
+
+void AVMRPGPlayerController::OpenInventory()
+{
+	if (!InventoryPanel)
+	{
+		InventoryPanel = CreateWidget<UVMInventoryPanel>(this, InventoryPanelClass);
+		if (InventoryPanel)
+		{
+			InventoryPanel->AddToViewport();
+		}
+	}
+
+	FInputModeGameAndUI InputMode;
+	InputMode.SetHideCursorDuringCapture(false);
+	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+
+	SetInputMode(InputMode);
+	bShowMouseCursor = true;
+
+	UE_LOG(LogTemp, Warning, TEXT("Inventory Opened → GameAndUI Mode"));
+}
+
+void AVMRPGPlayerController::CloseInventory()
+{
+	if (InventoryPanel)
+	{
+		InventoryPanel->RemoveFromParent();
+		InventoryPanel = nullptr;
+	}
+
+	FInputModeGameOnly InputMode;
+	SetInputMode(InputMode);
+	bShowMouseCursor = false;
+
+	UE_LOG(LogTemp, Warning, TEXT("Inventory Closed → GameOnly Mode"));
 }

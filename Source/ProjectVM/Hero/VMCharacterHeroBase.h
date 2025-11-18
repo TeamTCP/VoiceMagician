@@ -97,6 +97,8 @@ protected:
 	void BeingInteract();
 	void ToggleMenu();
 
+
+
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
@@ -108,6 +110,11 @@ public:
 	void OnHitExplosionByAOE(AActor* Target, FVector ExplosionCenter);
 
 	FTimerHandle StunTimerHandle;
+
+	UFUNCTION()
+	void ToggleInventory(const FInputActionValue& Value);
+
+	
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, Meta = (AllowPrivateAccess = "true"))
@@ -182,11 +189,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> ToggleAction;
 
-	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	//TObjectPtr<class UInputAction> BeginInteract;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> InventoryAction;
 
-	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	//TObjectPtr<class UInputAction> EndInteract;
+	UPROPERTY(BlueprintReadOnly, Category = "Inventory")
+	bool bInventoryIsOpen = false;
+
+
+
 
 
 #pragma region 나희영_손 묻음 ㅈㅅ

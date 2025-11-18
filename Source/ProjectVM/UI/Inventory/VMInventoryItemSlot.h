@@ -26,20 +26,7 @@ class PROJECTVM_API UVMInventoryItemSlot : public UUserWidget
 
 public:
 	FORCEINLINE UVMEquipment* GetItemReference() const { return ItemReference; };
-	FORCEINLINE void SetItemReference(UVMEquipment* ItemIn) 
-	{ 
-		ItemReference = ItemIn;
-		const TCHAR* NameForLog = TEXT("NULL");
-		if (ItemReference)
-		{
-			// ItemName 이 FString 이라면 이렇게 TCHAR* 로 꺼내야 함
-			NameForLog = *ItemReference->GetEquipmentInfo().ItemName;
-		}
-
-		UE_LOG(LogTemp, Warning, TEXT("SetItemReference called, Item: %s"), NameForLog);
-
-		RefreshFromItem();
-	};
+	void SetItemReference(UVMEquipment* ItemIn);
 
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "Inventory Slot")
@@ -57,6 +44,10 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Inventory Slot", meta = (BindWidget))
 	TObjectPtr<UImage> ItemIcon;
 
+	UPROPERTY()
+	TObjectPtr<class UMaterialInstanceDynamic> ItemMaterialInstance;
+
+	void SetUp(const FVMEquipmentInfo& Info);
 	//UPROPERTY(VisibleAnywhere, Category = "Inventory Slot", meta = (BindWidget))
 	//TObjectPtr<UTextBlock> ItemQuantity;
 

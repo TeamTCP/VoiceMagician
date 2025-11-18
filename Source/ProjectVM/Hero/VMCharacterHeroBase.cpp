@@ -25,6 +25,7 @@
 
 #include "Components/PawnNoiseEmitterComponent.h"
 
+#include "Game/VMRPGPlayerController.h"
 
 #include "AI/Allies/VMAllyBase.h"
 
@@ -261,6 +262,7 @@ void AVMCharacterHeroBase::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	PlayerInputComponent->BindAction("Interaction", IE_Pressed, this, &AVMCharacterHeroBase::EndInteract);
 
 
+
 	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AVMCharacterHeroBase::Jump);
@@ -276,6 +278,7 @@ void AVMCharacterHeroBase::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	
 	
 	EnhancedInputComponent->BindAction(ToggleAction, ETriggerEvent::Triggered, this, &AVMCharacterHeroBase::ToggleMenu);
+	EnhancedInputComponent->BindAction(InventoryAction, ETriggerEvent::Started,this, &AVMCharacterHeroBase::ToggleInventory);
 	
 	//EnhancedInputComponent->BindAction(Toggle, ETriggerEvent::Triggered, this, &AVMCharacterHeroBase::BeginInteract);
 	//EnhancedInputComponent->BindAction(Toggle, ETriggerEvent::Triggered, this, &AVMCharacterHeroBase::EndInteract);
@@ -630,6 +633,17 @@ void AVMCharacterHeroBase::ToggleMenu()
 {
 	UE_LOG(LogTemp, Log, TEXT("QWER "));
 	HUD->ToggleMenu();
+}
+
+void AVMCharacterHeroBase::ToggleInventory(const FInputActionValue& Value)
+{
+	AVMRPGPlayerController* PC = Cast<AVMRPGPlayerController>(GetController());
+	if (!PC) return;
+
+	if (bInventoryIsOpen)
+		PC->CloseInventory();
+	else
+		PC->OpenInventory();
 }
 
 
