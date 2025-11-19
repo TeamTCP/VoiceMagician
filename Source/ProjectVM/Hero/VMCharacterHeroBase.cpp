@@ -25,6 +25,9 @@
 
 #include "Components/PawnNoiseEmitterComponent.h"
 
+#include "Interface/VMStatChangeable.h"
+#include "AOE/VMAOEHeal.h"
+
 
 #include "AI/Allies/VMAllyBase.h"
 
@@ -703,6 +706,7 @@ void AVMCharacterHeroBase::ApplyFireDotDamage()
 
 	UE_LOG(LogTemp, Warning, TEXT("Fire DOT Damage: %d"), Damage);
 
+	// this를 주면 Hero가 데미지 준거임.ㅋㅋㅋㅋ
 	HealthPointChange(Damage, this);
 	//DamageHandle.Invalidate();
 	// 여기에 실제 데미지 입히는 코드 넣으면 됨
@@ -719,8 +723,71 @@ void AVMCharacterHeroBase::ClearFireDot()
 }
 
 #pragma region 필요해서 넣었습니다
+#include "DrawDebugHelpers.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameFramework/Character.h"  // 기본 플레이어 캐릭터
+#include "AI/VMEnemyBase.h"
+
 void AVMCharacterHeroBase::SpawnAllyActor()
 {
+	
+	
+	FVector Origin = GetActorLocation();       // 공격 시작 위치
+	FVector Forward = GetActorForwardVector(); // 공격 방향
+	float Radius = 500.f;                       // 공격 범위
+	float AngleDeg = 60.f;                      // 부채꼴 각도
+
+	int32 Segments = 20;  // 부채꼴 외곽 디테일
+	TArray<FVector> Points;
+	Points.Add(Origin);
+
+	for (int32 i = 0; i <= Segments; i++)
+	{
+		float CurrentAngle = FMath::Lerp(-AngleDeg / 2, AngleDeg / 2, i / (float)Segments);
+		FVector Dir = Forward.RotateAngleAxis(CurrentAngle, FVector::UpVector);
+		Points.Add(Origin + Dir * Radius);
+	}
+
+	// 부채꼴 외곽선 연결
+	for (int32 i = 1; i < Points.Num(); i++)
+	{
+		DrawDebugLine(GetWorld(), Points[i - 1], Points[i], FColor::Red, false, 3.f, 0, 2.f);
+		DrawDebugLine(GetWorld(), Origin, Points[i], FColor::Red, false, 3.f, 0, 2.f);
+	}
+
+
+	// 월드에서 플레이어 모두 가져오기
+	TArray<AActor*> PlayerActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AVMEnemyBase::StaticClass(), PlayerActors);
+
+	for (AActor* Player : PlayerActors)
+	{
+		FVector ToPlayer = Player->GetActorLocation() - Origin;
+		float Dist = ToPlayer.Size();
+		UE_LOG(LogTemp, Display, TEXT("Player: Name:%s"), *Player->GetName());
+		if (Dist > Radius) continue; // 범위 밖이면 제외
+
+		ToPlayer.Normalize();
+		float Dot = FVector::DotProduct(Forward, ToPlayer);
+		float CosAngle = FMath::Cos(FMath::DegreesToRadians(AngleDeg / 2));
+
+		if (Dot >= CosAngle)
+		{
+			IVMStatChangeable* IStat = Cast<IVMStatChangeable>(Player);
+			IStat->HealthPointChange(4, this);
+			// 부채꼴 안에 있음 → 공격 적용
+			//ApplyAttack(Player);
+			UE_LOG(LogTemp, Log, TEXT("Hi"));
+		}
+	}
+	return;
+
+	AVMAOEHeal* HealSpawnedActor = GetWorld()->SpawnActor<AVMAOEHeal>(AVMAOEHeal::StaticClass(), GetActorLocation(), GetActorRotation());
+	if (HealSpawnedActor)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("스폰 성공!"));
+	}
+	return;
 	UE_LOG(LogTemp, Log, TEXT("SpawnAllyActor"));
 	// 1. SpawnActor 알아보기.
 	UWorld* World = GetWorld();
