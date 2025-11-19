@@ -106,7 +106,7 @@ void AVMAOEBomb::Explode()
         UGameplayStatics::PlaySoundAtLocation(GetWorld(), ExplosionSound, ExplosionLocation);
     }
 
-    // 2️⃣ 범위 내 Actor 찾기
+    // 범위 내 Actor 찾기
     TArray<FOverlapResult> Overlaps;
     FCollisionShape Sphere = FCollisionShape::MakeSphere(Radius);
 
