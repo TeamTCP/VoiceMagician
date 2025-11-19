@@ -239,7 +239,7 @@ void UVMShopScreen::RemoveListItem(int32 Price, UVMShopItemDataObject* ListObjec
 
 	UE_LOG(LogTemp, Log, TEXT("deldte : %s"), *ListObject->EquipmentInfo->ItemName);
 	//그리드 뷰에 아이템 추가
-	
+
 	UVMShopItemWidget* NewItemWidget = CreateWidget<UVMShopItemWidget>(this, ShopItemWidgetClass);
 	NewItemWidget->Setup(*(ListObject->EquipmentInfo));
 
@@ -399,14 +399,18 @@ void UVMShopScreen::OnExitClicked()
 	PC->SetInputMode(InputMode);
 
 	ACharacter* PlayerCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-	if (PlayerCharacter != nullptr)
+	if (PlayerCharacter == nullptr)
 	{
-		AVMCharacterHeroBase* Player = Cast<AVMCharacterHeroBase>(PlayerCharacter);
-		if (Player != nullptr)
-		{
-			Player->ChangeInputMode(EInputMode::Default);
-		}
+		UE_LOG(LogTemp, Log, TEXT("ACharacter is nullptr"));
+		return;
 	}
+	AVMCharacterHeroBase* Player = Cast<AVMCharacterHeroBase>(PlayerCharacter);
+	if (Player == nullptr)
+	{
+		UE_LOG(LogTemp, Log, TEXT("AVMCharacterHeroBase is nullptr"));
+		return;
+	}
+	Player->ChangeInputMode(EInputMode::Default);
 
 	//ShopComponent nullptr로 초기화
 	ShopListView->ClearListItems();
@@ -417,6 +421,10 @@ void UVMShopScreen::OnExitClicked()
 
 	//시점 다시 돌리기
 	PC->SetViewTargetWithBlend(PC->GetPawn(), 0.5f);
+
+	//인벤토리 UI 갱신
+	Player->GetInventory()->UpdateUI();
+	UE_LOG(LogTemp, Log, TEXT("인벤토리 갱신"));
 }
 
 void UVMShopScreen::UpdateButtonStyle()
@@ -451,7 +459,7 @@ void UVMShopScreen::RepackShopGrid()
 		UVMShopItemWidget* ItemWidget = Cast<UVMShopItemWidget>(Children[i]);
 		if (ItemWidget)
 		{
-			ItemWidget->InventoryIndex = i; 
+			ItemWidget->InventoryIndex = i;
 		}
 		UUniformGridSlot* GridSlot = Cast<UUniformGridSlot>(ShopGridPanel->AddChild(Children[i]));
 		if (GridSlot != nullptr)

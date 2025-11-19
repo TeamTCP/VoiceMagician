@@ -132,7 +132,10 @@ void UVMInventoryComponent::AddNewItem(UVMEquipment* Item, const int32 AmountTod
 	OnInventoryUpdated.Broadcast();
 }
 
-
+void UVMInventoryComponent::UpdateUI()
+{
+	OnInventoryUpdated.Broadcast();
+}
 
 
 // Called every frame
