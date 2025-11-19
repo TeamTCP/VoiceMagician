@@ -129,6 +129,8 @@ public:
 	//FORCEINLINE void SetWeightCapacity(const int32 NewWeightCapacity) { InventoryWeightCapacity = NewWeightCapacity; };
 
 	void AddNewItem(UVMEquipment* Item, const int32 AmountTodd);
+
+	void UpdateUI();
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
