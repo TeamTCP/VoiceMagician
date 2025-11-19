@@ -17,7 +17,6 @@
 #include "Components/CapsuleComponent.h"
 
 #include "ProjectVmCharacter.h"
-#include "Game/VMPlayer.h"
 
 #include "BehaviorTree/BlackboardComponent.h"
 
@@ -243,15 +242,15 @@ void AVMAllyBase::ApplyOwnerDamageBuff()
 	}
 
 	// TODO: 인터페이스로 바꿔야 함.
-	AVMPlayer* OwnerCharacterPtr = Cast<AVMPlayer>(OwnerActor);
+
+	AVMCharacterHeroBase* OwnerCharacterPtr = Cast<AVMCharacterHeroBase>(OwnerActor);
 	if (OwnerCharacterPtr == nullptr)
 	{
 		UE_LOG(LogTemp, Error, TEXT("[AVMAllyBase::ApplyOwnerDamageBuff] OwnerCharacterPtr is nullptr"));
 		return;
 	}
-	OwnerCharacterPtr->AddAttackDamage(3.0f);
 
-	UE_LOG(LogTemp, Log, TEXT("주인의 데미지를 임시로 올립니다."));
+	UE_LOG(LogTemp, Log, TEXT("주인의 데미지를 임시로 올립니다. 윤성님 코드 보고 해야 함."));
 }
 
 void AVMAllyBase::ActivateDamageBuffParticle()
