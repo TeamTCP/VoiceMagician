@@ -5,6 +5,10 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Core/VMInteractableInterface.h"
+
+#include "NavigationSystem.h"
+#include "NavigationSystemTypes.h" 
+
 #include "VMPortal.generated.h"
 
 UCLASS()
@@ -13,15 +17,19 @@ class PROJECTVM_API AVMPortal : public AActor, public IVMInteractableInterface
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	AVMPortal();
 	virtual void Interact() override;
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-	
+
+	FORCEINLINE class UNiagaraComponent* GetPortalNiagaraSystem() const {
+		return PortalNiagaraSystem;
+	}
+
 	//맵 이동
-	void TeleportPlayerToMap();
+	UFUNCTION()
+	virtual void TeleportPlayerToMap();
+
+protected:
+	virtual void BeginPlay() override;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Portal")
@@ -36,10 +44,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interact")
 	TObjectPtr<class UInteractComponent> InteractComponent;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TargetMap")
-	FString TargetLevelPath = "/Game/Project/Map/TestBossMap.TestBossMap";
+	//TObjectPtr < class ULevelStreamingDynamic> LoadedLevel = nullptr;
 
-	TObjectPtr < class ULevelStreamingDynamic> LoadedLevel = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Position")
+	FVector MapTeleportPos = FVector(0.f, 0.f, 0.f);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Position")
+	FVector PlayerTeleportPos = FVector(0.f, 0.f, 0.f);
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Position")
+	//FRotator PlayerTeleportRot = FRotator(0.f, 0.f, 0.f);
 
 	//이펙트 타이머
 	FTimerHandle EffectTimerHandle;
