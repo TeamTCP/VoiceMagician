@@ -35,7 +35,6 @@ void UAnimNotify_CheckHitFlag::Notify(USkeletalMeshComponent* MeshComp, UAnimSeq
 		//FString NextSection = FString::Printf(TEXT("%s%d"), *EnemyBase->SectionNamePrefix, EnemyBase->CurrentSectionIndex);
 		FString NextSection = EnemyBase->SectionNamePrefix + FString::FromInt(EnemyBase->CurrentSectionIndex);
 		FName SectionName(*NextSection);
-		UE_LOG(LogTemp, Log, TEXT("들어오냐? %s"), *SectionName.ToString());
 		AnimInstance->Montage_JumpToSection(SectionName, EnemyBase->NormalAttackMontage);
 
 		EnemyBase->CurrentSectionIndex = EnemyBase->CurrentSectionIndex + 1;
