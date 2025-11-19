@@ -20,8 +20,6 @@ void UBTService_UpdateHp::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* Nod
 {
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
 
-	UE_LOG(LogTemp, Log, TEXT("UpdateHp::TickNode"));
-
 	// AI 컨트롤러 획득 시도
 	AAIController* AIControllerPtr = OwnerComp.GetAIOwner();
 	if (AIControllerPtr == nullptr)
@@ -60,7 +58,7 @@ void UBTService_UpdateHp::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* Nod
 
 	float CurrentHp = OwnerPlayerPtr->GetStatComponent()->GetStat().HealthPoint;
 	float MaxHp = OwnerPlayerPtr->GetStatComponent()->GetDefaultStat().HealthPoint;
-
+	UE_LOG(LogTemp, Log, TEXT("Cur:%f, Max:%f"), CurrentHp, MaxHp);
 	BBComponentPtr->SetValueAsFloat(TEXT("OwnerCurrentHp"), CurrentHp);
 	BBComponentPtr->SetValueAsFloat(TEXT("OwnerMaxHp"), MaxHp);
 }
@@ -68,6 +66,4 @@ void UBTService_UpdateHp::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* Nod
 void UBTService_UpdateHp::OnSearchStart(FBehaviorTreeSearchData& SearchData)
 {
 	Super::OnSearchStart(SearchData);
-
-	UE_LOG(LogTemp, Log, TEXT("UpdateHp::OnHpStart"));
 }

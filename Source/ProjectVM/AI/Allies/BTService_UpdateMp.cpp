@@ -66,6 +66,4 @@ void UBTService_UpdateMp::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* Nod
 void UBTService_UpdateMp::OnSearchStart(FBehaviorTreeSearchData& SearchData)
 {
 	Super::OnSearchStart(SearchData);
-
-	UE_LOG(LogTemp, Log, TEXT("UpdateMp::OnMpStart"));
 }
