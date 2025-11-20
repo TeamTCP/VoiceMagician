@@ -134,6 +134,7 @@ void AVMRPGPlayerController::HideBossStatusWidget()
 		{
 			if (VMBossStatusWidget != nullptr)
 			{
+				UE_LOG(LogTemp, Log, TEXT("HideBossStatusWidget Call"));
 				VMBossStatusWidget->RemoveFromParent();
 				Boss->ClearDelegate();
 			}
@@ -143,16 +144,6 @@ void AVMRPGPlayerController::HideBossStatusWidget()
 	
 }
 
-void AVMRPGPlayerController::ResetInputSystem()
-{
-	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
-
-	if (Subsystem)
-	{
-		Subsystem->ClearAllMappings();
-	}
-}
-
 void AVMRPGPlayerController::ShowGameOverUI()
 {
 	GameOverWidget = CreateWidget<UUserWidget>(this, GameOverWidgetClass);
@@ -160,6 +151,11 @@ void AVMRPGPlayerController::ShowGameOverUI()
 	{
 		GameOverWidget->AddToViewport();
 	}
+}
+
+void AVMRPGPlayerController::HideGameOverUI()
+{
+	GameOverWidget->RemoveFromParent();
 }
 
 void AVMRPGPlayerController::BeginPlay()

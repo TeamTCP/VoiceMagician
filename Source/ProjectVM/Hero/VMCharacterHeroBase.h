@@ -50,11 +50,13 @@ public:
 	AVMCharacterHeroBase();
 	
 	FHeroDeathHandler OnHeroDeath;
+	FHeroDeathHandler OnHeroResurrect;
 
 	FORCEINLINE class UCameraComponent* GetCameraComponent() { return FollowCamera; }
 	FORCEINLINE class UVMHeroStatComponent* GetStatComponent() { return Stat; }
 	FORCEINLINE class UVMHeroSkillComponent* GetSkillComponent() { return Skills; }
 	FORCEINLINE EHeroState GetHeroState() { return CurState; }
+	void Resurrect();
 	
 	void ChangeInputMode(EInputMode NewMode);
 	virtual void HealthPointChange(float Amount, AActor* Causer) override; // TODO : ApplyDamage로 네이밍 변경 고려
@@ -159,6 +161,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputMappingContext> InputMappingContext;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputMappingContext> DeadStateInputMappingContext;
 
 	//대화 매핑 컨텍스트
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))

@@ -31,7 +31,7 @@
 #include "Game/VMRPGPlayerController.h"
 
 #include "AI/Allies/VMAllyBase.h"
-
+#include "Core/VMLevelManager.h"
 
 
 AVMCharacterHeroBase::AVMCharacterHeroBase()
@@ -75,6 +75,12 @@ AVMCharacterHeroBase::AVMCharacterHeroBase()
 	if (InputMappingContextRef.Succeeded())
 	{
 		InputMappingContext = InputMappingContextRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputMappingContext> DeadStateInputMappingContextRef(TEXT("/Game/Project/Input/IMC_Dead.IMC_Dead"));
+	if (DeadStateInputMappingContextRef.Succeeded())
+	{
+		DeadStateInputMappingContext = DeadStateInputMappingContextRef.Object;
 	}
 
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext> DialogueMappingContextRef(TEXT("/Game/Project/Input/IMC_Dialogue.IMC_Dialogue"));
@@ -191,8 +197,7 @@ void AVMCharacterHeroBase::ChangeInputMode(EInputMode NewMode)
 	APlayerController* PC = Cast<APlayerController>(GetController());
 	if (PC)
 	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem =
-			ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
 		{
 			// 현재 등록된 모든 매핑 제거
 			Subsystem->ClearAllMappings();
@@ -206,15 +211,13 @@ void AVMCharacterHeroBase::ChangeInputMode(EInputMode NewMode)
 			case EInputMode::Dialogue:
 				Subsystem->AddMappingContext(DialogueMappingContext, 0);
 				break;
+			case EInputMode::Dead:
+				Subsystem->AddMappingContext(DeadStateInputMappingContext, 0);
 			default:
 				break;
 			}
 		}
-
-	
 	}
-
-
 }
 
 void AVMCharacterHeroBase::SetInteractNPC(AVMNPC* NewInteractNPC)
@@ -327,12 +330,31 @@ void AVMCharacterHeroBase::ApplySpeed(int32 SpeedStat)
 
 void AVMCharacterHeroBase::Die()
 {
-	UE_LOG(LogTemp, Log, TEXT("Die : 테스트"));
+	UE_LOG(LogTemp, Log, TEXT("Test : Die"));
 	CurState = EHeroState::Dead;
-	
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+	ChangeInputMode(EInputMode::Dead);
+	GetCapsuleComponent()->SetCollisionProfileName(TEXT("NoCollision"));
+	
 	OnHeroDeath.Broadcast();
+}
+
+void AVMCharacterHeroBase::Resurrect()
+{
+	UE_LOG(LogTemp, Log, TEXT("Test : Resurrect"));
+	CurState = EHeroState::Idle;
+
+	ChangeInputMode(EInputMode::Default);
+	GetCapsuleComponent()->SetCollisionProfileName(TEXT("VMHeroCollision"));
+	
+	UVMLevelManager* LevelManager = GetGameInstance()->GetSubsystem<UVMLevelManager>();
+	LevelManager->DeleteLevel(FName("BossMap"));
+
+	SetActorLocation(FVector(-3700.0f, 1400.0f, 200.0f));
+	Stat->RecoverHealth(100);
+	Stat->RecoverMana(100);
+
+	OnHeroResurrect.Broadcast();
 }
 
 void AVMCharacterHeroBase::BasicSkill(const FInputActionValue& Value)
