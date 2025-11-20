@@ -55,7 +55,7 @@ void AVMCharacterHeroHUD::BeginPlay()
 		if (EquipmentPanel)
 		{
 			EquipmentPanel->AddToViewport();
-			EquipmentPanel->SetVisibility(ESlateVisibility::Collapsed);
+			EquipmentPanel->SetVisibility(ESlateVisibility::Visible);
 			UE_LOG(LogTemp, Warning, TEXT("HUD: EquipmentPanel created OK"));
 		}
 	}

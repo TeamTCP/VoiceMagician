@@ -48,6 +48,8 @@ void UVMInventoryPanel::RefreshInventory()
         UVMInventoryItemSlot* ItemSlot =
             CreateWidget<UVMInventoryItemSlot>(this, InventorySlotClass);
 
+        ItemSlot->SlotType = ESlotType::Inventory;
+
         ItemSlot->OnItemDoubleClicked.AddDynamic(this, &UVMInventoryPanel::HandleItemDoubleClicked);
 
         ItemSlot->SetItemReference(InventoryItem);  // 여기서 SetItemReference 로그가 떠야 함

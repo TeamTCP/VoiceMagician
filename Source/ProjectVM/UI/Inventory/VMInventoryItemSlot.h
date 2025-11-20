@@ -20,6 +20,13 @@ class UImage;
  * 
  */
 
+UENUM(BlueprintType)
+enum class ESlotType : uint8
+{
+	Inventory UMETA(DisplayName = "Inventory"),
+	Equipment UMETA(DisplayName = "Equipment")
+};
+
 //더블 클릭 델리게이트
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryItemDoubleClicked, UVMEquipment*, Item);
 
@@ -60,21 +67,28 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Inventory Slot")
 	TSubclassOf<UVMInventoryTooltip> TooltipClass;
 
-	UPROPERTY(VisibleAnywhere, Category = "Inventory Slot")
+	UPROPERTY(VisibleAnywhere, Category = "Inventory Slot | Equipment Slot")
 	TObjectPtr<UVMEquipment> ItemReference;
 
-	UPROPERTY(VisibleAnywhere, Category = "Inventory Slot", meta = (BindWidget))
+	UPROPERTY(VisibleAnywhere, Category = "Inventory Slot | Equipment Slot", meta = (BindWidget))
 	TObjectPtr<UBorder> ItemBorder;
 
-	UPROPERTY(VisibleAnywhere, Category = "Inventory Slot", meta = (BindWidget))
+	UPROPERTY(VisibleAnywhere, Category = "Inventory Slot | Equipment Slot", meta = (BindWidget))
 	TObjectPtr<UImage> ItemIcon;
 
 	UPROPERTY()
 	TObjectPtr<class UMaterialInstanceDynamic> ItemMaterialInstance;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
+	TObjectPtr<UMaterialInterface> ItemAtlasBaseMaterial;
+
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "ItemIcon")
 	TObjectPtr<UMaterialInterface> AtlasMaterial;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Slot")
+	ESlotType SlotType = ESlotType::Inventory;
+
 
 	// 더블 클릭 델리게이트 (패널에서 바인딩)
 	UPROPERTY(BlueprintAssignable, Category = "Inventory")

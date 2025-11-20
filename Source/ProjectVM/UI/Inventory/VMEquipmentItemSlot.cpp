@@ -45,29 +45,51 @@ void UVMEquipmentItemSlot::NativeConstruct()
 
 void UVMEquipmentItemSlot::SetItem(UVMEquipment* InItem)
 {
-
-    UE_LOG(LogTemp, Warning, TEXT("EquipSlot::SetItem called, Item: %s"),
-        InItem ? *InItem->GetEquipmentInfo().ItemName : TEXT("NULL"));
-
     ItemReference = InItem;
+    UE_LOG(LogTemp, Warning,
+        TEXT("InventorySlot(%s)::SetItemReference Item=%s"),
+        *GetName(),
+        *GetNameSafe(ItemReference));
     RefreshFromItem();
 }
 
 void UVMEquipmentItemSlot::ClearItem()
 {
     ItemReference = nullptr;
-    RefreshFromItem();
+    SetItem(nullptr);
 }
 
 void UVMEquipmentItemSlot::RefreshFromItem()
 {
+    /*UE_LOG(LogTemp, Warning,
+        TEXT("RefreshFromItem: ENTER, Ref=%s"),
+        *GetNameSafe(ItemReference));
+
+    UObject* ResObj = ItemIcon ? ItemIcon->GetBrush().GetResourceObject() : nullptr;
+    UMaterialInterface* BaseMat = Cast<UMaterialInterface>(ResObj);
+
     UE_LOG(LogTemp, Warning,
-        TEXT("EquipmentItemSlot::RefreshFromItem ENTER, AtlasMaterial=%s, MID=%s"),
-        *GetNameSafe(AtlasMaterial),
-        *GetNameSafe(ItemMaterialInstance));
+        TEXT("RefreshFromItem: ItemIcon=%p, ResObj=%p, BaseMat=%p, MID=%p"),
+        ItemIcon.Get(),
+        ResObj,
+        BaseMat,
+        ItemMaterialInstance.Get());
 
     if (!ItemIcon || !ItemBorder)
         return;
+
+    //// 머티리얼 인스턴스가 없으면 여기서라도 생성
+    //if (!ItemMaterialInstance)
+    //{
+    //    if (UObject* ResObj = ItemIcon->GetBrush().GetResourceObject())
+    //    {
+    //        if (UMaterialInterface* BaseMat = Cast<UMaterialInterface>(ResObj))
+    //        {
+    //            ItemMaterialInstance = UMaterialInstanceDynamic::Create(BaseMat, this);
+    //            ItemIcon->SetBrushFromMaterial(ItemMaterialInstance);
+    //        }
+    //    }
+    //}
 
     // 아이템 없으면 숨기기
     if (!ItemReference)
@@ -103,4 +125,73 @@ void UVMEquipmentItemSlot::RefreshFromItem()
 
     ItemIcon->SetVisibility(ESlateVisibility::Visible);
     ItemBorder->SetVisibility(ESlateVisibility::Visible);
+    */
+    UE_LOG(LogTemp, Warning,
+        TEXT("InventorySlot::RefreshFromItem ENTER, Ref=%s"),
+        *GetNameSafe(ItemReference));
+
+    if (!ItemIcon || !ItemBorder)
+    {
+        UE_LOG(LogTemp, Warning,
+            TEXT("RefreshFromItem: ItemIcon or ItemBorder is NULL"));
+        return;
+    }
+
+    // ★ 슬롯이 비어 있을 때 처리
+    if (!ItemReference)
+    {
+        ItemIcon->SetVisibility(ESlateVisibility::Hidden);
+        UE_LOG(LogTemp, Warning,
+            TEXT("RefreshFromItem: Empty slot -> hide icon"));
+        return;
+    }
+
+    ItemIcon->SetVisibility(ESlateVisibility::Visible);
+
+    // ★ 브러시에서 머티리얼/텍스처 가져오기
+    UObject* ResObj = ItemIcon->GetBrush().GetResourceObject();
+    UMaterialInterface* BaseMat = Cast<UMaterialInterface>(ResObj);
+
+    UE_LOG(LogTemp, Warning,
+        TEXT("RefreshFromItem: ItemIcon=%p, ResObj=%p, BaseMat=%p, MID=%p"),
+        ItemIcon.Get(),
+        ResObj,
+        BaseMat,
+        ItemMaterialInstance.Get());
+
+    if (!BaseMat)
+    {
+        UE_LOG(LogTemp, Warning,
+            TEXT("RefreshFromItem: BaseMat is NULL. "
+                "Check ItemIcon Brush uses a material (e.g. M_ItemAtlas)."));
+        return;
+    }
+
+    // ★ MID 없으면 여기서 무조건 생성
+    if (!ItemMaterialInstance)
+    {
+        ItemMaterialInstance = UMaterialInstanceDynamic::Create(BaseMat, this);
+        ItemIcon->SetBrushFromMaterial(ItemMaterialInstance);
+
+        UE_LOG(LogTemp, Warning,
+            TEXT("RefreshFromItem: MID created=%p"), ItemMaterialInstance.Get());
+    }
+
+    if (!ItemMaterialInstance)
+    {
+        UE_LOG(LogTemp, Warning,
+            TEXT("RefreshFromItem: ItemMaterialInstance STILL NULL"));
+        return;
+    }
+
+    // ★ 여기서 아이템의 Atlas 정보 적용
+    //    (구조체/함수 이름은 네 프로젝트에 맞게 수정)
+    const FVMEquipmentInfo& Info = ItemReference->GetEquipmentInfo();
+
+    ItemMaterialInstance->SetScalarParameterValue(TEXT("ColumnIndex"), Info.AtlasCol);
+    ItemMaterialInstance->SetScalarParameterValue(TEXT("RowIndex"), Info.AtlasRow);
+
+    UE_LOG(LogTemp, Warning,
+        TEXT("RefreshFromItem: Set Atlas Col=%d Row=%d"),
+        Info.AtlasCol, Info.AtlasRow);
 }

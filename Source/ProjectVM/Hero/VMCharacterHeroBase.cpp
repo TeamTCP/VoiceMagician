@@ -628,6 +628,16 @@ void AVMCharacterHeroBase::DropItem(UVMEquipment* ItemToDrop, const int32 Quanti
 	}
 }
 
+void AVMCharacterHeroBase::UnequipItem(UVMEquipment* Item)
+{
+	if (!Item) return;
+
+    // 장비 효과 제거
+    ApplyEquipmentStats(Info);
+
+    UE_LOG(LogTemp, Warning, TEXT("Hero: Unequipped %s"), *Item->GetEquipmentInfo().ItemName);
+}
+
 void AVMCharacterHeroBase::SetCurrentNPC(AVMNPC* NewNPC)
 {
 	CurrentNPC = NewNPC;
