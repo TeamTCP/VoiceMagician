@@ -78,7 +78,7 @@ void ARotatingLaserPillar::BeginPlay()
     Super::BeginPlay();
 
     // 10초 후 제거
-    //SetLifeSpan(10.f);
+    SetLifeSpan(10.f);
 
     // 지속 데미지 타이머 시작
     GetWorldTimerManager().SetTimer(DamageTimerHandle, this, &ARotatingLaserPillar::DealDamage, DamageInterval, true);
