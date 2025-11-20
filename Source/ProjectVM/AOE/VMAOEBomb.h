@@ -42,4 +42,6 @@ public:
     void Explode();
 
     bool flag = false;
+
+    float ExplosionTime;
 };
