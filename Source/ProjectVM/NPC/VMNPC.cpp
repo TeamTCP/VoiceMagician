@@ -113,43 +113,16 @@ void AVMNPC::BeginPlay()
 	UVMQuestManager* QuestManager = GetGameInstance()->GetSubsystem<UVMQuestManager>();
 	if (QuestManager != nullptr)
 	{
-		//퀘스트 배포 구독
-		QuestManager->OnQuestPublished.AddLambda([this](const FVMQuestData& QuestData)
-			{
-				if (QuestData.QuestGiver == NPCId)
-				{
-					//퀘스트가 없었는데 생긴거라면 headInfo에 QuestionIcon 띄우기
-					if (AvailableQuests.IsEmpty())
-					{
-						UVMNPCHeadInfo* NPCHeadInfoWidget = Cast<UVMNPCHeadInfo>(NPCHeadInfo->GetUserWidgetObject());
-						if (NPCHeadInfoWidget != nullptr)
-						{
-							NPCHeadInfoWidget->QuestionIcon->SetVisibility(ESlateVisibility::Visible);
-						}
-					}
-					//퀘스트 배열에 추가
-					AvailableQuests.Enqueue(&QuestData);
-				}
-			}
+		QuestManager->OnQuestPublished.RemoveAll(this);
+		QuestManager->OnQuestPublished.AddUObject(
+			this,
+			&AVMNPC::HandleQuestPublished
 		);
 
-		//퀘스트 완료 구독
-		QuestManager->OnQuestCompleted.AddLambda([this](const FVMQuestData& QuestData)
-			{
-				if (QuestData.QuestGiver == NPCId)
-				{
-					//퀘스트 완료가 없었는데 생긴거라면 headInfo에 ExclamationIcon 띄우기
-					if (AvailableQuests.IsEmpty())
-					{
-						UVMNPCHeadInfo* NPCHeadInfoWidget = Cast<UVMNPCHeadInfo>(NPCHeadInfo->GetUserWidgetObject());
-						if (NPCHeadInfoWidget != nullptr)
-						{
-							NPCHeadInfoWidget->ExclamationIcon->SetVisibility(ESlateVisibility::Visible);
-						}
-					}
-					CompletedQuests.Enqueue(QuestData); // 값 복사 하지 않으면 휘발됨. 
-				}
-			}
+		QuestManager->OnQuestCompleted.RemoveAll(this);
+		QuestManager->OnQuestCompleted.AddUObject(
+			this,
+			&AVMNPC::HandleQuestCompleted
 		);
 	}
 
@@ -162,6 +135,41 @@ void AVMNPC::BeginPlay()
 			NPCHeadInfoWidget->QuestionIcon->SetVisibility(ESlateVisibility::Hidden);
 			NPCHeadInfoWidget->ExclamationIcon->SetVisibility(ESlateVisibility::Hidden);
 		}
+	}
+}
+
+void AVMNPC::HandleQuestPublished(const FVMQuestData& QuestData)
+{
+	if (QuestData.QuestGiver == NPCId)
+	{
+		//퀘스트가 없었는데 생긴거라면 headInfo에 QuestionIcon 띄우기
+		if (AvailableQuests.IsEmpty())
+		{
+			UVMNPCHeadInfo* NPCHeadInfoWidget = Cast<UVMNPCHeadInfo>(NPCHeadInfo->GetUserWidgetObject());
+			if (NPCHeadInfoWidget != nullptr)
+			{
+				NPCHeadInfoWidget->QuestionIcon->SetVisibility(ESlateVisibility::Visible);
+			}
+		}
+		//퀘스트 배열에 추가
+		AvailableQuests.Enqueue(&QuestData);
+	}
+}
+
+void AVMNPC::HandleQuestCompleted(const FVMQuestData& QuestData)
+{
+	if (QuestData.QuestGiver == NPCId)
+	{
+		//퀘스트 완료가 없었는데 생긴거라면 headInfo에 ExclamationIcon 띄우기
+		if (AvailableQuests.IsEmpty())
+		{
+			UVMNPCHeadInfo* NPCHeadInfoWidget = Cast<UVMNPCHeadInfo>(NPCHeadInfo->GetUserWidgetObject());
+			if (NPCHeadInfoWidget != nullptr)
+			{
+				NPCHeadInfoWidget->ExclamationIcon->SetVisibility(ESlateVisibility::Visible);
+			}
+		}
+		CompletedQuests.Enqueue(QuestData); // 값 복사 하지 않으면 휘발됨. 
 	}
 }
 

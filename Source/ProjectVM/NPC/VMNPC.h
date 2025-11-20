@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "VMNPCEnums.h"
 #include "GameData/VMNPCData.h"
+#include "GameData/VMQuestData.h"
 #include "Core/VMInteractableInterface.h"
 #include "VMNPC.generated.h"
 
@@ -33,6 +34,9 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+
+	void HandleQuestPublished(const FVMQuestData& QuestData);
+	void HandleQuestCompleted(const FVMQuestData& QuestData);
 
 	//다이얼로그에 옵션 추가하는 함수
 	void AddDialogueOption(ENPCOption NewNPCOption);
