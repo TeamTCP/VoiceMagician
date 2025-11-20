@@ -20,7 +20,13 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
 
+	void CreateEffectPath();
+	void VerticalMove();
+	void Rotate();
+
+protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ItemCube")
 	TObjectPtr<class UBoxComponent> Box;
 
@@ -33,5 +39,15 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	TObjectPtr<class UVMEquipment> Equipment; 
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ItemCube")
 	TObjectPtr<class UMaterialInstanceDynamic> ItemMaterialInstance;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ItemCube")
+	float TimeProgress;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Projectile, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class USplineComponent> SplinePath;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Projectile, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UNiagaraComponent> Effect;
 };

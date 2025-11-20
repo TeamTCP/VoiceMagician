@@ -4,6 +4,8 @@
 #include "Item/VMItemCube.h"
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/SplineComponent.h"
+
 #include "Core/InteractComponent.h"
 #include "Item/Equipment/VMEquipment.h"
 #include "Item/Equipment/VMEquipmentInfo.h"
@@ -13,10 +15,15 @@
 #include "Game/VMRPGPlayerController.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
+
+#include "Utils/VMMath.h"
+
 // Sets default values
 AVMItemCube::AVMItemCube()
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
     // 루트 컴포넌트로 Box Collision 생성
     Box = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollision"));
@@ -39,6 +46,23 @@ AVMItemCube::AVMItemCube()
     //상호작용 컴포넌트 추가
     InteractComponent = CreateDefaultSubobject<UInteractComponent>(TEXT("InteractComponent"));
     InteractComponent->SetupAttachment(RootComponent);
+
+    SplinePath = CreateDefaultSubobject<USplineComponent>(TEXT("SplinePath"));
+    SplinePath->SetupAttachment(RootComponent);
+    SplinePath->bDrawDebug = true;
+
+    Effect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Effect"));
+    Effect->SetupAttachment(SplinePath);
+    Effect->SetAutoActivate(true);
+
+    static ConstructorHelpers::FObjectFinder<UNiagaraSystem> NiagaraSystemAsset(TEXT("/Game/_SplineVFX/NS/NS_Spline_Wind_Custom.NS_Spline_Wind_Custom"));
+    if (NiagaraSystemAsset.Succeeded())
+    {
+        Effect->SetAsset(NiagaraSystemAsset.Object);
+    }
+
+    TimeProgress = 0.0f;
+
 }
 
 void AVMItemCube::Interact()
@@ -99,6 +123,66 @@ void AVMItemCube::BeginPlay()
     Equipment = GetGameInstance()->GetSubsystem<UItemFactorySubsystem>()->CreateRandomBaseEquipment();
 
     Setup();
+    CreateEffectPath();
+}
+
+void AVMItemCube::Tick(float DeltaTime)
+{
+    Super::Tick(DeltaTime);
+
+    TimeProgress += DeltaTime;
+
+    VerticalMove();
+    Rotate();
+}
+
+void AVMItemCube::CreateEffectPath()
+{
+    FVector RandomNormalA = FVector(FMath::FRand(), FMath::FRand(), FMath::FRand()).GetSafeNormal();
+    FCircle3D CircleA(GetActorLocation(), RandomNormalA, 100.0f);
+
+    FVector RandomNormalB = FVector(FMath::FRand(), FMath::FRand(), FMath::FRand()).GetSafeNormal();
+    FCircle3D CircleB(GetActorLocation(), RandomNormalB, 75.0f);
+
+    SplinePath->ClearSplinePoints();
+
+    SplinePath->AddSplinePoint(CircleA.GetLocation(HALF_PI), ESplineCoordinateSpace::World);
+    SplinePath->SetSplinePointType(SplinePath->GetNumberOfSplinePoints(), ESplinePointType::Curve);
+
+    SplinePath->AddSplinePoint(CircleA.GetLocation(PI), ESplineCoordinateSpace::World);
+    SplinePath->SetSplinePointType(SplinePath->GetNumberOfSplinePoints(), ESplinePointType::Curve);
+
+    SplinePath->AddSplinePoint(CircleA.GetLocation(PI + HALF_PI), ESplineCoordinateSpace::World);
+    SplinePath->SetSplinePointType(SplinePath->GetNumberOfSplinePoints(), ESplinePointType::Curve);
+
+    SplinePath->AddSplinePoint(CircleA.GetLocation(TWO_PI), ESplineCoordinateSpace::World);
+    SplinePath->SetSplinePointType(SplinePath->GetNumberOfSplinePoints(), ESplinePointType::Curve);
+
+    SplinePath->AddSplinePoint(CircleB.GetLocation(HALF_PI), ESplineCoordinateSpace::World);
+    SplinePath->SetSplinePointType(SplinePath->GetNumberOfSplinePoints(), ESplinePointType::Curve);
+
+    SplinePath->AddSplinePoint(CircleB.GetLocation(PI), ESplineCoordinateSpace::World);
+    SplinePath->SetSplinePointType(SplinePath->GetNumberOfSplinePoints(), ESplinePointType::Curve);
+
+    SplinePath->AddSplinePoint(CircleB.GetLocation(PI + HALF_PI), ESplineCoordinateSpace::World);
+    SplinePath->SetSplinePointType(SplinePath->GetNumberOfSplinePoints(), ESplinePointType::Curve);
+
+    SplinePath->AddSplinePoint(CircleB.GetLocation(TWO_PI), ESplineCoordinateSpace::World);
+    SplinePath->SetSplinePointType(SplinePath->GetNumberOfSplinePoints(), ESplinePointType::Curve);
+
+    SplinePath->UpdateSpline();
+}
+
+void AVMItemCube::VerticalMove()
+{
+    FVector Offset = FVector::UpVector * FMath::Sin(TimeProgress);
+    
+    SetActorLocation(GetActorLocation() + Offset);
+}
+
+void AVMItemCube::Rotate()
+{
+    SetActorRotation(GetActorRotation().Clamp().Add(0.f, 0.3f, 0.f));
 }
 
 
