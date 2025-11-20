@@ -11,6 +11,7 @@
 #include "InputMappingContext.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "VMAnimInstance.h"
 
 #include "Hero/VMHeroStatComponent.h"
 #include "Hero/VMHeroSkillComponent.h"
@@ -325,7 +326,8 @@ void AVMCharacterHeroBase::BasicSkill(const FInputActionValue& Value)
 {
 	if (Stat == nullptr) return;
 	if (Skills == nullptr) return;
-	
+
+	CurState = EHeroState::Skill;
 	Skills->ExecuteBasicSkill(this, Stat);
 }
 
