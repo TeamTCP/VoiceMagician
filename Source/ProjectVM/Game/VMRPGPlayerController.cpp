@@ -178,8 +178,10 @@ void AVMRPGPlayerController::BeginPlay()
 			VMGameScreen->InteractKeyWidget->SetVisibility(ESlateVisibility::Hidden);
 
 			AVMCharacterHeroBase* Hero = Cast<AVMCharacterHeroBase>(GetPawn());
-			Hero->GetStatComponent()->OnHealthPointPercentageChanged.AddUObject(VMGameScreen->HeroStatus, &UVMHeroStatusWidget::RefreshHealthPointBar);
-			Hero->GetStatComponent()->OnManaPointPercentageChanged.AddUObject(VMGameScreen->HeroStatus, &UVMHeroStatusWidget::RefreshManaPointBar);
+			Hero->GetStatComponent()->OnHealthPointChanged.AddUObject(VMGameScreen->HeroStatus, &UVMHeroStatusWidget::UpdateMaxHealthPoint);
+			Hero->GetStatComponent()->OnCurrentHealthPointChanged.AddUObject(VMGameScreen->HeroStatus, &UVMHeroStatusWidget::UpdateCurrentHealthPoint);
+			Hero->GetStatComponent()->OnManaPointChanged.AddUObject(VMGameScreen->HeroStatus, &UVMHeroStatusWidget::UpdateMaxManaPoint);
+			Hero->GetStatComponent()->OnCurrentManaPointChanged.AddUObject(VMGameScreen->HeroStatus, &UVMHeroStatusWidget::UpdateCurrentManaPoint);
 		}
 	}
 
