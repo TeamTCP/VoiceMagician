@@ -19,7 +19,7 @@ public:
 
 	/** 폭탄/마인 클래스 */
 	UPROPERTY(EditAnywhere, Category = "Spawn")
-	TSubclassOf<AActor> ProjectileClass;
+	TArray<TSubclassOf<AActor>> ProjectileClass;
 
 	/** 반경 */
 	UPROPERTY(EditAnywhere, Category = "Spawn")
@@ -27,7 +27,7 @@ public:
 
 	/** Impulse 세기 */
 	UPROPERTY(EditAnywhere, Category = "Spawn")
-	float ImpulseStrength = 1200.f;
+	float ImpulseStrength = 120.f;
 
 	/** 스폰 개수 (20~30) */
 	UPROPERTY(EditAnywhere, Category = "Spawn")
@@ -45,4 +45,6 @@ private:
 
 	/** 최초 1회 방향 계산 */
 	void InitRadialDirections();
+
+	bool bHasSpawned = false;
 };

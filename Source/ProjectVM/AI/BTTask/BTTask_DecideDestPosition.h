@@ -31,11 +31,11 @@ public:
 
 	/** 랜덤 탐색 반경 */
 	UPROPERTY(EditAnywhere, Category = "Search")
-	float SearchRadius = 5000.f;
+	float SearchRadius = 3000.f;
 
 	/** 지면에서 띄울 거리 */
 	UPROPERTY(EditAnywhere, Category = "Search")
-	float GroundOffset = 500.f;
+	float GroundOffset = 400.f;
 
 	/** 윗 레이 벽 체크용 길이 */
 	UPROPERTY(EditAnywhere, Category = "Search")

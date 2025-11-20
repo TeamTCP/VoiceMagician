@@ -7,6 +7,8 @@
 
 #include "BehaviorTree/BlackboardComponent.h"
 
+#include "AI/Enemies/VMEnemyBoss.h"
+
 UBTTask_FlyToDest::UBTTask_FlyToDest()
 {
     NodeName = "Fly To Destination";
@@ -16,6 +18,7 @@ UBTTask_FlyToDest::UBTTask_FlyToDest()
 EBTNodeResult::Type UBTTask_FlyToDest::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
     // Tick에서 이동 처리할 거라 바로 InProgress 반환
+    MoveSpeed = FMath::RandRange(300, 1000);
     return EBTNodeResult::InProgress;
 }
 
@@ -27,8 +30,8 @@ void UBTTask_FlyToDest::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
         return;
     }
 
-    APawn* Pawn = AICon->GetPawn();
-    if (Pawn == nullptr)
+    AVMEnemyBoss* BossPtr = Cast<AVMEnemyBoss>(AICon->GetPawn());
+    if (BossPtr == nullptr)
     {
         return;
     }
@@ -39,15 +42,18 @@ void UBTTask_FlyToDest::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
         return;
     }
 
-    FVector Dest = BlackboardComp->GetValueAsVector(DestPositionKey.SelectedKeyName);
-    FVector Current = Pawn->GetActorLocation();
+    
+
+    FVector Dest = BlackboardComp->GetValueAsVector(TEXT("DestPosition"));
+    FVector Current = BossPtr->GetActorLocation();
 
     // 이동용 방향 (Z 포함)
     FVector MoveDir = Dest - Current;
     float Distance = MoveDir.Size();
 
     if (Distance <= AcceptanceRadius)
-    {
+    { 
+        BossPtr->StopAnimMontage(BossPtr->MoveMontage);
         FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
         return;
     }
@@ -58,12 +64,23 @@ void UBTTask_FlyToDest::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
     if (!LookDir.IsNearlyZero())
     {
         FRotator TargetRot = LookDir.Rotation();
-        Pawn->SetActorRotation(FRotator(0.f, TargetRot.Yaw, 0.f));
+        BossPtr->SetActorRotation(FRotator(0.f, TargetRot.Yaw, 0.f));
     }
 
     // 이동
     FVector MoveDelta = MoveDir.GetSafeNormal() * MoveSpeed * DeltaSeconds;
-    Pawn->AddActorWorldOffset(MoveDelta, true);
+    BossPtr->AddActorWorldOffset(MoveDelta, true);
 
-    // 몽타주 재생 (원하면 추가)
+    USkeletalMeshComponent* MeshComp = BossPtr->GetMesh();
+    if (MeshComp)
+    {
+        UAnimInstance* AnimInst = MeshComp->GetAnimInstance();
+        if (AnimInst)
+        {
+            if (AnimInst->Montage_IsPlaying(BossPtr->MoveMontage) == false)
+            {
+                AnimInst->Montage_Play(BossPtr->MoveMontage);
+            }
+        }
+    }
 }

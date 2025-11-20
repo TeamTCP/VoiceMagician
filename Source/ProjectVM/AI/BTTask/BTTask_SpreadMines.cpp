@@ -11,6 +11,7 @@
 #include "Components/PrimitiveComponent.h"
 
 #include "AOE/VMAOEMine.h"
+#include "AOE/VMAOETargetBomb.h"
 
 
 
@@ -37,6 +38,16 @@ void UBTTask_SpreadMines::InitRadialDirections()
 
 EBTNodeResult::Type UBTTask_SpreadMines::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
+	if (bHasSpawned == true)
+	{
+		return EBTNodeResult::Failed;
+	}
+
+	if (ProjectileClass.Num() <= 0)
+	{
+		return EBTNodeResult::Failed;
+	}
+
 	InitRadialDirections();
 
 	AAIController* AICon = OwnerComp.GetAIOwner();
@@ -51,7 +62,13 @@ EBTNodeResult::Type UBTTask_SpreadMines::ExecuteTask(UBehaviorTreeComponent& Own
 	FVector PawnForward = AIPawn->GetActorForwardVector();
 	FVector SpawnBase = AIPawn->GetActorLocation() + PawnForward * SpawnOffset;
 
-	int32 CountToSpawn = FMath::Clamp(SpawnCount, 20, 30);
+	int32 CountToSpawn = FMath::Clamp(SpawnCount, 5, 10);
+	UE_LOG(LogTemp, Warning, TEXT("CountToSpawn is :%d"), CountToSpawn);
+
+	int32 RandomIndex = FMath::RandRange(0, ProjectileClass.Num() - 1);
+	TSubclassOf<AActor> SpawnClass = ProjectileClass[RandomIndex];
+
+	float Impulse = FMath::FRandRange(300, ImpulseStrength);
 
 	for (int32 i = 0; i < CountToSpawn; ++i)
 	{
@@ -65,17 +82,20 @@ EBTNodeResult::Type UBTTask_SpreadMines::ExecuteTask(UBehaviorTreeComponent& Own
 		FVector SpawnLoc = SpawnBase + SpawnDir * Radius;
 		FRotator SpawnRot = SpawnDir.Rotation();
 
-		AVMAOEMine* SpawnedMine = World->SpawnActor<AVMAOEMine>(AVMAOEMine::StaticClass(), SpawnLoc, SpawnRot);
-
+		AActor* SpawnedMine = World->SpawnActor<AActor>(SpawnClass, SpawnLoc, SpawnRot);
+		UE_LOG(LogTemp, Warning, TEXT("마인 들어왔다?"));
 		if (SpawnedMine)
 		{
+			UE_LOG(LogTemp, Warning, TEXT("제발?"));
 			// Root Collision 또는 PrimitiveComponent 가져오기
 			if (UPrimitiveComponent* Comp = Cast<UPrimitiveComponent>(SpawnedMine->GetComponentByClass(UPrimitiveComponent::StaticClass())))
 			{
 				Comp->SetSimulatePhysics(true);
-				Comp->AddImpulse(SpawnDir * ImpulseStrength, NAME_None, true);
+				Comp->AddImpulse(SpawnDir * Impulse, NAME_None, true);
 			}
 		}
+
+		bHasSpawned = true;
 	}
 
 	return EBTNodeResult::Succeeded;

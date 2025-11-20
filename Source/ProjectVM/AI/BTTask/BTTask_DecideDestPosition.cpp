@@ -79,30 +79,31 @@ EBTNodeResult::Type UBTTask_DecideDestPosition::ExecuteTask(UBehaviorTreeCompone
 	FVector FinalPos;
 
 	float MinZ = GroundPoint.Z + GroundOffset;   // 바닥에서 최소 500 위
-	float MaxZ;
+	float MaxZ = GroundPoint.Z + 2*GroundOffset;
 
-	// 위에 벽(천장)이 있으면 그 바로 아래
-	if (bHitCeiling)
-	{
-		MaxZ = HitUp.ImpactPoint.Z - GroundOffset;
-	}
-	else
-	{
-		// 천장 없으면 그냥 StartUp + UpperTraceLength 범위 안에서 Random
-		MaxZ = StartUp.Z + UpperTraceLength;
-	}
+	//// 위에 벽(천장)이 있으면 그 바로 아래
+	//if (bHitCeiling)
+	//{
+	//	MaxZ = HitUp.ImpactPoint.Z - GroundOffset;
+	//}
+	//else
+	//{
+	//	// 천장 없으면 그냥 StartUp + UpperTraceLength 범위 안에서 Random
+	//	MaxZ = StartUp.Z + UpperTraceLength;
+	//}
 
-	// 안전 장치: MinZ > MaxZ면 오류 → 실패처리
-	if (MinZ > MaxZ)
-	{
-		return EBTNodeResult::Failed;
-	}
+	//// 안전 장치: MinZ > MaxZ면 오류 → 실패처리
+	//if (MinZ > MaxZ)
+	//{
+	//	return EBTNodeResult::Failed;
+	//}
 
 	// Z 랜덤선택
 	float RandomZ = FMath::FRandRange(MinZ, MaxZ);
 
 	// 최종 도착점
 	FinalPos = FVector(RandomPoint.X, RandomPoint.Y, RandomZ);
+	UE_LOG(LogTemp, Warning, TEXT("Dest(%f %f %f)"), FinalPos.X, FinalPos.Y, FinalPos.Z);
 
 	// DestPos에 저장
 	BBComp->SetValueAsVector(TEXT("DestPosition"), FinalPos);
