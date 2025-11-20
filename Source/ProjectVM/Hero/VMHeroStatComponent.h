@@ -16,8 +16,8 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FManaRegenerationHandler, int32 /* FinalMPRe
 DECLARE_MULTICAST_DELEGATE_OneParam(FSpeedHandler, int32 /* FinalSpeed */);
 DECLARE_MULTICAST_DELEGATE_OneParam(FLifeStealHandler, int32 /* FinalSpeed */);
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FCurrentHealthPointHandler, float /* CurrentHP */);
-DECLARE_MULTICAST_DELEGATE_OneParam(FCurrentManaPointHandler, float /* CurrentMP */);
+DECLARE_MULTICAST_DELEGATE_OneParam(FCurrentHealthPointHandler, int32 /* CurrentHP */);
+DECLARE_MULTICAST_DELEGATE_OneParam(FCurrentManaPointHandler, int32 /* CurrentMP */);
 DECLARE_MULTICAST_DELEGATE_OneParam(FHealthPointPercentageHandler, float /* HPPercentage */);
 DECLARE_MULTICAST_DELEGATE_OneParam(FManaPointPercentageHandler, float /* MPPercentage */);
 

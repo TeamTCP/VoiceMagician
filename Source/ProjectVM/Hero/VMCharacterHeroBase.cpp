@@ -324,8 +324,8 @@ void AVMCharacterHeroBase::Look(const FInputActionValue& Value)
 
 void AVMCharacterHeroBase::ApplySpeed(int32 SpeedStat)
 {
-	GetCharacterMovement()->MaxAcceleration = 500.f + SpeedStat;
-	GetCharacterMovement()->MaxWalkSpeed = 500.f + SpeedStat;
+	GetCharacterMovement()->MaxAcceleration = SpeedStat;
+	GetCharacterMovement()->MaxWalkSpeed = SpeedStat;
 }
 
 void AVMCharacterHeroBase::Die()
