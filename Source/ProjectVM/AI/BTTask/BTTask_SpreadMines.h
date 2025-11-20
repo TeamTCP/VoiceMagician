@@ -27,7 +27,7 @@ public:
 
 	/** Impulse 세기 */
 	UPROPERTY(EditAnywhere, Category = "Spawn")
-	float ImpulseStrength = 120.f;
+	float ImpulseStrength = 1200.f;
 
 	/** 스폰 개수 (20~30) */
 	UPROPERTY(EditAnywhere, Category = "Spawn")
