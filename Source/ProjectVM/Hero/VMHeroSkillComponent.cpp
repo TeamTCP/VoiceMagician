@@ -21,11 +21,12 @@ void UVMHeroSkillComponent::ExecuteBasicSkill(AVMCharacterHeroBase* Owner, UVMHe
 	
 	if (BasicSkill->IsSkillValid(StatComp->GetStat()))
 	{
+		Owner->GetMesh()->GetAnimInstance()->Montage_Play(BasicSkillMontage);
 		BasicSkill->ActivateSkill(Owner, StatComp);
 	}
 }
 
-void UVMHeroSkillComponent::ExecuteAdvancedSkill(class AVMCharacterHeroBase* Owner, class UVMHeroStatComponent* StatComp)
+void UVMHeroSkillComponent::ExecuteAdvancedSkill(AVMCharacterHeroBase* Owner, UVMHeroStatComponent* StatComp)
 {
 	if (AdvancedSkill == nullptr)
 	{
@@ -34,11 +35,12 @@ void UVMHeroSkillComponent::ExecuteAdvancedSkill(class AVMCharacterHeroBase* Own
 	
 	if (AdvancedSkill->IsSkillValid(StatComp->GetStat()))
 	{
+		Owner->GetMesh()->GetAnimInstance()->Montage_Play(AdvancedSkillMontage);
 		AdvancedSkill->ActivateSkill(Owner, StatComp);
 	}
 }
 
-void UVMHeroSkillComponent::ExecuteMovementSkill(class AVMCharacterHeroBase* Owner, class UVMHeroStatComponent* StatComp)
+void UVMHeroSkillComponent::ExecuteMovementSkill(AVMCharacterHeroBase* Owner, UVMHeroStatComponent* StatComp)
 {
 	if (MovementSkill == nullptr)
 	{
@@ -47,11 +49,12 @@ void UVMHeroSkillComponent::ExecuteMovementSkill(class AVMCharacterHeroBase* Own
 	
 	if (MovementSkill->IsSkillValid(StatComp->GetStat()))
 	{
+		Owner->GetMesh()->GetAnimInstance()->Montage_Play(MovementSkillMontage);
 		MovementSkill->ActivateSkill(Owner, StatComp);
 	}
 }
 
-void UVMHeroSkillComponent::ExecuteUltimateSkill(class AVMCharacterHeroBase* Owner, class UVMHeroStatComponent* StatComp)
+void UVMHeroSkillComponent::ExecuteUltimateSkill(AVMCharacterHeroBase* Owner, UVMHeroStatComponent* StatComp)
 {
 	if (UltimateSkill == nullptr)
 	{
@@ -60,6 +63,7 @@ void UVMHeroSkillComponent::ExecuteUltimateSkill(class AVMCharacterHeroBase* Own
 	
 	if (UltimateSkill->IsSkillValid(StatComp->GetStat()))
 	{
+		Owner->GetMesh()->GetAnimInstance()->Montage_Play(UltimateSkillMontage);
 		UltimateSkill->ActivateSkill(Owner, StatComp);
 	}
 }
@@ -82,6 +86,26 @@ void UVMHeroSkillComponent::BindMovementSkill(USkillBase* InSkill)
 void UVMHeroSkillComponent::BindUltimateSkill(USkillBase* InSkill)
 {
 	UltimateSkill = InSkill;
+}
+
+void UVMHeroSkillComponent::BindBasicSkillMontage(class UAnimMontage* InMontage)
+{
+	BasicSkillMontage = InMontage;
+}
+
+void UVMHeroSkillComponent::BindAdvancedSkillMontage(class UAnimMontage* InMontage)
+{
+	AdvancedSkillMontage = InMontage;
+}
+
+void UVMHeroSkillComponent::BindMovementSkillMontage(class UAnimMontage* InMontage)
+{
+	MovementSkillMontage = InMontage;
+}
+
+void UVMHeroSkillComponent::BindUltimateSkillMontage(class UAnimMontage* InMontage)
+{
+	UltimateSkillMontage = InMontage;
 }
 
 void UVMHeroSkillComponent::BeginPlay()

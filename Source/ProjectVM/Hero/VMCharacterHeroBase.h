@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
 #include "Core/GameEnums.h"
+#include "Core/VMHeroEnums.h"
 
 #include "Interface/VMStatChangeable.h"
 #include "Interface/VMInteractionInterface.h"
@@ -40,11 +41,6 @@ struct FInteractionData
 
 
 
-
-
-
-
-
 UCLASS()
 class PROJECTVM_API AVMCharacterHeroBase : public ACharacter, public IVMStatChangeable
 {
@@ -53,8 +49,10 @@ class PROJECTVM_API AVMCharacterHeroBase : public ACharacter, public IVMStatChan
 public:
 	AVMCharacterHeroBase();
 
+	FORCEINLINE class UCameraComponent* GetCameraComponent() { return FollowCamera; }
 	FORCEINLINE class UVMHeroStatComponent* GetStatComponent() { return Stat; }
 	FORCEINLINE class UVMHeroSkillComponent* GetSkillComponent() { return Skills; }
+	FORCEINLINE EHeroState GetHeroState() { return CurState; }
 	
 	void ChangeInputMode(EInputMode NewMode);
 	virtual void HealthPointChange(float Amount, AActor* Causer) override; // TODO : ApplyDamage로 네이밍 변경 고려
@@ -66,6 +64,7 @@ public:
 	void DropItem(UVMEquipment* ItemToDrop, const int32 QuantityToDrop);
 
 	void SetCurrentNPC(AVMNPC* NewNPC);
+
 protected:
 	virtual void BeginPlay() override;
 	//virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -199,6 +198,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Skill, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UVMHeroSkillComponent> Skills;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Skill, Meta = (AllowPrivateAccess = "true"))
+	EHeroState CurState;
 
 	//상호작용 관련 변수
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interact")

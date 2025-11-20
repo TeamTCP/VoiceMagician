@@ -24,6 +24,11 @@ public:
 	void BindAdvancedSkill(class USkillBase* InSkill);
 	void BindMovementSkill(class USkillBase* InSkill);
 	void BindUltimateSkill(class USkillBase* InSkill);
+	
+	void BindBasicSkillMontage(class UAnimMontage* InMontage);
+	void BindAdvancedSkillMontage(class UAnimMontage* InMontage);
+	void BindMovementSkillMontage(class UAnimMontage* InMontage);
+	void BindUltimateSkillMontage(class UAnimMontage* InMontage);
 
 protected:
 	virtual void BeginPlay() override;
@@ -41,4 +46,16 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Skill, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class USkillBase> UltimateSkill;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Skill, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UAnimMontage> BasicSkillMontage;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Skill, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UAnimMontage> AdvancedSkillMontage;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Skill, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UAnimMontage> MovementSkillMontage;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Skill, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UAnimMontage> UltimateSkillMontage;
 };

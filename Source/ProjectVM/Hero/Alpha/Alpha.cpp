@@ -34,6 +34,30 @@ AAlpha::AAlpha()
 	{
 		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
 	}
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> BasicSkillMontageRef(TEXT("/Game/Project/Hero/Alpha/Anim/AM_SparksFly.AM_SparksFly"));
+	if (BasicSkillMontageRef.Succeeded())
+	{
+		GetSkillComponent()->BindBasicSkillMontage(BasicSkillMontageRef.Object);
+	}
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> AdvancedSkillMontageRef(TEXT("/Game/Project/Hero/Alpha/Anim/AM_BurningFuse.AM_BurningFuse"));
+	if (AdvancedSkillMontageRef.Succeeded())
+	{
+		GetSkillComponent()->BindAdvancedSkillMontage(AdvancedSkillMontageRef.Object);
+	}
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> MovementSkillMontageRef(TEXT("/Game/Project/Hero/Alpha/Anim/AM_FlamingLaunch.AM_FlamingLaunch"));
+	if (MovementSkillMontageRef.Succeeded())
+	{
+		GetSkillComponent()->BindMovementSkillMontage(MovementSkillMontageRef.Object);
+	}
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> UltimateSkillMontageRef(TEXT("/Game/Project/Hero/Alpha/Anim/AM_Fireworks.AM_Fireworks"));
+	if (UltimateSkillMontageRef.Succeeded())
+	{
+		GetSkillComponent()->BindUltimateSkillMontage(UltimateSkillMontageRef.Object);
+	}
 }
 
 void AAlpha::BeginPlay()
