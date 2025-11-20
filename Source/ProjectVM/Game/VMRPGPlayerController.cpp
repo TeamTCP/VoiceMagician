@@ -47,6 +47,12 @@ AVMRPGPlayerController::AVMRPGPlayerController()
 	{
 		VMBossStatusWidgetClass = VMBossStatusWidgetRef.Class;
 	}
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> GameOverWidgetRef(TEXT("/Game/Project/UI/Common/WBP_GameOverWidget.WBP_GameOverWidget_C"));
+	if (GameOverWidgetRef.Succeeded())
+	{
+		GameOverWidgetClass = GameOverWidgetRef.Class;
+	}
 }
 
 void AVMRPGPlayerController::ShowScreen(EScreenUIType ScreenType)
@@ -149,8 +155,12 @@ void AVMRPGPlayerController::ResetInputSystem()
 
 void AVMRPGPlayerController::ShowGameOverUI()
 {
+	GameOverWidget = CreateWidget<UUserWidget>(this, GameOverWidgetClass);
+	if (GameOverWidget != nullptr)
+	{
+		GameOverWidget->AddToViewport();
+	}
 }
-
 
 void AVMRPGPlayerController::BeginPlay()
 {

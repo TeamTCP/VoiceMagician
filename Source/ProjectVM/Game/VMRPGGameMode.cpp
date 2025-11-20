@@ -47,5 +47,5 @@ void AVMRPGGameMode::GameOver()
 void AVMRPGGameMode::RestartGame()
 {
 	FName LevelName = FName(TEXT("RPGMap"));
-	UGameplayStatics::OpenLevel(GetWorld(), LevelName);
+	UGameplayStatics::OpenLevel(GetWorld(), LevelName); // TODO : LevelManager 로직으로 교체
 }
