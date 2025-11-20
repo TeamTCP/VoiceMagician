@@ -471,6 +471,31 @@ void AVMNPC::QuestCompleted()
 		EndDialogue();
 
 		GetGameInstance()->GetSubsystem<UVMQuestManager>()->ClearQuest(QuestData);
+
+		APlayerController* PC = GetWorld()->GetFirstPlayerController();
+		if (PC)
+		{
+			AVMRPGPlayerController* VMPC = Cast<AVMRPGPlayerController>(PC);
+			if (VMPC)
+			{
+				VMPC->ShowQuestClearUI();   // ⭐ 호출
+			}
+
+			// 2초 뒤 UI 숨기기 타이머 설정
+			FTimerHandle HideUITimer;
+			GetWorld()->GetTimerManager().SetTimer(
+				HideUITimer,
+				FTimerDelegate::CreateLambda([VMPC]()
+					{
+						if (VMPC)
+						{
+							VMPC->HideQuestClearUI();
+						}
+					}),
+				2.0f,
+				false
+			);
+		}
 	}
 	else
 	{

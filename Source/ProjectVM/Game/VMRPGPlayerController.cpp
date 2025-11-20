@@ -53,6 +53,13 @@ AVMRPGPlayerController::AVMRPGPlayerController()
 	{
 		GameOverWidgetClass = GameOverWidgetRef.Class;
 	}
+
+	//퀘스트 클리어 스크린 로드
+		static ConstructorHelpers::FClassFinder<UUserWidget> QuestClearOverlayRef(TEXT("/Game/Project/UI/Quest/WBP_QuestClearOverlay.WBP_QuestClearOverlay_C"));
+	if (QuestClearOverlayRef.Succeeded())
+	{
+		QuestClearOverlayClass = QuestClearOverlayRef.Class;
+	}
 }
 
 void AVMRPGPlayerController::ShowScreen(EScreenUIType ScreenType)
@@ -156,6 +163,20 @@ void AVMRPGPlayerController::ShowGameOverUI()
 void AVMRPGPlayerController::HideGameOverUI()
 {
 	GameOverWidget->RemoveFromParent();
+}
+
+void AVMRPGPlayerController::ShowQuestClearUI()
+{
+	QuestClearOverlay = CreateWidget<UUserWidget>(this, QuestClearOverlayClass);
+	if (QuestClearOverlay != nullptr)
+	{
+		QuestClearOverlay->AddToViewport();
+	}
+}
+
+void AVMRPGPlayerController::HideQuestClearUI()
+{
+	QuestClearOverlay->RemoveFromParent();
 }
 
 void AVMRPGPlayerController::BeginPlay()

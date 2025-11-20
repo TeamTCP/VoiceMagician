@@ -48,6 +48,8 @@ public:
 	void ShowGameOverUI();
 	void HideGameOverUI();
 
+	void ShowQuestClearUI();
+	void HideQuestClearUI();
 protected:
 	virtual void BeginPlay() override;
 
@@ -92,4 +94,10 @@ protected:
 	TSubclassOf<class UUserWidget> GameOverWidgetClass;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
 	TObjectPtr<class UUserWidget> GameOverWidget;
+
+	//퀘스트
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<class UUserWidget> QuestClearOverlayClass;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
+	TObjectPtr<class UUserWidget> QuestClearOverlay;
 };
