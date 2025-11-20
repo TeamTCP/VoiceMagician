@@ -128,7 +128,7 @@ void AVMRPGPlayerController::HideBossStatusWidget()
 		{
 			if (VMBossStatusWidget != nullptr)
 			{
-				VMBossStatusWidget->RemoveFromViewport();
+				VMBossStatusWidget->RemoveFromParent();
 				Boss->ClearDelegate();
 			}
 			return;
