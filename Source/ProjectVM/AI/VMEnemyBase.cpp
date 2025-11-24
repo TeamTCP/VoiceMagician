@@ -334,7 +334,7 @@ void AVMEnemyBase::NormalAttackCheck()
 			IVMStatChangeable* IVMStatPtr = Cast<IVMStatChangeable>(HitResult.GetActor());
 			if (IVMStatPtr)
 			{
-				IVMStatPtr->HealthPointChange(AttackRange_, this);
+				IVMStatPtr->HealthPointChange(AttackDamage_, this);
 			}
 			UE_LOG(LogTemp, Log, TEXT("Name: %s"), *HitResult.GetActor()->GetName());
 		}
