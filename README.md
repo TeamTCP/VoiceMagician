@@ -7,6 +7,38 @@ Voice Magician
 > *이탤릭도 가능*  
 > `코드 조각`도 가능
 
+<br>  
+
+<div align="center">
+  <table>
+    <tr>
+      <th> 플랫폼 </th>
+      <th> 장르 </th>
+      <th> 개발 환경 </th>
+      <th> 시연 영상 </th>
+    </tr>  
+    <tr>
+      <td align="center"> <code> Windows </code> </td>
+      <td align="center"> <code> 액션RPG </code> </td>
+      <td align="center"> <code> Unreal </code> <code> C++ </code> </td>
+      <td align="center"> <a href="https://youtu.be/"> <code> YouTube </code> </a> </td>
+    </tr>
+  </table>
+</div>
+
+<div align="center">
+  <table>
+    <tr>
+      <th> 개발 인원 </th>
+      <th> 개발 기간 </th>
+    </tr>  
+    <tr>
+      <td align="center"> <code> 프로그래머 4 </code> </td>
+      <td align="center"> <code> 2025.11 ~ 개발중 </code> </td>
+    </tr>
+  </table>
+</div>
+
 ---
 
 ## 🖼️ 데모 / 스크린샷
