@@ -5,11 +5,13 @@
 
 #include "Hero/VMCharacterHeroBase.h"
 #include "Hero/VMHeroStatComponent.h"
+#include "Hero/VMHeroSkillComponent.h"
 #include "UI/Common/VMGameScreen.h"
 #include "UI/Dialogue/VMNPCDialogueScreen.h"
 #include "UI/Shop/VMShopScreen.h"
 #include "UI/Stat/VMHeroStatusWidget.h"
 #include "UI/Common/VMInteractKeyWidget.h"
+#include "UI/Skill/VMSkillsCooldownWidget.h"
 
 // 보스
 #include "AI/Enemies/VMEnemyBoss.h"
@@ -55,10 +57,16 @@ AVMRPGPlayerController::AVMRPGPlayerController()
 	}
 
 	//퀘스트 클리어 스크린 로드
-		static ConstructorHelpers::FClassFinder<UUserWidget> QuestClearOverlayRef(TEXT("/Game/Project/UI/Quest/WBP_QuestClearOverlay.WBP_QuestClearOverlay_C"));
+	static ConstructorHelpers::FClassFinder<UUserWidget> QuestClearOverlayRef(TEXT("/Game/Project/UI/Quest/WBP_QuestClearOverlay.WBP_QuestClearOverlay_C"));
 	if (QuestClearOverlayRef.Succeeded())
 	{
 		QuestClearOverlayClass = QuestClearOverlayRef.Class;
+	}
+	
+	static ConstructorHelpers::FClassFinder<UVMSkillsCooldownWidget> SkillCooldownWidgetRef(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/Project/UI/Skill/WBP_HeroSkillWidget.WBP_HeroSkillWidget_C'"));
+	if (SkillCooldownWidgetRef.Succeeded())
+	{
+		SkillsCooldownWidgetClass = SkillCooldownWidgetRef.Class;
 	}
 }
 
@@ -225,6 +233,21 @@ void AVMRPGPlayerController::BeginPlay()
 			VMShopScreen->AddToViewport();
 			VMShopScreen->SetVisibility(ESlateVisibility::Hidden);
 			ScreenUIMap.Add(EScreenUIType::ShopScreen, VMShopScreen);
+		}
+	}
+
+	if (SkillsCooldownWidgetClass != nullptr)
+	{
+		SkillsCooldownWidget = CreateWidget<UVMSkillsCooldownWidget>(this, SkillsCooldownWidgetClass);
+		if (SkillsCooldownWidget != nullptr)
+		{
+			SkillsCooldownWidget->AddToViewport();
+
+			AVMCharacterHeroBase* Hero = Cast<AVMCharacterHeroBase>(GetPawn());
+			Hero->GetSkillComponent()->OnBasicSkillExecute.AddUObject(SkillsCooldownWidget, &UVMSkillsCooldownWidget::StartBasicSkillCooldown);
+			Hero->GetSkillComponent()->OnAdvancedSkillExecute.AddUObject(SkillsCooldownWidget, &UVMSkillsCooldownWidget::StartAdvancedSkillCooldown);
+			Hero->GetSkillComponent()->OnMovementSkillExecute.AddUObject(SkillsCooldownWidget, &UVMSkillsCooldownWidget::StartMovementSkillCooldown);
+			Hero->GetSkillComponent()->OnUltimateSkillExecute.AddUObject(SkillsCooldownWidget, &UVMSkillsCooldownWidget::StartUltimateSkillCooldown);
 		}
 	}
 }
