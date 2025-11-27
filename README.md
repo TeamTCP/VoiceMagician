@@ -68,27 +68,21 @@
 <div align="center">
   <table>
     <tr>
-      <th>팀원</th>
-      <th>구현 사항</th>
+      <th>김윤성</th>
+      <th>나희영</th>
+      <th>이상윤</th>
     </tr>
     <tr>
-      <td align="center"><b>김윤성</b></td>
       <td align="left">
         - 게임 시스템 설계<br>
         - 맵 구조 및 레벨 디자인<br>
         - 몬스터/아이템/스킬 기획
       </td>
-    </tr>
-    <tr>
-      <td align="center"><b>나희영</b></td>
       <td align="left">
         - 게임 시스템 설계<br>
         - 맵 구조 및 레벨 디자인<br>
         - 몬스터/아이템/스킬 기획
       </td>
-    </tr>
-    <tr>
-      <td align="center"><b>이상윤</b></td>
       <td align="left">
         - 캐릭터/몬스터 모델링<br>
         - UI 디자인<br>
