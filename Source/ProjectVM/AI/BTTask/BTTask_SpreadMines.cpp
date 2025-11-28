@@ -90,7 +90,7 @@ EBTNodeResult::Type UBTTask_SpreadMines::ExecuteTask(UBehaviorTreeComponent& Own
 			// Root Collision 또는 PrimitiveComponent 가져오기
 			if (UPrimitiveComponent* Comp = Cast<UPrimitiveComponent>(SpawnedMine->GetComponentByClass(UPrimitiveComponent::StaticClass())))
 			{
-				Comp->SetSimulatePhysics(true);
+				//Comp->SetSimulatePhysics(true);
 				Comp->AddImpulse(SpawnDir * Impulse, NAME_None, true);
 			}
 		}

@@ -44,7 +44,7 @@ AVMAOEBomb::AVMAOEBomb()
         MeshComp->SetStaticMesh(MeshRef.Object);
     }
 
-    MeshComp->SetSimulatePhysics(true);         // Physics Simulation 켬
+    //MeshComp->SetSimulatePhysics(true);         // Physics Simulation 켬
     MeshComp->SetEnableGravity(true);          // 중력 적용
     MeshComp->SetNotifyRigidBodyCollision(true); // OnHit 이벤트 받기
     MeshComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
@@ -52,7 +52,7 @@ AVMAOEBomb::AVMAOEBomb()
     MeshComp->SetCollisionResponseToAllChannels(ECR_Block); // 모든 채널 Block
     
     
-    MeshComp->SetMassOverrideInKg(NAME_None, 5.f); // 무게 설정
+    //MeshComp->SetMassOverrideInKg(NAME_None, 5.f); // 무게 설정
 }
 
 // Called when the game starts or when spawned
