@@ -15,6 +15,8 @@
 
 #include "GameFramework/CharacterMovementComponent.h"
 
+#include "Macro/VMPhysics.h"
+
 
 
 AVMAOELightning::AVMAOELightning()
@@ -135,7 +137,7 @@ void AVMAOELightning::SpawnAOE()
     TArray<FOverlapResult> Overlaps;
     float Radius = 256.0f;
     FCollisionShape Sphere = FCollisionShape::MakeSphere(Radius);
-    bool bHasOverlap = GetWorld()->OverlapMultiByObjectType(Overlaps, Location, FQuat::Identity, FCollisionObjectQueryParams(ECollisionChannel::ECC_Pawn), Sphere);
+    bool bHasOverlap = GetWorld()->OverlapMultiByObjectType(Overlaps, Location, FQuat::Identity, VM_HERO, Sphere);
     if (bHasOverlap)
     {
         for (auto& Result : Overlaps)

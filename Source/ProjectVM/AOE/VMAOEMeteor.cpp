@@ -6,6 +6,7 @@
 
 #include "Kismet/GameplayStatics.h"
 #include "Components/DecalComponent.h"
+#include "Core/VMLevelManager.h"
 #include "Materials/MaterialInterface.h"
 
 #include "Particles/ParticleSystem.h"
@@ -15,6 +16,8 @@
 #include "Hero/VMCharacterHeroBase.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
+
+#include "Macro/VMPhysics.h"
 
 
 
@@ -92,42 +95,33 @@ void AVMAOEMeteor::InitAOEPosition()
         AActor* HitActor = Hit.GetActor();
         if (HitActor)
         {
-            Location = Hit.Location;
-            UE_LOG(LogTemp, Log, TEXT("맞긴하니?"));
+            FloorLocation = Hit.Location;
         }
     }
     FColor LineColor = bHit ? FColor::Red : FColor::Green;
-
-    DrawDebugLine(GetWorld(), StartLocation, EndLocation, LineColor, true, 2.0f, 0, 2.0f);
-    UE_LOG(LogTemp, Log, TEXT("끝난거니?"));
+    DrawDebugLine(GetWorld(), StartLocation, EndLocation, LineColor, false, 2.0f, 0, 2.0f);
 }
 
 void AVMAOEMeteor::SpawnAOE()
 {
-    UE_LOG(LogTemp, Display, TEXT("(%f,%f,%f) (%f,%f,%f)"), Location.X, Location.Y, Location.Z, GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z);
-
+    // 사운드 동기 로드
     USoundBase* MySound = LoadObject<USoundBase>(nullptr, TEXT("/Script/Engine.SoundCue'/Game/StarterContent/Audio/Explosion_Cue.Explosion_Cue'"));
     if (MySound == nullptr)
     {
-        UE_LOG(LogTemp, Warning, TEXT("엥?"));
         return;
     }
 
-    UGameplayStatics::PlaySoundAtLocation(
-        this,           // World context (보통 Actor나 UObject)
-        MySound,    // USoundBase* 사운드
-        GetActorLocation(),  // 재생 위치
-        1.0f,           // 볼륨
-        1.0f            // 피치
-    );
+    // 사운드 재생.
+    UGameplayStatics::PlaySoundAtLocation(this, MySound, FloorLocation, 1.0f, 1.0f);
 
+    // 이펙트 동기 로드
     UParticleSystem* ParticleSystem = LoadObject<UParticleSystem>(nullptr, TEXT("/Script/Engine.ParticleSystem'/Game/FXVarietyPack/Particles/P_ky_hit2.P_ky_hit2'"));
     if (ParticleSystem == nullptr)
     {
-        UE_LOG(LogTemp, Warning, TEXT("운석이 안나오는데?"));
         return;
     }
 
+    // 이펙트 재생.
     UGameplayStatics::SpawnEmitterAttached(ParticleSystem, RootComponent, TEXT("NoName"), FVector::Zero(), GetActorRotation(), EAttachLocation::KeepRelativeOffset);
 
 
@@ -136,7 +130,7 @@ void AVMAOEMeteor::SpawnAOE()
     TArray<FOverlapResult> Overlaps;
     float Radius = 256.0f;
     FCollisionShape Sphere = FCollisionShape::MakeSphere(Radius);
-    bool bHasOverlap = GetWorld()->OverlapMultiByObjectType(Overlaps, Location, FQuat::Identity, FCollisionObjectQueryParams(ECollisionChannel::ECC_Pawn), Sphere);
+    bool bHasOverlap = GetWorld()->OverlapMultiByObjectType(Overlaps, FloorLocation, FQuat::Identity, VM_HERO, Sphere);
     if (bHasOverlap)
     {
         for (auto& Result : Overlaps)
@@ -144,30 +138,32 @@ void AVMAOEMeteor::SpawnAOE()
             AActor* OverlappedActor = Result.GetActor();
             if (OverlappedActor)
             {
-                UE_LOG(LogTemp, Log, TEXT("Overlapped: %s"), *OverlappedActor->GetName());
-                FString Debug = FString::Printf(TEXT("Name: %s"), *OverlappedActor->GetName());
-                GEngine->AddOnScreenDebugMessage(
-                    -1,                 // Key, -1이면 새 메시지
-                    5.0f,               // 화면에 표시될 시간(초)
-                    FColor::Red,        // 텍스트 색상
-                    Debug // 출력할 문자열
-                );
-                //Alpha의 CharacterMovement를 건들여보자.
-                AVMCharacterHeroBase* HeroPawn = Cast<AVMCharacterHeroBase>(OverlappedActor);
-                if (HeroPawn == nullptr)
-                {
-                    continue;
-                }
                 
-                BroadcastOverlapActor(HeroPawn, 40);
+                BroadcastOverlapActor(OverlappedActor, 10);
             }
         }
     }
-#pragma region Debug용 코드
-    DrawDebugSphere(GetWorld(), Location, Radius, 16, FColor::Green, false, 10.0f, 0, 1.0f);
-#pragma endregion 
+    
+    FActorSpawnParameters Params;
+    Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
-    AVMAOEFire* FireSpawnActor = GetWorld()->SpawnActor<AVMAOEFire>(AVMAOEFire::StaticClass(), GetActorTransform());
+    //Spawn Level BossMap으로 한정. BossMap 없으면 퍼시스턴트 레벨에 소환
+    UVMLevelManager* LevelManager = GetGameInstance()->GetSubsystem<UVMLevelManager>();
+    if (LevelManager != nullptr)
+    {
+        ULevelStreaming* BossLevel = LevelManager->GetLevel(FName("BossMap"));
+        if (BossLevel != nullptr && BossLevel->GetLoadedLevel() != nullptr)
+        {
+            Params.OverrideLevel = BossLevel->GetLoadedLevel();
+            UE_LOG(LogTemp, Log, TEXT("Spawn location changed to BossMap"));
+        }
+        else
+        {
+            UE_LOG(LogTemp, Log, TEXT("BossLevel is nullptr"));
+        }
+    }
+    
+    AVMAOEFire* FireSpawnActor = GetWorld()->SpawnActor<AVMAOEFire>(AVMAOEFire::StaticClass(), GetActorTransform(), Params);
     if (FireSpawnActor == nullptr)
     {
         UE_LOG(LogTemp, Warning, TEXT("운석 충돌 -> 불 소환 실패"));

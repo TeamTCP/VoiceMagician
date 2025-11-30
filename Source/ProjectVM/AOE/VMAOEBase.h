@@ -53,7 +53,7 @@ public:	// 델리게이트
 	void FOnAOEOverlapActor(AActor* Target);
 
 	UFUNCTION()
-	void FOnAOEOverlapActorWithCenter(AActor* Target, FVector ExplosionCenter);
+	void FOnAOEOverlapActorWithCenter(AActor* Target, const FVector& ExplosionCenter);
 
 protected:
 
@@ -68,14 +68,12 @@ protected:
 	float Radius;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Member)
-	uint8 bDrawDebugSphere : 1;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Member)
 	uint8 bIgnoreInstigator : 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Member)
 	FColor Color;
 
 public:
-	FORCEINLINE void SetRadius(float InRadius) { Radius = InRadius; }
+	FORCEINLINE void	SetRadius(float InRadius)	{ Radius = InRadius; }
+	FORCEINLINE float	GetRadius() const			{ return Radius; }
 };

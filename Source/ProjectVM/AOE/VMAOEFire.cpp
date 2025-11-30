@@ -14,6 +14,10 @@
 
 #include "Kismet/GameplayStatics.h"
 
+#include "Utils/VMUtils.h"
+
+#include "Macro/VMPhysics.h"
+
 
 // Sets default values
 AVMAOEFire::AVMAOEFire()
@@ -67,72 +71,43 @@ void AVMAOEFire::TriggerSpawnAOESphere()
 
 void AVMAOEFire::SpawnAOESphere()
 {
-	UWorld* World = GetWorld();
-	if (World == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("[AVMAOEBase::SpawnAOESphere] World is nullptr"));
-		return;
-	}
-
-	FVector Center = GetActorLocation();
-	UE_LOG(LogTemp, Log, TEXT("Center is (%f, %f, %f)"), Center.X, Center.Y, Center.Z);
-
-#pragma region Debug용 코드
-	if (bDrawDebugSphere == true)
-	{
-		FColor Color = FColor::Green;
-		DrawDebugSphere(World, Center, Radius, 16, Color, false, 10.0f, 0, 1.0f);
-	}
-#pragma endregion 
+	UWorld* World = GetWorld(); 
+	FVector SphereCenterLocation = GetActorLocation();
+	
 
 	USoundBase* MySound = LoadObject<USoundBase>(nullptr, TEXT("/Script/Engine.SoundCue'/Game/StarterContent/Audio/Explosion_Cue.Explosion_Cue'"));
 	if (MySound == nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("엥?"));
 		return;
 	}
 
-	UGameplayStatics::PlaySoundAtLocation(
-		this,           // World context (보통 Actor나 UObject)
-		MySound,    // USoundBase* 사운드
-		GetActorLocation(),  // 재생 위치
-		1.0f,           // 볼륨
-		1.0f            // 피치
-	);
+	// 사운드 재생.
+	UGameplayStatics::PlaySoundAtLocation(this, MySound, SphereCenterLocation, 1.0f, 1.0f);
 
 	UParticleSystem* ParticleSystem = LoadObject<UParticleSystem>(nullptr, TEXT("/Script/Engine.ParticleSystem'/Game/StarterContent/Particles/P_Fire.P_Fire'"));
 	if (ParticleSystem == nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("불 확인"));
 		return;
 	}
 
 	FVector Scale(3.0, 3.0f, 3.0f);
 	UGameplayStatics::SpawnEmitterAttached(ParticleSystem, RootComponent,  TEXT("NoName"), FVector::Zero(), GetActorRotation(), Scale, EAttachLocation::KeepRelativeOffset);
 
-
-
 	// 충돌 채널 설정
 	TArray<FOverlapResult> Overlaps;
 	FCollisionShape Sphere = FCollisionShape::MakeSphere(Radius);
-	bool bHasOverlap = World->OverlapMultiByObjectType(Overlaps, Center, FQuat::Identity, FCollisionObjectQueryParams(ECollisionChannel::ECC_Pawn), Sphere);
-	if (bHasOverlap)
+	bool bHasOverlap = World->OverlapMultiByObjectType(Overlaps, SphereCenterLocation, FQuat::Identity, VM_HERO, Sphere);
+	if (bHasOverlap == false)
 	{
-		for (auto& Result : Overlaps)
+		return;
+	}
+	
+	for (auto& Result : Overlaps)
+	{
+		AActor* OverlappedActor = Result.GetActor();
+		if (OverlappedActor)
 		{
-			AActor* OverlappedActor = Result.GetActor();
-			if (OverlappedActor)
-			{
-				UE_LOG(LogTemp, Log, TEXT("Overlapped: %s"), *OverlappedActor->GetName());
-				FString Debug = FString::Printf(TEXT("Name: %s"), *OverlappedActor->GetName());
-				GEngine->AddOnScreenDebugMessage(
-					-1,                 // Key, -1이면 새 메시지
-					5.0f,               // 화면에 표시될 시간(초)
-					FColor::Red,        // 텍스트 색상
-					Debug // 출력할 문자열
-				);
-				BroadCastFireOverlapActor(OverlappedActor);
-			}
+			BroadCastFireOverlapActor(OverlappedActor);
 		}
 	}
 }

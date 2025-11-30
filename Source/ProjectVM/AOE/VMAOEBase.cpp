@@ -9,21 +9,18 @@
 
 #include "Hero/VMCharacterHeroBase.h"
 
+#include "Macro/VMPhysics.h"
+
+#include "Utils/VMUtils.h"
+
 #pragma region 특수 멤버 함수
 
 AVMAOEBase::AVMAOEBase()
 {
-	UE_LOG(LogTemp, Log, TEXT("AVMAOEBase 생성자"));
-
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	SceneRootComp = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultSceneComponent"));
 	RootComponent = SceneRootComp;
-
-	Radius = 300.0f;
-
-	bDrawDebugSphere = true;
 }
 
 #pragma endregion 
@@ -32,64 +29,42 @@ AVMAOEBase::AVMAOEBase()
 
 void AVMAOEBase::BeginPlay()
 {
-	UE_LOG(LogTemp, Log, TEXT("AVMAOEBase BeginPlay"));
+	// Parent: AActor
 	Super::BeginPlay();
-
-	//TriggerSpawnAOESphere();
+	
+	// Sphere Radius 설정
+	Radius = 300.0f;
 }
 
-// Called every frame
 void AVMAOEBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 #pragma endregion 
 
 void AVMAOEBase::SpawnAOESphere()
 {
-	UE_LOG(LogTemp, Log, TEXT("SpawnAOESphere"));
-	UWorld* World = GetWorld();
-	if (World == nullptr)
+	// 충돌 채널 파라메터 설정
+	TArray<FOverlapResult> Overlaps;
+	FVector Center = GetActorLocation();
+	FCollisionShape Sphere = FCollisionShape::MakeSphere(Radius);
+
+	const bool bHasOverlap = GetWorld()->OverlapMultiByObjectType(Overlaps, Center, FQuat::Identity, VM_HERO, Sphere);
+	if (bHasOverlap == false)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[AVMAOEBase::SpawnAOESphere] World is nullptr"));
 		return;
 	}
-
-	FVector Center = GetActorLocation();
-	UE_LOG(LogTemp, Log, TEXT("Center is (%f, %f, %f)"), Center.X, Center.Y, Center.Z);
-
-//#pragma region Debug용 코드
-//	if (bDrawDebugSphere == true)
-//	{
-//		Color = FColor::Green;
-//		DrawDebugSphere(World, Center, Radius, 16, Color, false, 10.0f, 0, 1.0f);
-//	}
-//#pragma endregion 
-
-	// 충돌 채널 설정
-	TArray<FOverlapResult> Overlaps;
-	FCollisionShape Sphere = FCollisionShape::MakeSphere(Radius);
-	bool bHasOverlap = World->OverlapMultiByObjectType(Overlaps, Center, FQuat::Identity, FCollisionObjectQueryParams(ECollisionChannel::ECC_Pawn), Sphere);
-	if (bHasOverlap)
+	
+	// 부딪힌 케이스
+	for (auto& Result : Overlaps)
 	{
-		for (auto& Result : Overlaps)
+		AActor* OverlappedActor = Result.GetActor();
+		if (OverlappedActor == nullptr)
 		{
-			AActor* OverlappedActor = Result.GetActor();
-			if (OverlappedActor)
-			{
-				UE_LOG(LogTemp, Log, TEXT("Overlapped: %s"), *OverlappedActor->GetName());
-				FString Debug = FString::Printf(TEXT("Name: %s"), *OverlappedActor->GetName());
-				GEngine->AddOnScreenDebugMessage(
-					-1,                 // Key, -1이면 새 메시지
-					5.0f,               // 화면에 표시될 시간(초)
-					FColor::Red,        // 텍스트 색상
-					Debug // 출력할 문자열
-				);
-				FOnAOEOverlapActorWithCenter(OverlappedActor, Center);
-			}
+			continue;
 		}
+		FOnAOEOverlapActorWithCenter(OverlappedActor, Center);
 	}
 }
 
@@ -101,18 +76,18 @@ void AVMAOEBase::TriggerSpawnAOESphere()
 // 델리게이트
 void AVMAOEBase::FOnAOEOverlapActor(AActor* Target)
 {
-	UE_LOG(LogTemp, Log, TEXT("FOnAOEOverlapActor를 실행합니다.Target:%s"), *Target->GetName());
 	OnAOEOverlapActor.Broadcast(Target);
 
-
-	// 캐릭터인지 확인
+	// 히어로의 Base인 AVMCharacterHeroBase 타입 변환
 	AVMCharacterHeroBase* HitPawn = Cast<AVMCharacterHeroBase>(Target);
-	if (!HitPawn) return;
+	if (HitPawn == nullptr)
+	{
+		return;
+	}
 
 	// 폭발 중심 -> Target 방향
 	FVector Direction = HitPawn->GetActorLocation() - GetActorLocation();
-	Direction.Z = 0; // 수평만 적용
-	Direction.Normalize();
+	Direction = Direction.GetSafeNormal2D();	// Direction.Z = 0; 대신 사용.
 
 	// 넉백 세기
 	float LaunchStrength = 1500.f;
@@ -123,7 +98,7 @@ void AVMAOEBase::FOnAOEOverlapActor(AActor* Target)
 	HitPawn->LaunchCharacter(LaunchVelocity, true, true);
 }
 
-void AVMAOEBase::FOnAOEOverlapActorWithCenter(AActor* Target, FVector ExplosionCenter)
+void AVMAOEBase::FOnAOEOverlapActorWithCenter(AActor* Target, const FVector& ExplosionCenter)
 {
 	UE_LOG(LogTemp, Log, TEXT("FOnAOEOverlapActor를 실행합니다.Target:%s"), *Target->GetName());
 	OnAOEExplosionOverlapActor.Broadcast(Target, ExplosionCenter);

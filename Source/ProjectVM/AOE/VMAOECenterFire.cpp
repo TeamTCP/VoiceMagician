@@ -14,6 +14,8 @@
 
 #include "Kismet/GameplayStatics.h"
 
+#include "Macro/VMPhysics.h"
+
 // Sets default values
 AVMAOECenterFire::AVMAOECenterFire()
 {
@@ -75,14 +77,7 @@ void AVMAOECenterFire::SpawnAOESphere()
 
 	FVector Center = GetActorLocation();
 	UE_LOG(LogTemp, Log, TEXT("Center is (%f, %f, %f)"), Center.X, Center.Y, Center.Z);
-
-#pragma region Debug용 코드
-	if (bDrawDebugSphere == true)
-	{
-		FColor Color = FColor::Green;
-		DrawDebugSphere(World, Center, Radius, 16, Color, false, 10.0f, 0, 1.0f);
-	}
-#pragma endregion 
+	
 
 	USoundBase* MySound = LoadObject<USoundBase>(nullptr, TEXT("/Script/Engine.SoundCue'/Game/StarterContent/Audio/Explosion_Cue.Explosion_Cue'"));
 	if (MySound == nullptr)
@@ -114,7 +109,7 @@ void AVMAOECenterFire::SpawnAOESphere()
 	// 충돌 채널 설정
 	TArray<FOverlapResult> Overlaps;
 	FCollisionShape Sphere = FCollisionShape::MakeSphere(Radius);
-	bool bHasOverlap = World->OverlapMultiByObjectType(Overlaps, Center, FQuat::Identity, FCollisionObjectQueryParams(ECollisionChannel::ECC_Pawn), Sphere);
+	bool bHasOverlap = World->OverlapMultiByObjectType(Overlaps, Center, FQuat::Identity, VM_HERO, Sphere);
 	if (bHasOverlap)
 	{
 		for (auto& Result : Overlaps)
