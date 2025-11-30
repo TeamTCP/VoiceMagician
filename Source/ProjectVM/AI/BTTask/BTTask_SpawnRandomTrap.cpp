@@ -8,6 +8,7 @@
 
 #include "AIController.h"
 #include "DrawDebugHelpers.h"
+#include "Core/VMLevelManager.h"
 #include "Kismet/KismetMathLibrary.h"
 
 UBTTask_SpawnRandomTrap::UBTTask_SpawnRandomTrap()
@@ -108,8 +109,28 @@ void UBTTask_SpawnRandomTrap::SpawnTick(UBehaviorTreeComponent* OwnerComp)
 
 	// 랜덤 클래스
 	TSubclassOf<AActor> TrapClass = SpawnActors[Index];
-
-	World->SpawnActor<AActor>(TrapClass, SpawnLoc, FRotator::ZeroRotator);
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+	UVMLevelManager* LevelManager = GetWorld()->GetGameInstance()->GetSubsystem<UVMLevelManager>();
+	if (LevelManager != nullptr)
+	{
+		ULevelStreaming* BossLevel = LevelManager->GetLevel(FName("BossMap"));
+		if (BossLevel != nullptr && BossLevel->GetLoadedLevel() != nullptr)
+		{
+			SpawnParams.OverrideLevel = BossLevel->GetLoadedLevel();
+			UE_LOG(LogTemp, Log, TEXT("Spawn location changed to BossMap"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("BossLevel is nullptr"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("LevelManager is nullptr"));
+	}
+	
+	World->SpawnActor<AActor>(TrapClass, SpawnLoc, FRotator::ZeroRotator, SpawnParams);
 
 	SpawnedCount++;
 

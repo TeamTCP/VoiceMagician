@@ -8,8 +8,8 @@
 #include "AI/Enemies/VMEnemyBoss.h"
 #include "Projectile/VMStraightProjectile.h"
 #include "Projectile/VMHomingProjectile.h"
-
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Core/VMLevelManager.h"
 
 UBTTask_FireHomingProjectile::UBTTask_FireHomingProjectile()
 {
@@ -86,9 +86,6 @@ EBTNodeResult::Type UBTTask_FireHomingProjectile::SpawnAroundAll(UBehaviorTreeCo
         FVector FinalSpawnLocation = SpawnLocation + Dir * 1000.0f;
 
         AVMHomingProjectile* Projectile = GetWorld()->SpawnActor<AVMHomingProjectile>(AVMHomingProjectile::StaticClass(), FinalSpawnLocation, SpawnRot, SpawnParams);
-
-        /*AVMStraightProjectile* Projectile = GetWorld()->SpawnActor<AVMStraightProjectile>(AVMStraightProjectile::StaticClass(), FinalSpawnLocation, SpawnRot, SpawnParams);*/
-
         if (Projectile == nullptr)
         {
             UE_LOG(LogTemp, Warning, TEXT("Projectile Spawn Failed at %d"), i);
@@ -114,6 +111,28 @@ EBTNodeResult::Type UBTTask_FireHomingProjectile::SpawnForwardRand(UBehaviorTree
     FActorSpawnParameters SpawnParams;
     SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
+    
+    UVMLevelManager* LevelManager = GetWorld()->GetGameInstance()->GetSubsystem<UVMLevelManager>();
+    if (LevelManager != nullptr)
+    {
+        ULevelStreaming* BossLevel = LevelManager->GetLevel(FName("BossMap"));
+        if (BossLevel != nullptr && BossLevel->GetLoadedLevel() != nullptr)
+        {
+            SpawnParams.OverrideLevel = BossLevel->GetLoadedLevel();
+            UE_LOG(LogTemp, Log, TEXT("Spawn location changed to BossMap"));
+        }
+        else
+        {
+            UE_LOG(LogTemp, Log, TEXT("BossLevel is nullptr"));
+        }
+    }
+    else
+    {
+        UE_LOG(LogTemp, Log, TEXT("LevelManager is nullptr"));
+    }
+    
+    
+    
     // 타겟 설정.
     UBlackboardComponent* BBComp = OwnerComp.GetBlackboardComponent();
     AActor* PawnActorPtr = Cast<AActor>(BBComp->GetValueAsObject(TEXT("EnemyTarget")));

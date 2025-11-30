@@ -5,6 +5,7 @@
 
 #include "Core/VMMonsterEnums.h"
 #include "AI/Enemies/VMEnemySpawnBase.h"
+#include "Core/VMLevelManager.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Projectile/VMStraightProjectile.h"
 
@@ -68,8 +69,33 @@ void AVMEnemySpawnSiege::NormalAttack()
 	FTransform SpawnTransform(GetActorRotation(), SpawnLocation);
 
 	PlayNormalAttackMontage();
+	
+	
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride =
+		ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
-	AVMStraightProjectile* Projectile = GetWorld()->SpawnActor<AVMStraightProjectile>(AVMStraightProjectile::StaticClass(), SpawnTransform);
+	//Spawn Level BossMap으로 한정. BossMap 없으면 퍼시스턴트 레벨에 소환
+	UVMLevelManager* LevelManager = GetGameInstance()->GetSubsystem<UVMLevelManager>();
+	if (LevelManager != nullptr)
+	{
+		ULevelStreaming* BossLevel = LevelManager->GetLevel(FName("BossMap"));
+		if (BossLevel != nullptr && BossLevel->GetLoadedLevel() != nullptr)
+		{
+			Params.OverrideLevel = BossLevel->GetLoadedLevel();
+			UE_LOG(LogTemp, Log, TEXT("Spawn location changed to BossMap"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("BossLevel is nullptr"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("LevelManager is nullptr"));
+	}
+
+	AVMStraightProjectile* Projectile = GetWorld()->SpawnActor<AVMStraightProjectile>(AVMStraightProjectile::StaticClass(), SpawnTransform, Params);
 	if (Projectile == nullptr)
 	{
 		return;

@@ -15,6 +15,7 @@
 #include "AOE/VMAOECenterFire.h"	// 이걸로 대체할 예정.
 
 #include "Components/PrimitiveComponent.h"
+#include "Core/VMLevelManager.h"
 
 
 UBTTask_SpawnBigFireOnCenter::UBTTask_SpawnBigFireOnCenter()
@@ -35,8 +36,31 @@ EBTNodeResult::Type UBTTask_SpawnBigFireOnCenter::ExecuteTask(UBehaviorTreeCompo
 		return EBTNodeResult::Failed;
 	}
 
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+	UVMLevelManager* LevelManager = GetWorld()->GetGameInstance()->GetSubsystem<UVMLevelManager>();
+	if (LevelManager != nullptr)
+	{
+		ULevelStreaming* BossLevel = LevelManager->GetLevel(FName("BossMap"));
+		if (BossLevel != nullptr && BossLevel->GetLoadedLevel() != nullptr)
+		{
+			Params.OverrideLevel = BossLevel->GetLoadedLevel();
+			UE_LOG(LogTemp, Log, TEXT("Spawn location changed to BossMap"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("BossLevel is nullptr"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("LevelManager is nullptr"));
+	}
+
+	
 	FTransform Transform = BossPawnPtr->GetActorTransform();
-	AVMAOECenterFire* FireSpawnActor = GetWorld()->SpawnActor<AVMAOECenterFire>(AVMAOECenterFire::StaticClass(), Transform);
+	AVMAOECenterFire* FireSpawnActor = GetWorld()->SpawnActor<AVMAOECenterFire>(AVMAOECenterFire::StaticClass(), Transform, Params);
 	if (FireSpawnActor == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("센터 불 소환 실패"));

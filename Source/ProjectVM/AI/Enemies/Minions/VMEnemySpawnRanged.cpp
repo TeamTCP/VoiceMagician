@@ -3,6 +3,7 @@
 
 #include "AI/Enemies/Minions/VMEnemySpawnRanged.h"
 
+#include "Core/VMLevelManager.h"
 #include "Projectile/VMStraightProjectile.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 
@@ -64,7 +65,29 @@ void AVMEnemySpawnRanged::NormalAttack()
 	FVector SpawnLocation = Location + GetActorForwardVector() * 100.0f;
 	FTransform SpawnTransform(GetActorRotation(), SpawnLocation);
 
-	AVMStraightProjectile* Projectile = GetWorld()->SpawnActor<AVMStraightProjectile>(AVMStraightProjectile::StaticClass(), SpawnTransform);
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+	UVMLevelManager* LevelManager = GetWorld()->GetGameInstance()->GetSubsystem<UVMLevelManager>();
+	if (LevelManager != nullptr)
+	{
+		ULevelStreaming* BossLevel = LevelManager->GetLevel(FName("BossMap"));
+		if (BossLevel != nullptr && BossLevel->GetLoadedLevel() != nullptr)
+		{
+			SpawnParams.OverrideLevel = BossLevel->GetLoadedLevel();
+			UE_LOG(LogTemp, Log, TEXT("Spawn location changed to BossMap"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("BossLevel is nullptr"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("LevelManager is nullptr"));
+	}
+	
+	
+	AVMStraightProjectile* Projectile = GetWorld()->SpawnActor<AVMStraightProjectile>(AVMStraightProjectile::StaticClass(), SpawnTransform, SpawnParams);
 	if (Projectile == nullptr)
 	{
 		return;

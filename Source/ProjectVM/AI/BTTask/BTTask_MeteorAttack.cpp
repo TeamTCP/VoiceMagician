@@ -85,19 +85,18 @@ EBTNodeResult::Type UBTTask_MeteorAttack::SpawnMeteorToTarget(UBehaviorTreeCompo
 
 
             FTransform Transform = HeroPawnTarget->GetActorTransform();
-            UE_LOG(LogTemp, Log, TEXT("Target Transform: (%f, %f, %f)"), Transform.GetLocation().X, Transform.GetLocation().Y, Transform.GetLocation().Z);
 
             FActorSpawnParameters Params;
             Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-            //AVMAOEFire* SpawnMeteorActorPtr = World->SpawnActorDeferred<AVMAOEFire>(AVMAOEFire::StaticClass(), Transform, BossPtr, BossPtr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+            
             AVMAOEMeteor* SpawnMeteorActorPtr = World->SpawnActorDeferred<AVMAOEMeteor>(AVMAOEMeteor::StaticClass(), Transform, BossPtr, BossPtr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
             if (SpawnMeteorActorPtr == nullptr)
             {
                 FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
                 return;
             }
-            //RemoveDynamic
+            
+            // 이벤트 제거 후 다시 삽입.
             SpawnMeteorActorPtr->OnAOEMeteorOverlapActor.RemoveDynamic(HeroPawnTarget, &AVMCharacterHeroBase::OnHitMeteorByAOE);
             SpawnMeteorActorPtr->OnAOEMeteorOverlapActor.AddDynamic(HeroPawnTarget, &AVMCharacterHeroBase::OnHitMeteorByAOE);
 
