@@ -9,10 +9,16 @@
 #include "Materials/MaterialInterface.h" 
 #include "Materials/MaterialInstanceDynamic.h"  
 #include "Components/ListView.h"
+#include "VMShopItemTooltip.h"
 
-#define LOG_POS(Format, ...) \
-    UE_LOG(LogTemp, Log, TEXT("%s(%d): " Format), \
-    ANSI_TO_TCHAR(__FILE__), __LINE__, ##__VA_ARGS__)
+UVMShopListViewEntry::UVMShopListViewEntry(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+{
+	static ConstructorHelpers::FClassFinder<UVMShopItemTooltip> TooltipRef(TEXT("/Game/Project/UI/Shop/WBP_VMShopItemToolTip.WBP_VMShopItemToolTip_C"));
+	if (TooltipRef.Succeeded())
+	{
+		ItemTooltipClass = TooltipRef.Class;
+	}
+}
 
 void UVMShopListViewEntry::NativeOnListItemObjectSet(UObject* ListItemObject)
 {
@@ -25,7 +31,6 @@ void UVMShopListViewEntry::NativeOnListItemObjectSet(UObject* ListItemObject)
 
 	if (ShopItemDataObject->EquipmentInfo == nullptr)
 	{
-		LOG_POS("아직 초기화 안됨");
 		return;
 	}
 
@@ -57,10 +62,17 @@ void UVMShopListViewEntry::NativeOnListItemObjectSet(UObject* ListItemObject)
 		ItemMaterialInstance->SetScalarParameterValue(TEXT("RowIndex"), ShopItemDataObject->EquipmentInfo->AtlasRow);
 	}
 
+	//툴팁 설정
+	if (ItemTooltip != nullptr)
+	{
+		ItemTooltip->Setup(ShopItemDataObject->EquipmentInfo);
+	}
+
 	//아이템 변경사항 구독
 	ShopItemDataObject->OnItemCountUpdated.AddUObject(this, &UVMShopListViewEntry::ChangeItemCount);
 
 	ChangeItemCount();
+
 }
 
 void UVMShopListViewEntry::NativeConstruct()
@@ -68,6 +80,20 @@ void UVMShopListViewEntry::NativeConstruct()
 	if (ItemButton != nullptr)
 	{
 		ItemButton->OnClicked.AddDynamic(this, &UVMShopListViewEntry::OnListButtonClicked);
+	}
+
+	//툴팁 위젯 생성
+	if (ItemTooltipClass != nullptr)
+	{
+		ItemTooltip = CreateWidget<UVMShopItemTooltip>(GetWorld(), ItemTooltipClass);
+		if (ItemTooltip != nullptr)
+		{
+			this->SetToolTip(ItemTooltip);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("ItemTooltip is not create"));
+		}
 	}
 }
 
@@ -97,7 +123,7 @@ void UVMShopListViewEntry::OnListButtonClicked()
 {
 	if (ShopItemDataObject == nullptr)
 	{	
-		LOG_POS("ShopItemDataObject is nullptr");
+		UE_LOG(LogTemp, Warning, TEXT("ShopItemDataObject is nullptr"));
 		return;
 	}
 	ShopItemDataObject->ChangeItemCount(false);

@@ -1,16 +1,26 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "UI/Shop/VMShopItemWidget.h"
+#include "VMShopItemWidget.h"
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
 #include "Components/Button.h"
 #include "Materials/MaterialInterface.h" 
 #include "Materials/MaterialInstanceDynamic.h"  
-#include "UI/Shop/VMShopScreen.h"
+#include "VMShopScreen.h"
+#include "VMShopItemTooltip.h"
 
 
 
+
+UVMShopItemWidget::UVMShopItemWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+{
+	static ConstructorHelpers::FClassFinder<UVMShopItemTooltip> TooltipRef(TEXT("/Game/Project/UI/Shop/WBP_VMShopItemToolTip.WBP_VMShopItemToolTip_C"));
+	if (TooltipRef.Succeeded())
+	{
+		ItemTooltipClass = TooltipRef.Class;
+	}
+}
 
 void UVMShopItemWidget::Setup(const FVMEquipmentInfo& Info)
 {
@@ -42,8 +52,11 @@ void UVMShopItemWidget::Setup(const FVMEquipmentInfo& Info)
 		ItemPriceText->SetText(FText::AsNumber(EquipmentInfo->ItemLevel * 2000));
 	}
 
-
-	//this->SetToolTipText(FText::FromString(Info.ItemName));
+	//툴팁 설정
+	if (ItemTooltip != nullptr)
+	{
+		ItemTooltip->Setup(EquipmentInfo);
+	}
 }
 
 void UVMShopItemWidget::NativeConstruct()
@@ -59,7 +72,19 @@ void UVMShopItemWidget::NativeConstruct()
 		ItemButton->OnClicked.AddDynamic(this, &UVMShopItemWidget::OnItemButtonClicked);
 	}
 
-
+	//툴팁 위젯 생성
+	if (ItemTooltipClass != nullptr)
+	{
+		ItemTooltip = CreateWidget<UVMShopItemTooltip>(GetWorld(), ItemTooltipClass);
+		if (ItemTooltip != nullptr)
+		{
+			this->SetToolTip(ItemTooltip);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("ItemTooltip is not create"));
+		}
+	}
 }
 
 void UVMShopItemWidget::OnItemButtonClicked()
@@ -67,7 +92,6 @@ void UVMShopItemWidget::OnItemButtonClicked()
 	UE_LOG(LogTemp, Log, TEXT("Button Click"));
 	if (ShopScreen != nullptr)
 	{
-		//ShopScreen->OnGridItemButtonClicked(*EquipmentInfo); //포인터의 구조체 전달
 		ShopScreen->OnGridItemButtonClicked(this); //위젯 자기자신 전달
 	}
 }
