@@ -153,14 +153,12 @@ AVMCharacterHeroBase::AVMCharacterHeroBase()
 	Skills = CreateDefaultSubobject<UVMHeroSkillComponent>(TEXT("Skills"));
 
 
-#pragma region 나희영 손 묻음 ㅈㅅ
 	ConstructorHelpers::FObjectFinder<UInputAction> SpawnAllyActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Project/Input/Actions/IA_SpawnAlly.IA_SpawnAlly'"));
 	if (SpawnAllyActionRef.Object)
 	{
 		SpawnAllyAction = SpawnAllyActionRef.Object;
 	}
 	PawnNoiseEmitter = CreateDefaultSubobject<UPawnNoiseEmitterComponent>(TEXT("PawnNoiseEmitterComponent"));
-#pragma endregion
 
 
 	// 인벤토리 관련
@@ -168,7 +166,6 @@ AVMCharacterHeroBase::AVMCharacterHeroBase()
 	static ConstructorHelpers::FObjectFinder<UInputAction> ToggleActionRef(TEXT("/Game/Project/Input/Actions/IA_ToggelMenu.IA_ToggelMenu"));
 	if (ToggleActionRef.Succeeded())
 	{
-		UE_LOG(LogTemp, Log, TEXT("QWER 여긴 오니"));
 		ToggleAction = ToggleActionRef.Object;
 	}
 
@@ -847,36 +844,9 @@ void AVMCharacterHeroBase::ClearFireDot()
 	UE_LOG(LogTemp, Warning, TEXT("Fire DOT expired! Count reset to 0"));
 }
 
-#pragma region 필요해서 넣었습니다
-#include "DrawDebugHelpers.h"
-#include "Kismet/GameplayStatics.h"
-#include "GameFramework/Character.h"  // 기본 플레이어 캐릭터
-#include "AI/VMEnemyBase.h"
-
 void AVMCharacterHeroBase::SpawnAllyActor()
 {
-	
-	// 1. SpawnActor 알아보기.
-	UWorld* World = GetWorld();
-	if (World)
-	{
-		// 스폰 위치와 회전 지정
-		FVector SpawnLocation = GetActorLocation() + FVector(100, 0, 0);
-		FRotator SpawnRotation = FRotator::ZeroRotator;
-
-		// 스폰 파라미터 설정
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.Owner = this;
-		SpawnParams.Instigator = GetInstigator();
-
-		// 실제 스폰
-		AVMAllyBase* AllySpawnedActor = World->SpawnActor<AVMAllyBase>(AVMAllyBase::StaticClass(), SpawnLocation, SpawnRotation, SpawnParams);
-		if (AllySpawnedActor)
-		{
-			AllySpawnedActor->SetOwnerTarget(this);
-			UE_LOG(LogTemp, Warning, TEXT("스폰 성공!"));
-		}
-	}
+	return;
 }
 
 #pragma endregion
