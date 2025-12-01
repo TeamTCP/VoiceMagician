@@ -54,6 +54,11 @@ void AVMBurningFuseProjectile::InitProjectile(AActor* InOwner, int32 InDamage)
 
 void AVMBurningFuseProjectile::HitTarget(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if (OtherActor == nullptr || OtherActor->IsValidLowLevel() == false)
+	{
+		return;
+	}
+	
 	IVMStatChangeable* StatChangeable = Cast<IVMStatChangeable>(OtherActor);
 	
 	if (StatChangeable)

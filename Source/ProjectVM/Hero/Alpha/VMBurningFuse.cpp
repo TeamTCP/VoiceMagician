@@ -57,8 +57,10 @@ void UVMBurningFuse::SpawnProjectile()
 	FVector ProjectileDirection = CameraForward;
 	ProjectileDirection.Z = 0;
 	ProjectileDirection.Normalize();
+
+	FVector SpawnLocation = Owner->GetMesh()->GetSocketLocation(TEXT("SkillSpawnLocation"));
 	
-	AVMBurningFuseProjectile* Projectile = Owner->GetWorld()->SpawnActor<AVMBurningFuseProjectile>(AVMBurningFuseProjectile::StaticClass(), Owner->GetActorLocation(), ProjectileDirection.Rotation());
+	AVMBurningFuseProjectile* Projectile = Owner->GetWorld()->SpawnActor<AVMBurningFuseProjectile>(AVMBurningFuseProjectile::StaticClass(), SpawnLocation, ProjectileDirection.Rotation());
 	if (Projectile != nullptr && Projectile->IsValidLowLevel())
 	{
 		Projectile->InitProjectile(Owner, ProjectileDamage);
