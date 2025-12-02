@@ -357,8 +357,8 @@ void AVMCharacterHeroBase::BasicSkill(const FInputActionValue& Value)
 {
 	if (Stat == nullptr) return;
 	if (Skills == nullptr) return;
-
-	CurState = EHeroState::Skill;
+	if (CurState == EHeroState::Skill) return;
+	
 	Skills->ExecuteBasicSkill(this, Stat);
 }
 
@@ -366,6 +366,7 @@ void AVMCharacterHeroBase::AdvancedSkill(const FInputActionValue& Value)
 {
 	if (Stat == nullptr) return;
 	if (Skills == nullptr) return;
+	if (CurState == EHeroState::Skill) return;
 	
 	Skills->ExecuteAdvancedSkill(this, Stat);
 }
@@ -374,6 +375,7 @@ void AVMCharacterHeroBase::MovementSkill(const FInputActionValue& Value)
 {
 	if (Stat == nullptr) return;
 	if (Skills == nullptr) return;
+	if (CurState == EHeroState::Skill) return;
 	
 	Skills->ExecuteMovementSkill(this, Stat);
 }
@@ -382,6 +384,7 @@ void AVMCharacterHeroBase::UltimateSkill(const FInputActionValue& Value)
 {
 	if (Stat == nullptr) return;
 	if (Skills == nullptr) return;
+	if (CurState == EHeroState::Skill) return;
 	
 	Skills->ExecuteUltimateSkill(this, Stat);
 }
