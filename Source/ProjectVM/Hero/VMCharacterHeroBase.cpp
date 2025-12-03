@@ -558,26 +558,6 @@ void AVMCharacterHeroBase::BeginInteract()
 	}
 }
 
-/*void AVMCharacterHeroBase::EndInteract()
-{
-	GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
-
-	if (IsValid(TargetInteractable.GetObject()))
-	{
-		TargetInteractable->EndInteract();
-	}
-}
-
-void AVMCharacterHeroBase::BeingInteract()
-{
-	GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
-
-	if (IsValid(TargetInteractable.GetObject()))
-	{
-		TargetInteractable->BeingInteract(this);
-	}
-}
-*/
 
 void AVMCharacterHeroBase::UpdateInteractionWidget() const
 {

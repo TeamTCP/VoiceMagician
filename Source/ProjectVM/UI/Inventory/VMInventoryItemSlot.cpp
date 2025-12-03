@@ -120,12 +120,6 @@ void UVMInventoryItemSlot::SetItemReference(UVMEquipment* ItemIn)
 { 
 	ItemReference = ItemIn;
 
-	UE_LOG(LogTemp, Warning,
-		TEXT("InventorySlot(%s in %s)::SetItemReference Item=%s"),
-		*GetName(),
-		*GetOuter()->GetName(),
-		ItemReference ? *ItemReference->GetEquipmentInfo().ItemName : TEXT("NULL"));
-
 	RefreshFromItem();   // 여기서만 처리
 
 	OnItemDoubleClicked.Clear();
@@ -204,11 +198,6 @@ void UVMInventoryItemSlot::SetUp(const FVMEquipmentInfo& Info)
 
 void UVMInventoryItemSlot::RefreshFromItem()
 {
-
-	UE_LOG(LogTemp, Warning,
-		TEXT("InventorySlot::RefreshFromItem ENTER, Ref=%s"),
-		*GetNameSafe(ItemReference));
-
 	if (SlotType == ESlotType::Inventory)
 	{
 		ItemBorder->SetBrushColor(FLinearColor(0.4f, 0.0f, 0.4f, 1.0f));  // 보라색
@@ -220,8 +209,6 @@ void UVMInventoryItemSlot::RefreshFromItem()
 
 	if (!ItemIcon || !ItemBorder)
 	{
-		UE_LOG(LogTemp, Warning,
-			TEXT("RefreshFromItem: ItemIcon or ItemBorder is NULL"));
 		return;
 	}
 
@@ -259,22 +246,15 @@ void UVMInventoryItemSlot::RefreshFromItem()
 	{
 		if (!ItemAtlasBaseMaterial)
 		{
-			UE_LOG(LogTemp, Warning,
-				TEXT("RefreshFromItem: ItemAtlasBaseMaterial is NULL! (set in WBP_VMInventoryItemSlot)"));
 			return;
 		}
 
 		ItemMaterialInstance = UMaterialInstanceDynamic::Create(ItemAtlasBaseMaterial, this);
 		ItemIcon->SetBrushFromMaterial(ItemMaterialInstance);
-
-		UE_LOG(LogTemp, Warning,
-			TEXT("RefreshFromItem: MID created=%p"), ItemMaterialInstance.Get());
 	}
 
 	if (!ItemMaterialInstance)
 	{
-		UE_LOG(LogTemp, Warning,
-			TEXT("RefreshFromItem: ItemMaterialInstance STILL NULL"));
 		return;
 	}
 
@@ -300,9 +280,6 @@ bool UVMInventoryItemSlot::NativeOnDrop(const FGeometry& InGeometry, const FDrag
 	// 슬롯 위 드롭 → 슬롯 이동 처리
 	if (IsHovered())
 	{
-		UE_LOG(LogTemp, Warning,
-			TEXT("OnDrop: Dropped ON SLOT %s"), *GetName());
-
 		// TODO: 인벤토리/장비 간 이동 로직
 		return true;
 	}

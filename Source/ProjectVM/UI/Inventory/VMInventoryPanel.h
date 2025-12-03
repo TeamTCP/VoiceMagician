@@ -18,9 +18,7 @@ class UVMEquipmentItemSlot;
 class UVMEquipmentPanel;
 
 
-/**
- * 
- */
+
 UCLASS()
 class PROJECTVM_API UVMInventoryPanel : public UUserWidget
 {
