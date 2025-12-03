@@ -18,20 +18,12 @@ AVMBossPortal::AVMBossPortal()
 
 void AVMBossPortal::Interact()
 {
-	Super::Interact();
-
+	//Super::Interact();
 	LoadMap();
 }
 
 void AVMBossPortal::LoadMap()
 {
-	////포탈로 이동하는 이펙트 라인 숨기기
-	//if (EffectLineNiagaraSystem == nullptr)
-	//{
-	//	return;
-	//}
-	//EffectLineNiagaraSystem->Deactivate(); // 비활성화
-
 	//맵 이동
 	if (!GetWorld()) return;
 
