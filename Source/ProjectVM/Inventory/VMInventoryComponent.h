@@ -10,6 +10,7 @@ DECLARE_MULTICAST_DELEGATE(FOnInventoryUpdated);
 
 
 class UVMEquipment;
+class AVMPickup;
 
 UENUM(BlueprintType)
 enum class EItemAddResult : uint8
@@ -79,6 +80,7 @@ public:
 	
 	FOnInventoryUpdated OnInventoryUpdated;
 
+	bool CombineAndAddToInventory(UVMEquipment* ItemA, UVMEquipment* ItemB, UVMEquipment*& OutResultItem);
 
 public:
 	// Sets default values for this component's properties
@@ -105,30 +107,41 @@ public:
 	UFUNCTION(Category = "Inventory")
 	void SplitExistingStack(UVMEquipment* ItemIn, const int32 AmountToSplit);
 
-	// Getter
-	//UFUNCTION(Category = "Inventory")
-	//FORCEINLINE float GetInventoryTotalWeight() const { return InventoryTotalWeight; };
-
-	//UFUNCTION(Category = "Inventory")
-	//FORCEINLINE float GetWeightCapacity() const { return InventoryWeightCapacity; };
-
-	//UFUNCTION(Category = "Inventory")
-	//FORCEINLINE int32 GetSlotCapacity() const { return InventorySlotsCapacity; };
-
 	UFUNCTION(Category = "Inventory")
-	TArray<UVMEquipment*>& GetInventoryContents() { return InventoryContents; };
-	//TArray<TObjectPtr<UVMEquipment>>& GetInventoryContents()
-	//{
-	//	return InventoryContents;
-	//}
-	//// Setter
-	//UFUNCTION(Category = "Inventory")
-	//FORCEINLINE void SetSlotsCapacity(const int32 NewSlotsCapacity) { InventorySlotsCapacity = NewSlotsCapacity; };
 
-	//UFUNCTION(Category = "Inventory")
-	//FORCEINLINE void SetWeightCapacity(const int32 NewWeightCapacity) { InventoryWeightCapacity = NewWeightCapacity; };
+	FORCEINLINE TArray<UVMEquipment*> GetInventoryContents() const { return InventoryContents; };
 
-	void AddNewItem(UVMEquipment* Item, const int32 AmountTodd);
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	void RemoveItem(UVMEquipment* Item);
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	void DropItemToWorld(class UVMEquipment* ItemToDrop, int32 Quantity = 1);
+
+	UFUNCTION(BlueprintCallable, Category = "Combine")
+	UVMEquipment* CombineItems(UVMEquipment* ItemA, UVMEquipment* ItemB);
+
+	UPROPERTY(EditDefaultsOnly, Category = "Inventory|Drop")
+	TSubclassOf<AVMPickup> DefaultPickupClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Equipment", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UDataTable> EquipmentDataTable;
+
+	UPROPERTY()
+	TArray<TObjectPtr<UVMEquipment>> EquipmentList;
+
+	
+
+	UPROPERTY()
+	int32 SlotCapacity;
+
+	void AddNewItem(UVMEquipment* Item, const int32 AmountToAdd);
+
+	void RemoveEquipmentFromInventory(UVMEquipment* Item);
+
+	UFUNCTION(BlueprintCallable, Category = "Combine")
+	void AddEquipmentToInventory(UVMEquipment* NewItem); // 이미 Add 함수 있으면 그거 쓰면 됨
+
+
 
 	void UpdateUI();
 

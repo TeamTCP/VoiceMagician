@@ -14,6 +14,8 @@
 class UVMInventoryItemSlot;
 class UVMInventoryComponent;
 class AVMCharacterHeroBase;
+class UVMEquipmentItemSlot;
+class UVMEquipmentPanel;
 
 
 /**
@@ -32,17 +34,6 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	UWrapBox* InventoryWrapBox;
 
-	//UPROPERTY(meta = (BindWidget))
-	//TObjectPtr<UTextBlock> WeightInfoText;
-	//UPROPERTY(meta = (BindWidget))
-	//TObjectPtr<UTextBlock> WeightInfo;
-
-	//UPROPERTY(meta = (BindWidget))
-	//TObjectPtr<UTextBlock> CapacityInfoText;
-
-	//UPROPERTY(meta = (BindWidget))
-	//TObjectPtr<UTextBlock> CapacityInfo;
-
 	UPROPERTY()
 	AVMCharacterHeroBase* Character;
 
@@ -52,7 +43,16 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UVMInventoryItemSlot> InventorySlotClass;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "PanelRefs")
+	TObjectPtr<UVMEquipmentPanel> LinkedEquipmentPanel;
+
+	UFUNCTION()
+	void HandleItemDoubleClicked(class UVMEquipment* Item);
+
 protected:
+
+
+
 	void SetInfoText() const;
 	virtual void NativeOnInitialized() override;
 	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;

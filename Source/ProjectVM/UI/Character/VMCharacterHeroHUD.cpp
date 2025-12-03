@@ -5,6 +5,7 @@
 #include "UI/Inventory/VMInteractionWidget.h"
 #include "UI/Inventory/VMMainMenu.h"
 #include "UI/Inventory/VMInventoryPanel.h"
+#include "UI/Inventory/VMEquipmentPanel.h"
 
 AVMCharacterHeroHUD::AVMCharacterHeroHUD()
 {
@@ -15,10 +16,11 @@ void AVMCharacterHeroHUD::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UE_LOG(LogTemp, Log, TEXT("QWER MainMenuClass 확인 전"));
+	APlayerController* PC = GetOwningPlayerController();
+
+
 	if (MainMenuClass)
 	{
-		UE_LOG(LogTemp, Log, TEXT("QWER MainMenuClass HIHI"));
 		MainMenuWidget = CreateWidget<UVMMainMenu>(GetWorld(), MainMenuClass);
 		MainMenuWidget->AddToViewport(5);
 		MainMenuWidget->SetVisibility(ESlateVisibility::Collapsed);
@@ -31,17 +33,25 @@ void AVMCharacterHeroHUD::BeginPlay()
 		InteractionWidget->SetVisibility(ESlateVisibility::Collapsed);
 	}
 
-
 	if (InventoryPanelClass)
 	{
 		InventoryPanel = CreateWidget<UVMInventoryPanel>(GetWorld(), InventoryPanelClass);
 		if (InventoryPanel)
 		{
 			InventoryPanel->AddToViewport();
-			// 처음에는 숨겨두고 싶으면 여기서 SetVisibility(Collapsed) 같은 것도 가능
+			InventoryPanel->SetVisibility(ESlateVisibility::Collapsed);
 		}
 	}
 
+	if (EquipmentPanelClass)
+	{
+		EquipmentPanel = CreateWidget<UVMEquipmentPanel>(GetWorld(), EquipmentPanelClass);
+		if (EquipmentPanel)
+		{
+			EquipmentPanel->AddToViewport();
+			EquipmentPanel->SetVisibility(ESlateVisibility::Collapsed);
+		}
+	}
 }
 
 

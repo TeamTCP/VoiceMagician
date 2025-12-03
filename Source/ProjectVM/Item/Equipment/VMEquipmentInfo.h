@@ -7,7 +7,7 @@
 #include "VMEquipmentInfo.generated.h"
 
 
-
+class UVMHeroStatComponent;
 
 USTRUCT(BlueprintType)
 struct FVMEquipmentInfo : public FTableRowBase
