@@ -57,6 +57,13 @@ void UVMAnimInstance::AnimNotify_SpawnProjectile()
 	OnSpawnProjectile.Clear();
 }
 
+void UVMAnimInstance::AnimNotify_AttackTiming()
+{
+	UE_LOG(LogTemp, Log, TEXT("AnimNotify : AttackTiming"));
+	OnAttackTiming.Broadcast();
+	OnAttackTiming.Clear();
+}
+
 void UVMAnimInstance::AnimNotify_SkillMotionEnd()
 {
 	UE_LOG(LogTemp, Log, TEXT("AnimNotify : SkillMotionEnd"));

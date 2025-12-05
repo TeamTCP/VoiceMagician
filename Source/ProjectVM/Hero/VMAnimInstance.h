@@ -23,6 +23,7 @@ public:
 
 	FSkillHandler OnSkillMotionStart;
 	FSkillHandler OnSpawnProjectile;
+	FSkillHandler OnAttackTiming;
 	FSkillHandler OnSkillMotionEnd;
 
 protected:
@@ -33,6 +34,8 @@ protected:
 	void AnimNotify_SkillMotionStart();
 	UFUNCTION()
 	void AnimNotify_SpawnProjectile();
+	UFUNCTION()
+	void AnimNotify_AttackTiming();
 	UFUNCTION()
 	void AnimNotify_SkillMotionEnd();
 
