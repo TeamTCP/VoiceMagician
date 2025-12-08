@@ -85,7 +85,7 @@ void AVMPortal::TeleportPlayerToMap()
 	Player->SetActorLocation(NewLocation);
 	UE_LOG(LogTemp, Log, TEXT("Player Teleport"));
 
-	//이동 위치에 포탈 생성 후 시간 지나면 사라지게 하기
+	//이동 위치에 포탈 잔상 생성 후 시간 지나면 사라지게 하기
 	TSubclassOf<AVMPortal> ActorToSpawn = AVMPortal::StaticClass();
 	AVMPortal* SpawnedPortal = GetWorld()->SpawnActor<AVMPortal>(ActorToSpawn, NewLocation, Player->GetActorRotation());
 	SpawnedPortal->InteractComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -121,7 +121,7 @@ void AVMPortal::TeleportPlayerToMap()
 			}
 		}, 2.f, false);
 
-	//안전하게 텀을 주고 5초 후에 포탈 삭제
+	//안전하게 텀을 주고 5초 후에 포탈 잔상 삭제
 	FTimerHandle DestroyTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(DestroyTimerHandle, [SpawnedPortal]()
 		{

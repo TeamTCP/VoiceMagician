@@ -115,39 +115,7 @@ void UVMQuestManager::NotifyMonsterDeath(EMonsterName MonsterType)
 {
 	UE_LOG(LogTemp, Log, TEXT("몬스터 죽음 : %s"), *UEnum::GetValueAsString(MonsterType));
 
-	FName Target;
-
-	// TODO: 상윤님 CSV 변경 부분
-	switch (MonsterType)
-	{
-	case EMonsterName::Warrior:
-		Target = "Warrior";
-		break;
-	case EMonsterName::Wizard:
-		Target = "Wizard";
-		break;
-	case EMonsterName::Archer:
-		Target = "Archer";
-		break;
-	case EMonsterName::MinionMelee:
-		Target = "MinionMelee";
-		break;
-	case EMonsterName::MinionRanged:
-		Target = "MinionRanged";
-		break;
-	case EMonsterName::MinionSiege:
-		Target = "MinionSiege";
-		break;
-	case EMonsterName::MinionSuper:
-		Target = "MinionSuper";
-		break;
-	case EMonsterName::Boss:
-		Target = "Boss";
-		break;
-	default:
-		Target = "None";
-		break;
-	}
+	FName Target = EnumToFName(MonsterType);
 
 	TArray<UVMQuestDataObject*>* Quests = CurrentQuests.Find(Target);
 	if (Quests != nullptr)
@@ -189,4 +157,11 @@ void UVMQuestManager::UpdateQuestProgress(TArray<UVMQuestDataObject*> Quests)
 			}
 		}
 	}
+}
+
+FName UVMQuestManager::EnumToFName(EMonsterName MonsterType)
+{
+	FString Name = UEnum::GetValueAsString(MonsterType);
+	Name.RemoveFromStart("EMonsterName::");
+	return FName(*Name);
 }
