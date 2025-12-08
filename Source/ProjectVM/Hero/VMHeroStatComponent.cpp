@@ -3,11 +3,18 @@
 
 #include "Hero/VMHeroStatComponent.h"
 #include "Item/Equipment/VMEquipment.h"
+#include "Hero/HeroStat.h"
 
 UVMHeroStatComponent::UVMHeroStatComponent()
 {
 	bWantsInitializeComponent = true;
 	PrimaryComponentTick.bCanEverTick = true;
+
+	BaseStats = FHeroStat();
+	FinalStats = FHeroStat();
+	CurStats = FHeroStat();
+	AdditiveModifier = FHeroStat();
+	MultiplicativeModifier = FHeroStat();
 
 	TimeProgress = 0.0f;
 }
@@ -70,6 +77,8 @@ void UVMHeroStatComponent::ApplyEquipmentStats(UVMEquipment* Equipment)
 
 void UVMHeroStatComponent::RemoveEquipmentStats(UVMEquipment* Equipment)
 {
+	if (!Equipment) return;
+
 	FVMEquipmentInfo EquipmentInfo = Equipment->GetEquipmentInfo();
 
 	EquipmentStats.AttackPower -= EquipmentInfo.AttackPower;

@@ -10,6 +10,7 @@ struct FInteractableData;
 class UVMMainMenu;
 class UVMInteractionWidget;
 class UVMInventoryPanel;
+class UVMEquipmentPanel;
 
 /**
  * 
@@ -29,8 +30,29 @@ public:
 
 	bool bIsMenuVisible;
 
+	// UMG 클래스 지정용
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<UVMInventoryPanel> InventoryPanelClass;
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<UVMEquipmentPanel> EquipmentPanelClass;
+
+
+	// 실제 인스턴스
+	UPROPERTY(BlueprintReadWrite, Category = "UI")
+	UVMInventoryPanel* InventoryPanel;
+
+
+	UPROPERTY(BlueprintReadWrite, Category = "UI")
+	UVMEquipmentPanel* EquipmentPanel;
+
+
 	UFUNCTION(BlueprintCallable)
 	UVMInventoryPanel* GetInventoryPanel() const { return InventoryPanel; }
+
+	UFUNCTION(BlueprintCallable)
+	UVMEquipmentPanel* GetEquipmentPanel() const { return EquipmentPanel; }
 
 public:
 	AVMCharacterHeroHUD();
@@ -50,13 +72,15 @@ protected:
 	UPROPERTY()
 	UVMInteractionWidget* InteractionWidget;
 
-	// UMG 클래스 지정용
-	UPROPERTY(EditDefaultsOnly, Category = "UI")
-	TSubclassOf<UVMInventoryPanel> InventoryPanelClass;
 
-	// 실제 인스턴스
-	UPROPERTY()
-	UVMInventoryPanel* InventoryPanel;
+
+
+
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	//TSubclassOf<UVMEquipmentPanel> EquipmentPanelClass;
+
+	//UPROPERTY(BlueprintReadOnly)
+	//UVMEquipmentPanel* EquipmentPanel;
 
 protected:
 	virtual void BeginPlay() override;

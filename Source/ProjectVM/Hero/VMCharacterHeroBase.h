@@ -13,6 +13,7 @@
 
 #include "Inventory/VMInventoryComponent.h"
 #include "UI/Character/VMCharacterHeroHUD.h"
+#include "Item/Equipment/VMEquipmentInfo.h"
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -22,6 +23,9 @@
 DECLARE_MULTICAST_DELEGATE(FHeroDeathHandler);
 
 class UVMEquipment;
+class UVMHeroStatComponent;
+class UVMEquipmentComponent;
+
 
 // 인벤토리 관련 구조체
 USTRUCT()
@@ -56,6 +60,7 @@ public:
 	FORCEINLINE class UVMHeroStatComponent* GetStatComponent() { return Stat; }
 	FORCEINLINE class UVMHeroSkillComponent* GetSkillComponent() { return Skills; }
 	FORCEINLINE EHeroState GetHeroState() { return CurState; }
+	FORCEINLINE void SetHeroState(EHeroState InState) { CurState = InState; }
 	void Resurrect();
 	
 	void ChangeInputMode(EInputMode NewMode);
@@ -71,7 +76,6 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	//virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
@@ -83,14 +87,10 @@ protected:
 	void MovementSkill(const FInputActionValue& Value);
 	void UltimateSkill(const FInputActionValue& Value);
 
-
 	//상호작용
 	void Interact(const FInputActionValue& Value);
-
 	//대화 넘기기
 	void NextTalk(const FInputActionValue& Value);
-	
-
 	void DebuggingTest(const FInputActionValue& Value);
 
 	// 인벤토리 관련 함수
@@ -98,16 +98,11 @@ protected:
 	void FoundInteractable(AActor* NewInteractable);
 	void NoInteractableFound();
 	void BeginInteract();
-	void EndInteract();
-	void BeingInteract();
 	void ToggleMenu();
-
 
 
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-
 
 	// 죄송합니다. 손 좀 대겠습니다.
 public:
@@ -125,8 +120,6 @@ public:
 	void ClearSlowDown();
 	float MaxWalkSpeed;
 
-
-
 	UFUNCTION()
 	void OnHitThunderByAOE(AActor* Target, float InDamage);
 
@@ -142,15 +135,14 @@ public:
 	int32 FireDotCount = 0;
 	
 	FTimerHandle FireTimerHandle;
-
 	FTimerHandle FrozenTimerHandle;
-
 	FTimerHandle DamageHandle;
 
 	UFUNCTION()
 	void ToggleInventory(const FInputActionValue& Value);
 
-	
+	UPROPERTY()
+	TObjectPtr<AVMCharacterHeroHUD> HUD;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, Meta = (AllowPrivateAccess = "true"))
@@ -208,6 +200,13 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Skill, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UVMHeroSkillComponent> Skills;
 
+	// 인벤토리 관련 변수
+	UPROPERTY(VisibleAnywhere, Category = "Character | Inventory")
+	TObjectPtr<UVMInventoryComponent> PlayerInventory;
+
+	UPROPERTY(VisibleAnywhere, Category = "Character | Interaction")
+	TScriptInterface<IVMInteractionInterface> TargetInteractable;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Skill, Meta = (AllowPrivateAccess = "true"))
 	EHeroState CurState;
 
@@ -216,17 +215,7 @@ protected:
 	bool bCanInteract = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interact")
 	class AVMNPC* CurrentNPC = nullptr;
-
-	// 인벤토리 관련 변수
-	UPROPERTY(VisibleAnywhere, Category = "Character | Interaction")
-	TScriptInterface<IVMInteractionInterface> TargetInteractable;
-
-	UPROPERTY(VisibleAnywhere, Category = "Character | Inventory")
-	//UVMInventoryComponent* PlayerInventory;
-	TObjectPtr<UVMInventoryComponent> PlayerInventory;
-
-	UPROPERTY()
-	TObjectPtr<AVMCharacterHeroHUD> HUD;
+	
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> ToggleAction;
@@ -236,9 +225,6 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Inventory")
 	bool bInventoryIsOpen = false;
-
-
-
 
 
 #pragma region 나희영_손 묻음 ㅈㅅ
@@ -251,10 +237,8 @@ protected:
 	TObjectPtr<class UPawnNoiseEmitterComponent> PawnNoiseEmitter;
 #pragma endregion
 
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* DefaultMappingContext;
-
 
 	float InteractionCheckFrequency;
 	float InteractionCheckDistance;

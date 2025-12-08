@@ -23,6 +23,10 @@
 #include "UI/Character/VMCharacterHeroHUD.h"
 #include "Inventory/VMPickup.h"
 #include "Inventory/VMInventoryComponent.h"
+#include "UI/Inventory/VMInventoryPanel.h"
+#include "UI/Inventory/VMEquipmentPanel.h"
+
+#include "Hero/HeroStat.h"
 
 #include "Components/PawnNoiseEmitterComponent.h"
 
@@ -63,12 +67,13 @@ AVMCharacterHeroBase::AVMCharacterHeroBase()
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->TargetArmLength = 300.0f;
 	CameraBoom->bUsePawnControlRotation = true;
+	CameraBoom->SetRelativeLocation(FVector(0.0f, 0.0f, 200.0f));
 
 	CameraBoom->bDoCollisionTest = false;
 
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
-	FollowCamera->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, 200.0f), FRotator(-30.0f, 0.0f, 0.0f));
+	FollowCamera->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, 0.0f), FRotator(-30.0f, 0.0f, 0.0f));
 	FollowCamera->bUsePawnControlRotation = false;
 
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext> InputMappingContextRef(TEXT("/Game/Project/Input/IMC_Shoulder.IMC_Shoulder"));
@@ -266,7 +271,7 @@ void AVMCharacterHeroBase::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 
 	//인벤토리
 	PlayerInputComponent->BindAction("Interaction", IE_Pressed, this, &AVMCharacterHeroBase::BeginInteract);
-	PlayerInputComponent->BindAction("Interaction", IE_Pressed, this, &AVMCharacterHeroBase::EndInteract);
+	//PlayerInputComponent->BindAction("Interaction", IE_Pressed, this, &AVMCharacterHeroBase::EndInteract);
 
 
 	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
@@ -357,8 +362,8 @@ void AVMCharacterHeroBase::BasicSkill(const FInputActionValue& Value)
 {
 	if (Stat == nullptr) return;
 	if (Skills == nullptr) return;
-
-	CurState = EHeroState::Skill;
+	if (CurState == EHeroState::Skill) return;
+	
 	Skills->ExecuteBasicSkill(this, Stat);
 }
 
@@ -366,6 +371,7 @@ void AVMCharacterHeroBase::AdvancedSkill(const FInputActionValue& Value)
 {
 	if (Stat == nullptr) return;
 	if (Skills == nullptr) return;
+	if (CurState == EHeroState::Skill) return;
 	
 	Skills->ExecuteAdvancedSkill(this, Stat);
 }
@@ -374,6 +380,7 @@ void AVMCharacterHeroBase::MovementSkill(const FInputActionValue& Value)
 {
 	if (Stat == nullptr) return;
 	if (Skills == nullptr) return;
+	if (CurState == EHeroState::Skill) return;
 	
 	Skills->ExecuteMovementSkill(this, Stat);
 }
@@ -382,6 +389,7 @@ void AVMCharacterHeroBase::UltimateSkill(const FInputActionValue& Value)
 {
 	if (Stat == nullptr) return;
 	if (Skills == nullptr) return;
+	if (CurState == EHeroState::Skill) return;
 	
 	Skills->ExecuteUltimateSkill(this, Stat);
 }
@@ -445,7 +453,7 @@ void AVMCharacterHeroBase::PerformInteractionCheck()
 	if (LookDirection > 0)
 	{
 
-		DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 1.0f, 0, 2.0f);
+		//DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 1.0f, 0, 2.0f);
 
 		FCollisionQueryParams QueryParams;
 		QueryParams.AddIgnoredActor(this);
@@ -470,28 +478,6 @@ void AVMCharacterHeroBase::PerformInteractionCheck()
 			}
 		}
 
-	/*	if (GetWorld()->LineTraceSingleByChannel(TraceHit, TraceStart, TraceEnd, ECC_Visibility, QueryParams))
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Hit: %s"), *TraceHit.GetActor()->GetName());
-
-			if (TraceHit.GetActor()->GetClass()->ImplementsInterface(UVMInteractionInterface::StaticClass()))
-			{
-				UE_LOG(LogTemp, Warning, TEXT("Implements IVMInteractionInterface!"));
-
-				const float Distance = (TraceStart - TraceHit.ImpactPoint).Size();
-				UE_LOG(LogTemp, Warning, TEXT("Distance: %f"), Distance);
-
-
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("Actor does NOT implement interface"));
-			}
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("LineTrace hit nothing"));
-		}*/
 	}
 
 
@@ -503,7 +489,7 @@ void AVMCharacterHeroBase::FoundInteractable(AActor* NewInteractable)
 {
 	if (IsInteracting())
 	{
-		EndInteract();
+		//EndInteract();
 	}
 
 	if (InteractionData.CurrentInteractable)
@@ -547,26 +533,7 @@ void AVMCharacterHeroBase::NoInteractableFound()
 
 void AVMCharacterHeroBase::BeginInteract()
 {
-	////verify nothing has changed with the interactable state since beginning interaction
-	//PerformInteractionCheck();
 
-	//if (InteractionData.CurrentInteractable)
-	//{
-	//	if (IsValid(TargetInteractable.GetObject()))
-	//	{
-	//		TargetInteractable->BeginInteract();
-
-	//		if (FMath::IsNearlyZero(TargetInteractable->InteractableData.InteractionDuration, 0.1f))
-	//		{
-	//			BeingInteract();
-	//		}
-	//		else
-	//		{
-	//			GetWorldTimerManager().SetTimer(TimerHandle_Interaction, this, &AVMCharacterHeroBase::BeingInteract,
-	//				TargetInteractable->InteractableData.InteractionDuration, false);
-	//		}
-	//	}
-	//}
 	UE_LOG(LogTemp, Warning, TEXT("BeginInteract called"));
 
 	PerformInteractionCheck();
@@ -583,45 +550,15 @@ void AVMCharacterHeroBase::BeginInteract()
 
 			if (FMath::IsNearlyZero(TargetInteractable->InteractableData.InteractionDuration, 0.1f))
 			{
-				UE_LOG(LogTemp, Warning, TEXT("InteractionDuration ~ 0, calling BeingInteract immediately"));
-				BeingInteract();
 			}
 			else
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Setting timer for BeingInteract, duration: %f"),
-					TargetInteractable->InteractableData.InteractionDuration);
-				GetWorldTimerManager().SetTimer(
-					TimerHandle_Interaction,
-					this,
-					&AVMCharacterHeroBase::BeingInteract,
-					TargetInteractable->InteractableData.InteractionDuration,
-					false);
 			}
 		}
 	}
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("BeginInteract: CurrentInteractable is nullptr"));
-	}
-}
-
-void AVMCharacterHeroBase::EndInteract()
-{
-	GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
-
-	if (IsValid(TargetInteractable.GetObject()))
-	{
-		TargetInteractable->EndInteract();
-	}
-}
-
-void AVMCharacterHeroBase::BeingInteract()
-{
-	GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
-
-	if (IsValid(TargetInteractable.GetObject()))
-	{
-		TargetInteractable->BeingInteract(this);
 	}
 }
 
@@ -659,6 +596,7 @@ void AVMCharacterHeroBase::DropItem(UVMEquipment* ItemToDrop, const int32 Quanti
 	}
 }
 
+
 void AVMCharacterHeroBase::SetCurrentNPC(AVMNPC* NewNPC)
 {
 	CurrentNPC = NewNPC;
@@ -672,13 +610,46 @@ void AVMCharacterHeroBase::ToggleMenu()
 
 void AVMCharacterHeroBase::ToggleInventory(const FInputActionValue& Value)
 {
-	AVMRPGPlayerController* PC = Cast<AVMRPGPlayerController>(GetController());
-	if (!PC) return;
+	// 1) 먼저 멤버 HUD 가 세팅되어 있는지 확인
+	if (!HUD)
+	{
+		if (APlayerController* PC = Cast<APlayerController>(GetController()))
+		{
+			HUD = PC->GetHUD<AVMCharacterHeroHUD>();
+		}
+	}
 
-	if (bInventoryIsOpen)
-		PC->CloseInventory();
+	if (!HUD || !HUD->InventoryPanel)
+		return;
+
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	if (!PC)
+		return;
+
+	const bool bVisible = HUD->InventoryPanel->IsVisible();
+
+	if (bVisible)
+	{
+		HUD->InventoryPanel->SetVisibility(ESlateVisibility::Collapsed);
+		if (HUD->EquipmentPanel)
+		{
+			HUD->EquipmentPanel->SetVisibility(ESlateVisibility::Collapsed);
+		}
+
+		PC->SetInputMode(FInputModeGameOnly());
+		PC->bShowMouseCursor = false;
+	}
 	else
-		PC->OpenInventory();
+	{
+		HUD->InventoryPanel->SetVisibility(ESlateVisibility::Visible);
+		if (HUD->EquipmentPanel)
+		{
+			HUD->EquipmentPanel->SetVisibility(ESlateVisibility::Visible);
+		}
+
+		PC->SetInputMode(FInputModeGameAndUI());
+		PC->bShowMouseCursor = true;
+	}
 }
 
 

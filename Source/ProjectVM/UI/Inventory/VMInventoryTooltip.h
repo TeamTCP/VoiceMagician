@@ -27,28 +27,17 @@ public:
 	TObjectPtr<UTextBlock> ItemName;
 
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> ItemID;
-
-	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> ItemDesc;
 
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> ItemLevel;
+	TObjectPtr<UTextBlock> DamageValue;
 
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> DefensivePower;
+	TObjectPtr<UTextBlock> ArmorRating;
 
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> HealthPoint;
+	TObjectPtr<UTextBlock> UsageText;
 
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> ManaPoint;
-
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> ManaRegeneration;
-
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> Ability;
 
 protected:
 	virtual void NativeConstruct() override;
