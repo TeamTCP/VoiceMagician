@@ -72,9 +72,9 @@ void AAlpha::BeginPlay()
 	FHeroStat BaseStats;
 	BaseStats.AttackPower = 70;
 	BaseStats.DefensivePower = 5;
-	BaseStats.HealthPoint = 1000;
+	BaseStats.HealthPoint = 100;
 	BaseStats.ManaPoint = 100;
-	BaseStats.ManaRegeneration = 15;
+	BaseStats.ManaRegeneration = 10;
 	BaseStats.Speed = 500;
 	BaseStats.LifeSteal = 10;
 	
