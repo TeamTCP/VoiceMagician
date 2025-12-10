@@ -42,7 +42,7 @@
       <td align="center"> <code> Windows </code> </td>
       <td align="center"> <code> 액션RPG </code> </td>
       <td align="center"> <code> Unreal </code> <code> C++ </code> </td>
-      <td align="center"> <a href="https://youtu.be/"> <code> YouTube </code> </a> </td>
+      <td align="center"> <a href="https://youtu.be/ByCoExA-XPc"> <code> YouTube </code> </a> </td>
     </tr>
   </table>
 </div>
