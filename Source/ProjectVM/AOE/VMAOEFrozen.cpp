@@ -161,7 +161,7 @@ void AVMAOEFrozen::SpawnAOE()
         }
     }
 #pragma region Debug용 코드
-    DrawDebugSphere(GetWorld(), Location, Radius, 16, FColor::Green, false, 10.0f, 0, 1.0f);
+    //DrawDebugSphere(GetWorld(), Location, Radius, 16, FColor::Green, false, 10.0f, 0, 1.0f);
 #pragma endregion 
 
 }

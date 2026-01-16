@@ -45,14 +45,6 @@ bool UVMCombineSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEv
     }
 
     return true;
-
-    if (DropBorder)
-    {
-        DropBorder->SetBrushColor(FLinearColor::Yellow);
-    }
-
-    UE_LOG(LogTemp, Warning, TEXT("NativeOnDrop: StoredItem SET OK"));
-    return true;
 }
 
 void UVMCombineSlot::RefreshFromStoredItem()
@@ -65,4 +57,9 @@ void UVMCombineSlot::RefreshFromStoredItem()
 
     // 인벤토리 슬롯에서 이미 쓰는 SetItemReference 함수 재사용
     InnerItemSlot->SetItemReference(StoredItem);
+}
+
+void UVMCombineSlot::ClearItem()
+{
+    InnerItemSlot->ClearItem();
 }

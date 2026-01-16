@@ -70,8 +70,8 @@ void AAlpha::BeginPlay()
 	USkillBase* Fireworks = NewObject<UVMFireworks>(this, UVMFireworks::StaticClass());
 
 	FHeroStat BaseStats;
-	BaseStats.AttackPower = 70;
-	BaseStats.DefensivePower = 5;
+	BaseStats.AttackPower = 10;
+	BaseStats.DefensivePower = 0;
 	BaseStats.HealthPoint = 100;
 	BaseStats.ManaPoint = 100;
 	BaseStats.ManaRegeneration = 10;

@@ -509,7 +509,7 @@ void AVMEnemyBase::TryMakeNoise()
 		5.0f,
 		false
 	);
-	DrawDebugSphere(GetWorld(), GetActorLocation(), 100.f, 16, FColor::Blue, false, 2.0f);
+	//DrawDebugSphere(GetWorld(), GetActorLocation(), 100.f, 16, FColor::Blue, false, 2.0f);
 }
 
 void AVMEnemyBase::ResetSoundCooldown()
