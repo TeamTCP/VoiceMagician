@@ -54,6 +54,9 @@ public:
 	
 	void ApplyEquipmentStats(class UVMEquipment* Equipment);
 	void RemoveEquipmentStats(class UVMEquipment* Equipment);
+	void RecalculateFromEquipment();
+
+
 
 	void ApplyAdditiveModifier(FHeroStat InStat);
 	void ApplyMultiplicativeModifier(FHeroStat InStat);

@@ -11,7 +11,7 @@ void AVMFieldPortal::Interact()
 {
 	Super::Interact();
 
-	TeleportPlayerToMap();
+	//TeleportPlayerToMap();
 	UVMLevelManager* LevelManager = GetGameInstance()->GetSubsystem<UVMLevelManager>();
 	LevelManager->DeleteLevel(DeleteLevelName);
 }

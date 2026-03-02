@@ -13,20 +13,55 @@ class UVMInventoryTooltip;
 class UVMDragItemVisual;
 class UVMEquipment;
 class UVMEquipmentInfo;
+class UVMInventoryPanel;
+class UVMEquipmnetPanel;
 class UTextBlock;
 class UBorder;
 class UImage;
 /**
  * 
  */
+
+UENUM(BlueprintType)
+enum class ESlotType : uint8
+{
+	None UMETA(DisplayName = "None"),
+	Inventory UMETA(DisplayName = "Inventory"),
+	Equipment UMETA(DisplayName = "Equipment")
+};
+
+//더블 클릭 델리게이트
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryItemDoubleClicked, UVMEquipment*, Item);
+
 UCLASS()
 class PROJECTVM_API UVMInventoryItemSlot : public UUserWidget
 {
 	GENERATED_BODY()
 
 public:
-	FORCEINLINE UVMEquipment* GetItemReference() const { return ItemReference; };
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	UVMEquipment* GetItemReference() const { return ItemReference; }
+
+
 	void SetItemReference(UVMEquipment* ItemIn);
+
+	void SetUp(const FVMEquipmentInfo& Info);
+	//UPROPERTY(VisibleAnywhere, Category = "Inventory Slot", meta = (BindWidget))
+	//TObjectPtr<UTextBlock> ItemQuantity;
+
+	void RefreshFromItem();
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	void ClearItem();
+	
+
+	virtual void NativeOnInitialized() override;
+	virtual void NativeConstruct() override;
+	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+	virtual void NativeOnMouseLeave(const FPointerEvent& InMouseEvent) override;
+	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;
+	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
+
 
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "Inventory Slot")
@@ -35,29 +70,54 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Inventory Slot")
 	TSubclassOf<UVMInventoryTooltip> TooltipClass;
 
-	UPROPERTY(VisibleAnywhere, Category = "Inventory Slot")
+	UPROPERTY(VisibleAnywhere, Category = "Inventory Slot | Equipment Slot")
 	TObjectPtr<UVMEquipment> ItemReference;
 
-	UPROPERTY(VisibleAnywhere, Category = "Inventory Slot", meta = (BindWidget))
+	UPROPERTY(VisibleAnywhere, Category = "Inventory Slot | Equipment Slot", meta = (BindWidget))
 	TObjectPtr<UBorder> ItemBorder;
 
-	UPROPERTY(VisibleAnywhere, Category = "Inventory Slot", meta = (BindWidget))
+	UPROPERTY(VisibleAnywhere, Category = "Inventory Slot | Equipment Slot", meta = (BindWidget))
 	TObjectPtr<UImage> ItemIcon;
 
 	UPROPERTY()
 	TObjectPtr<class UMaterialInstanceDynamic> ItemMaterialInstance;
 
-	void SetUp(const FVMEquipmentInfo& Info);
-	//UPROPERTY(VisibleAnywhere, Category = "Inventory Slot", meta = (BindWidget))
-	//TObjectPtr<UTextBlock> ItemQuantity;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
+	TObjectPtr<UMaterialInterface> ItemAtlasBaseMaterial;
 
-	void RefreshFromItem();
 
-	virtual void NativeOnInitialized() override;
-	virtual void NativeConstruct() override;
-	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
-	virtual void NativeOnMouseLeave(const FPointerEvent& InMouseEvent) override;
-	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;
-	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
-	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "ItemIcon")
+	TObjectPtr<UMaterialInterface> AtlasMaterial;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Slot")
+	ESlotType SlotType = ESlotType::None;
+
+	UPROPERTY()
+	UVMInventoryPanel* InventoryPanelRef;
+
+	UPROPERTY()
+	UVMEquipmentPanel* EquipmentPanelRef;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Inventory")
+	TObjectPtr<class UVMEquipment> StoredItem;
+
+
+	// 더블 클릭 델리게이트 (패널에서 바인딩)
+	UPROPERTY(BlueprintAssignable, Category = "Inventory")
+	FOnInventoryItemDoubleClicked OnItemDoubleClicked;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tooltip")
+	bool bEnableTooltip = true;
+	virtual void NativeOnDragCancelled(
+		const FDragDropEvent& InDragDropEvent,
+		UDragDropOperation* InOperation) override;
+
+
+protected:
+
+	// 더블클릭 처리
+	virtual FReply NativeOnMouseButtonDoubleClick(
+		const FGeometry& InGeometry,
+		const FPointerEvent& InMouseEvent) override;
+
 };

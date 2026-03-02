@@ -23,6 +23,9 @@ public:
 	FORCEINLINE class UNiagaraComponent* GetPortalNiagaraSystem() const {
 		return PortalNiagaraSystem;
 	}
+	FORCEINLINE class UNiagaraComponent* GetEffectLineNiagaraSystem() const {
+		return EffectLineNiagaraSystem;
+	}
 
 	//맵 이동
 	UFUNCTION()
@@ -50,8 +53,6 @@ protected:
 	FVector MapTeleportPos = FVector(0.f, 0.f, 0.f);
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Position")
 	FVector PlayerTeleportPos = FVector(0.f, 0.f, 0.f);
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Position")
-	//FRotator PlayerTeleportRot = FRotator(0.f, 0.f, 0.f);
 
 	//이펙트 타이머
 	FTimerHandle EffectTimerHandle;
