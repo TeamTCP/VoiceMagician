@@ -34,7 +34,7 @@ protected:
 	TObjectPtr<class UStaticMeshComponent> ItemCube;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interact")
-	TObjectPtr<class UInteractComponent> InteractComponent;
+	TObjectPtr<class UVMInteractComponent> InteractComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Info")
 	TObjectPtr<class UVMEquipment> Equipment; 

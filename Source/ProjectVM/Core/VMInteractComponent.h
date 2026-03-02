@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Components/BoxComponent.h"
-#include "InteractComponent.generated.h"
+#include "VMInteractComponent.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECTVM_API UInteractComponent : public UBoxComponent
+class PROJECTVM_API UVMInteractComponent : public UBoxComponent
 {
 	GENERATED_BODY()
 protected:

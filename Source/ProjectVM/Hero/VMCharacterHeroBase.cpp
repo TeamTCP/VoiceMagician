@@ -18,7 +18,7 @@
 
 #include "NPC/VMNPC.h"
 #include "Quest/VMQuestManager.h"
-#include "Core/InteractionManager.h"
+#include "Core/VMInteractionManager.h"
 
 #include "UI/Character/VMCharacterHeroHUD.h"
 #include "Inventory/VMPickup.h"
@@ -394,7 +394,7 @@ void AVMCharacterHeroBase::Interact(const FInputActionValue& Value)
 		UE_LOG(LogTemp, Log, TEXT("GameInstance is nullptr"));
 	}
 
-	UInteractionManager* InteractionManager = GI->GetSubsystem<UInteractionManager>();
+	UVMInteractionManager* InteractionManager = GI->GetSubsystem<UVMInteractionManager>();
 	if (InteractionManager == nullptr)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Interaction Manager is nullptr"));

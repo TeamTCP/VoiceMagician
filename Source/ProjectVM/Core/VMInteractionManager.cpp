@@ -1,14 +1,16 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Core/InteractionManager.h"
+#include "Core/VMInteractionManager.h"
 #include "Core/VMInteractableInterface.h"
 #include "Game/VMRPGPlayerController.h"
 #include "Kismet/GameplayStatics.h"
-void UInteractionManager::RegisterInteractable(AActor* InteractableActor)
+void UVMInteractionManager::RegisterInteractable(AActor* InteractableActor)
 {
-	if (!InteractableActor)
+	if (InteractableActor == nullptr)
+	{
 		return;
+	}
 
 	// 중복 등록 방지
 	if (!InteractableActors.Contains(InteractableActor))
@@ -29,10 +31,12 @@ void UInteractionManager::RegisterInteractable(AActor* InteractableActor)
 	}
 }
 
-void UInteractionManager::UnregisterInteractable(AActor* InteractableActor)
+void UVMInteractionManager::UnregisterInteractable(AActor* InteractableActor)
 {
-	if (!InteractableActor)
+	if (InteractableActor == nullptr)
+	{
 		return;
+	}
 
 	InteractableActors.Remove(InteractableActor);
 	UE_LOG(LogTemp, Log, TEXT("InteractManager: Unregister Actor"));
@@ -51,7 +55,7 @@ void UInteractionManager::UnregisterInteractable(AActor* InteractableActor)
 	}
 }
 
-void UInteractionManager::Interact()
+void UVMInteractionManager::Interact()
 {
 	if (InteractableActors.IsEmpty())
 	{

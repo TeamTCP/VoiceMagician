@@ -3,7 +3,7 @@
 #include "Components/CapsuleComponent.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
-#include "Core/InteractComponent.h"
+#include "Core/VMInteractComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/LevelStreamingDynamic.h"
 #include "Engine/LevelStreaming.h"
@@ -41,7 +41,7 @@ AVMPortal::AVMPortal()
 	}
 
 	//상호작용 컴포넌트 추가
-	InteractComponent = CreateDefaultSubobject<UInteractComponent>(TEXT("InteractComponent"));
+	InteractComponent = CreateDefaultSubobject<UVMInteractComponent>(TEXT("InteractComponent"));
 	InteractComponent->SetupAttachment(RootComponent);
 }
 

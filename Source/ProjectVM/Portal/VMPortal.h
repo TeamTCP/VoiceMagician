@@ -42,7 +42,7 @@ protected:
 	TObjectPtr<class UNiagaraComponent> EffectLineNiagaraSystem;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interact")
-	TObjectPtr<class UInteractComponent> InteractComponent;
+	TObjectPtr<class UVMInteractComponent> InteractComponent;
 
 	//TObjectPtr < class ULevelStreamingDynamic> LoadedLevel = nullptr;
 
