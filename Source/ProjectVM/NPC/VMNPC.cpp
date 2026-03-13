@@ -24,7 +24,7 @@
 #include "Blueprint/UserWidget.h"
 #include "UI/Quest/VMQuestTracker.h"
 #include "UI/Quest/VMQuestDataObject.h"
-#include "Core/InteractComponent.h"
+#include "Core/VMInteractComponent.h"
 
 // Sets default values
 AVMNPC::AVMNPC()
@@ -88,7 +88,7 @@ AVMNPC::AVMNPC()
 	CameraBoom->SetRelativeRotation(FRotator(-20.0f, 130.0f, 0.0f));
 	CameraBoom->TargetArmLength = 500.f;
 
-	InteractComponent = CreateDefaultSubobject<UInteractComponent>(TEXT("InteractComponent"));
+	InteractComponent = CreateDefaultSubobject<UVMInteractComponent>(TEXT("InteractComponent"));
 	InteractComponent->SetupAttachment(RootComponent);
 }
 
@@ -258,7 +258,7 @@ void AVMNPC::TalkSetting(FString TalkType)
 			UE_LOG(LogTemp, Log, TEXT("Talk Row Not Found: %s"), *TalkTag.ToString());
 			break;
 		}
-		DialogueTexts.Add(VMNPCTalk);
+		DialogueTexts.Add(*VMNPCTalk);
 	} while (!VMNPCTalk->bIsLastLine);
 }
 
@@ -358,7 +358,7 @@ bool AVMNPC::NextDialogue()
 
 	if (CurrentDialogueIndex < DialogueTexts.Num())
 	{
-		Dialogue->SetNPCText(FText::FromString(DialogueTexts[CurrentDialogueIndex]->Dialogue));
+		Dialogue->SetNPCText(FText::FromString(DialogueTexts[CurrentDialogueIndex].Dialogue));
 		++CurrentDialogueIndex;
 
 		if (DialogueTexts.Num() == CurrentDialogueIndex)

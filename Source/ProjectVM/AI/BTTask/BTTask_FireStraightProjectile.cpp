@@ -9,6 +9,7 @@
 #include "AI/Enemies/VMEnemyBoss.h"
 
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Core/VMLevelManager.h"
 
 UBTTask_FireStraightProjectile::UBTTask_FireStraightProjectile()
 {
@@ -71,12 +72,32 @@ EBTNodeResult::Type UBTTask_FireStraightProjectile::SpawnProjectileToTarget(UBeh
     FRotator Rot(Direction.Rotation());
 
     FActorSpawnParameters Params;
-    Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
+    Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+    UVMLevelManager* LevelManager = GetWorld()->GetGameInstance()->GetSubsystem<UVMLevelManager>();
+    if (LevelManager != nullptr)
+    {
+        ULevelStreaming* BossLevel = LevelManager->GetLevel(FName("BossMap"));
+        if (BossLevel != nullptr && BossLevel->GetLoadedLevel() != nullptr)
+        {
+            Params.OverrideLevel = BossLevel->GetLoadedLevel();
+            UE_LOG(LogTemp, Log, TEXT("Spawn location changed to BossMap"));
+        }
+        else
+        {
+            UE_LOG(LogTemp, Log, TEXT("BossLevel is nullptr"));
+        }
+    }
+    else
+    {
+        UE_LOG(LogTemp, Log, TEXT("LevelManager is nullptr"));
+    }
+    
+    
     AVMStraightProjectile* SpawnActor = SpawnStraightProjectile(GetWorld(), SpawnLocation, Rot, Params);
     if (SpawnActor == nullptr)
     {
-        EBTNodeResult::Failed;
+        return EBTNodeResult::Failed;
     }
     SpawnActor->SetMaxSpeed(3000);
     SpawnActor->SetVelocity(3000);
@@ -127,7 +148,26 @@ void UBTTask_FireStraightProjectile::FireOneVerticalProjectile(UBehaviorTreeComp
 
     FActorSpawnParameters Params;
     Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
+    
+    UVMLevelManager* LevelManager = GetWorld()->GetGameInstance()->GetSubsystem<UVMLevelManager>();
+    if (LevelManager != nullptr)
+    {
+        ULevelStreaming* BossLevel = LevelManager->GetLevel(FName("BossMap"));
+        if (BossLevel != nullptr && BossLevel->GetLoadedLevel() != nullptr)
+        {
+            Params.OverrideLevel = BossLevel->GetLoadedLevel();
+            UE_LOG(LogTemp, Log, TEXT("Spawn location changed to BossMap"));
+        }
+        else
+        {
+            UE_LOG(LogTemp, Log, TEXT("BossLevel is nullptr"));
+        }
+    }
+    else
+    {
+        UE_LOG(LogTemp, Log, TEXT("LevelManager is nullptr"));
+    }
+    
     // 실제 발사
     SpawnStraightProjectile(BossPtr->GetWorld(), SpawnLocation, Rot, Params);
 
@@ -156,7 +196,25 @@ EBTNodeResult::Type UBTTask_FireStraightProjectile::SpawnFromFront(UBehaviorTree
     const float Radius = 4000.f;
     FVector BossLoc = BossPtr->GetActorLocation();
     FActorSpawnParameters Params;
-    Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+    Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+    UVMLevelManager* LevelManager = GetWorld()->GetGameInstance()->GetSubsystem<UVMLevelManager>();
+    if (LevelManager != nullptr)
+    {
+        ULevelStreaming* BossLevel = LevelManager->GetLevel(FName("BossMap"));
+        if (BossLevel != nullptr && BossLevel->GetLoadedLevel() != nullptr)
+        {
+            Params.OverrideLevel = BossLevel->GetLoadedLevel();
+            UE_LOG(LogTemp, Log, TEXT("Spawn location changed to BossMap"));
+        }
+        else
+        {
+            UE_LOG(LogTemp, Log, TEXT("BossLevel is nullptr"));
+        }
+    }
+    else
+    {
+        UE_LOG(LogTemp, Log, TEXT("LevelManager is nullptr"));
+    }
 
     for (int32 i = 0; i < Count; i++)
     {
@@ -171,6 +229,8 @@ EBTNodeResult::Type UBTTask_FireStraightProjectile::SpawnFromFront(UBehaviorTree
         FRotator Rot = (BossLoc - SpawnLocation).Rotation();
         SpawnLocation.Z = BossLoc.Z - 200.f;
 
+        
+        
         AVMStraightProjectile* SpawnActor = SpawnStraightProjectile(GetWorld(), SpawnLocation, Rot, Params);
         if (SpawnActor == nullptr)
         {
@@ -217,7 +277,26 @@ void UBTTask_FireStraightProjectile::FireOneCircleProjectile(UBehaviorTreeCompon
     const float Distance = 400.0f;
     FVector BaseLoc = BossPtr->GetActorLocation();
     FActorSpawnParameters Params;
-    Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+    
+    Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+    UVMLevelManager* LevelManager = GetWorld()->GetGameInstance()->GetSubsystem<UVMLevelManager>();
+    if (LevelManager != nullptr)
+    {
+        ULevelStreaming* BossLevel = LevelManager->GetLevel(FName("BossMap"));
+        if (BossLevel != nullptr && BossLevel->GetLoadedLevel() != nullptr)
+        {
+            Params.OverrideLevel = BossLevel->GetLoadedLevel();
+            UE_LOG(LogTemp, Log, TEXT("Spawn location changed to BossMap"));
+        }
+        else
+        {
+            UE_LOG(LogTemp, Log, TEXT("BossLevel is nullptr"));
+        }
+    }
+    else
+    {
+        UE_LOG(LogTemp, Log, TEXT("LevelManager is nullptr"));
+    }
 
     float Yaw = ShotsFired * AngleStep;
     FRotator Rot(0.f, Yaw, 0.f);
@@ -278,8 +357,26 @@ EBTNodeResult::Type UBTTask_FireStraightProjectile::SpawnGangplankUlt(UBehaviorT
             FRotator Rot = FRotator(-90.f, 0.f, 0.f);
 
             FActorSpawnParameters Params;
-            Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
+            Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+            UVMLevelManager* LevelManager = GetWorld()->GetGameInstance()->GetSubsystem<UVMLevelManager>();
+            if (LevelManager != nullptr)
+            {
+                ULevelStreaming* BossLevel = LevelManager->GetLevel(FName("BossMap"));
+                if (BossLevel != nullptr && BossLevel->GetLoadedLevel() != nullptr)
+                {
+                    Params.OverrideLevel = BossLevel->GetLoadedLevel();
+                    UE_LOG(LogTemp, Log, TEXT("Spawn location changed to BossMap"));
+                }
+                else
+                {
+                    UE_LOG(LogTemp, Log, TEXT("BossLevel is nullptr"));
+                }
+            }
+            else
+            {
+                UE_LOG(LogTemp, Log, TEXT("LevelManager is nullptr"));
+            }
+            
             // 발사
             SpawnStraightProjectile(World, SpawnPos, Rot, Params);
 

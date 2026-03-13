@@ -13,7 +13,7 @@ AAlpha::AAlpha()
 {
 	HairMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("HairMesh"));
 	HairMesh->SetupAttachment(GetMesh());
-	HairMesh->SetCollisionProfileName(TEXT("VMHeroCollision"));
+	HairMesh->SetCollisionProfileName(TEXT("NoCollision"));
 	
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/EchoContent/Characters/Echo/Meshes/Echo.Echo'"));
 	if (CharacterMeshRef.Object)
@@ -71,10 +71,10 @@ void AAlpha::BeginPlay()
 
 	FHeroStat BaseStats;
 	BaseStats.AttackPower = 10;
-	BaseStats.DefensivePower = 5;
+	BaseStats.DefensivePower = 0;
 	BaseStats.HealthPoint = 100;
 	BaseStats.ManaPoint = 100;
-	BaseStats.ManaRegeneration = 5;
+	BaseStats.ManaRegeneration = 10;
 	BaseStats.Speed = 500;
 	BaseStats.LifeSteal = 10;
 	

@@ -39,7 +39,7 @@ UVMEquipment* UItemFactorySubsystem::CraftEquipment(UVMEquipment* BaseEquipment1
 	if (EquipmentInfo1.ItemLevel != 1) return nullptr;
 	if (EquipmentInfo2.ItemLevel != 1) return nullptr;
 	
-	int32 CombID = EquipmentInfo1.ItemID | EquipmentInfo2.ItemID;
+	int32 CombID = (EquipmentInfo1.ItemID == EquipmentInfo2.ItemID) ? EquipmentInfo1.ItemID * 1000 : EquipmentInfo1.ItemID | EquipmentInfo2.ItemID;
 	FVMEquipmentInfo* CombInfoPtr = EquipmentInfoByID.Find(CombID);
 	if (CombInfoPtr == nullptr) return nullptr;
 

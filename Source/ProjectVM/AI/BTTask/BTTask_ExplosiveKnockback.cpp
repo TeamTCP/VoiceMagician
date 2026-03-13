@@ -10,6 +10,7 @@
 #include "Projectile/VMHomingProjectile.h"
 
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Core/VMLevelManager.h"
 
 #include "Hero/VMCharacterHeroBase.h"
 UBTTask_ExplosiveKnockback::UBTTask_ExplosiveKnockback()
@@ -44,6 +45,26 @@ EBTNodeResult::Type UBTTask_ExplosiveKnockback::ExecuteTask(UBehaviorTreeCompone
     FActorSpawnParameters SpawnParams;
     SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
+    UVMLevelManager* LevelManager = GetWorld()->GetGameInstance()->GetSubsystem<UVMLevelManager>();
+    if (LevelManager != nullptr)
+    {
+        ULevelStreaming* BossLevel = LevelManager->GetLevel(FName("BossMap"));
+        if (BossLevel != nullptr && BossLevel->GetLoadedLevel() != nullptr)
+        {
+            SpawnParams.OverrideLevel = BossLevel->GetLoadedLevel();
+            UE_LOG(LogTemp, Log, TEXT("Spawn location changed to BossMap"));
+        }
+        else
+        {
+            UE_LOG(LogTemp, Log, TEXT("BossLevel is nullptr"));
+        }
+    }
+    else
+    {
+        UE_LOG(LogTemp, Log, TEXT("LevelManager is nullptr"));
+    }
+    
+    
     FRotator SpawnRot(BossPtr->GetActorLocation().Rotation());
 
     AVMAOEExplosion* Explosion = GetWorld()->SpawnActor<AVMAOEExplosion>(AVMAOEExplosion::StaticClass(), SpawnLocation, SpawnRot, SpawnParams);

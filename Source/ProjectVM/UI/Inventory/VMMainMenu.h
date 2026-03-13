@@ -20,6 +20,13 @@ public:
 	//AVMPracCharacter* PlayerCharacter;
 	TObjectPtr<AVMCharacterHeroBase> Character;
 
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UVMInventoryPanel> WBP_VMInventoryPanel;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UVMEquipmentPanel> WBP_VMEquipmentPanel;
+
+
 protected:
 	virtual void NativeOnInitialized() override;
 	virtual void NativeConstruct() override;

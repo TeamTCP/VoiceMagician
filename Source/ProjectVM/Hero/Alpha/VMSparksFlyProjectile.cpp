@@ -11,6 +11,7 @@
 #include "NiagaraFunctionLibrary.h"
 
 #include "Utils/VMMath.h"
+#include "Macro/VMPhysics.h"
 
 AVMSparksFlyProjectile::AVMSparksFlyProjectile()
 {
@@ -23,14 +24,13 @@ AVMSparksFlyProjectile::AVMSparksFlyProjectile()
 	SphereCollision = CreateDefaultSubobject<USphereComponent>(TEXT("SphereCollision"));
 	SphereCollision->SetupAttachment(RootComponent);
 	SphereCollision->SetSphereRadius(1.f);
-	SphereCollision->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
+	SphereCollision->SetCollisionProfileName(VM_HERO_PROJECTILE_COLLISION);
 	SphereCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &AVMSparksFlyProjectile::HitTarget);
 	
 	SparksFlyEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("SparksFlyEffect"));
 	SparksFlyEffect->SetupAttachment(SphereCollision);
 	SparksFlyEffect->SetAutoActivate(true);
-	//SparksFlyEffect->SetAutoDestroy(true);
 
 	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> NiagaraSystemAsset(TEXT("/Game/_SplineVFX/NS/NS_Spline_EnergyLoop_Burning.NS_Spline_EnergyLoop_Burning"));
 	if (NiagaraSystemAsset.Succeeded())
@@ -76,8 +76,6 @@ void AVMSparksFlyProjectile::InitProjectile(AActor* InOwner, AActor* InTarget, i
 
 void AVMSparksFlyProjectile::HitTarget(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor != Target) return;
-	
 	IVMStatChangeable* StatChangeable = Cast<IVMStatChangeable>(OtherActor);
 
 	if (StatChangeable)

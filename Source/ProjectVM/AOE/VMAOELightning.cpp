@@ -15,162 +15,187 @@
 
 #include "GameFramework/CharacterMovementComponent.h"
 
+#include "Macro/VMPhysics.h"
+
 
 
 AVMAOELightning::AVMAOELightning()
 {
-    RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
+	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 
-    DecalComp = CreateDefaultSubobject<UDecalComponent>(TEXT("DecalComponent"));
-    DecalComp->SetupAttachment(RootComponent);
-    DecalComp->SetHiddenInGame(true);
+	DecalComp = CreateDefaultSubobject<UDecalComponent>(TEXT("DecalComponent"));
+	DecalComp->SetupAttachment(RootComponent);
+	DecalComp->SetHiddenInGame(true);
 
-    ConstructorHelpers::FObjectFinder<UMaterialInterface> DecalCompMeterialRef(TEXT("/Script/Engine.MaterialInstanceConstant'/Game/KTP_Decal/Decal/plant_DID_101125.plant_DID_101125'"));
-    if (DecalCompMeterialRef.Object)
-    {
-        DecalComp->SetDecalMaterial(DecalCompMeterialRef.Object);
-    }
+	ConstructorHelpers::FObjectFinder<UMaterialInterface> DecalCompMeterialRef(TEXT("/Script/Engine.MaterialInstanceConstant'/Game/KTP_Decal/Decal/plant_DID_101125.plant_DID_101125'"));
+	if (DecalCompMeterialRef.Object)
+	{
+		DecalComp->SetDecalMaterial(DecalCompMeterialRef.Object);
+	}
 }
 
 void AVMAOELightning::BeginPlay()
 {
-    Super::BeginPlay();
-    CreateLogic();
-    /*GetWorld()->GetTimerManager().SetTimer(DecalTimeHandle, [this]()
-        {
-            CreateLogic();
-        }, 3.0f, false);*/
+	Super::BeginPlay();
+	CreateLogic();
+	/*GetWorld()->GetTimerManager().SetTimer(DecalTimeHandle, [this]()
+		{
+			CreateLogic();
+		}, 3.0f, false);*/
+}
+
+void AVMAOELightning::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+	// 타이머가 남아있다면 제거
+	GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
 }
 
 void AVMAOELightning::CreateLogic()
 {
-    DecalComp->DecalSize = FVector(256.f, 256.f, 256.f);
-    DecalComp->SetRelativeRotation(FRotator(-90.f, 0.f, 0.f));
-    DecalComp->MarkRenderStateDirty(); // 갱신 강제 굳이?
-    DecalComp->SetHiddenInGame(false);
+	if (!IsValid(this))
+		return;
+
+	UWorld* World = GetWorld();
+	if (!World)
+		return;
+
+	DecalComp->DecalSize = FVector(256.f, 256.f, 256.f);
+	DecalComp->SetRelativeRotation(FRotator(-90.f, 0.f, 0.f));
+	DecalComp->MarkRenderStateDirty(); // 갱신 강제 굳이?
+	DecalComp->SetHiddenInGame(false);
 
 
-    //DecalMaterial, Size, Location, Rotation, 0
-    DecalTimeHandle.Invalidate();
+	//DecalMaterial, Size, Location, Rotation, 0
+	DecalTimeHandle.Invalidate();
 
-GetWorld()->GetTimerManager().SetTimer(DecalTimeHandle, [this]()
-        {
-            UE_LOG(LogTemp, Log, TEXT("Hello"));
-            if (DecalComp == nullptr)
-            {
-                UE_LOG(LogTemp, Log, TEXT("No Nullptr"));
-            }
-            if (IsValid(DecalComp))
-            {
-                UE_LOG(LogTemp, Log, TEXT("정상이니까 삭제"));
-                DecalComp->DestroyComponent();
-            }
-            else
-            {
-                UE_LOG(LogTemp, Log, TEXT("비정상이니까 삭제 안함."));
-            }
-            InitAOEPosition();
-            SpawnAOE();
-        }, 3.0f, false);
+	TWeakObjectPtr<AVMAOELightning> WeakThis(this);
+
+	GetWorld()->GetTimerManager().SetTimer(DecalTimeHandle, [WeakThis]()
+		{
+			if (WeakThis.IsValid() == false)
+			{
+				return;
+			}
+
+			AVMAOELightning* Self = WeakThis.Get();
+
+			UWorld* WorldPtr = Self->GetWorld();
+			if (WorldPtr == nullptr)
+			{
+				return;
+			}
+
+			UE_LOG(LogTemp, Log, TEXT("Hello"));
+
+			if (IsValid(Self->DecalComp))
+			{
+				UE_LOG(LogTemp, Log, TEXT("정상이니까 삭제"));
+				Self->DecalComp->DestroyComponent();
+			}
+
+			Self->InitAOEPosition();
+			Self->SpawnAOE();
+		}, 3.0f, false);
 }
 
 void AVMAOELightning::InitAOEPosition()
 {
 	// z축으로 Lay를 쏴서 부딪힌 Mesh의 좌표를 얻는다.
-    DecalLocation = GetActorLocation();
-    FVector StartLocation = DecalLocation + FVector(0, 0, 1000);
-    FVector EndLocation = DecalLocation + FVector(0, 0, -1000);
+	DecalLocation = GetActorLocation();
+	FVector StartLocation = DecalLocation + FVector(0, 0, 1000);
+	FVector EndLocation = DecalLocation + FVector(0, 0, -1000);
 
-    FHitResult Hit;
-    FCollisionQueryParams Params;
-    Params.AddIgnoredActor(this);    // 자기 자신 무시
+	FHitResult Hit;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);    // 자기 자신 무시
 
-    bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECC_Visibility, Params);
-    if (bHit)
-    {
-        AActor* HitActor = Hit.GetActor();
-        if (HitActor)
-        {
-            Location = Hit.Location;
-            UE_LOG(LogTemp, Log, TEXT("맞긴하니?"));
-        }
-    }
-    FColor LineColor = bHit ? FColor::Red : FColor::Green;
+	bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECC_Visibility, Params);
+	if (bHit)
+	{
+		AActor* HitActor = Hit.GetActor();
+		if (HitActor)
+		{
+			Location = Hit.Location;
+			UE_LOG(LogTemp, Log, TEXT("맞긴하니?"));
+		}
+	}
+	FColor LineColor = bHit ? FColor::Red : FColor::Green;
 
-    DrawDebugLine(GetWorld(), StartLocation, EndLocation, LineColor, true, 2.0f, 0, 2.0f);
-    UE_LOG(LogTemp, Log, TEXT("끝난거니?"));
+	DrawDebugLine(GetWorld(), StartLocation, EndLocation, LineColor, true, 2.0f, 0, 2.0f);
+	UE_LOG(LogTemp, Log, TEXT("끝난거니?"));
 }
 
 void AVMAOELightning::SpawnAOE()
 {
-    UE_LOG(LogTemp, Display, TEXT("(%f,%f,%f) (%f,%f,%f)"), Location.X, Location.Y, Location.Z, GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z);
-    
-    USoundBase* MySound = LoadObject<USoundBase>(nullptr, TEXT("/Script/Engine.SoundCue'/Game/StarterContent/Audio/Explosion_Cue.Explosion_Cue'"));
-    if (MySound == nullptr)
-    {
-        UE_LOG(LogTemp, Warning, TEXT("엥?"));
-        return;
-    }
+	UE_LOG(LogTemp, Display, TEXT("(%f,%f,%f) (%f,%f,%f)"), Location.X, Location.Y, Location.Z, GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z);
 
-    UGameplayStatics::PlaySoundAtLocation(
-        this,           // World context (보통 Actor나 UObject)
-        MySound,    // USoundBase* 사운드
-        GetActorLocation(),  // 재생 위치
-        1.0f,           // 볼륨
-        1.0f            // 피치
-    );
+	USoundBase* MySound = LoadObject<USoundBase>(nullptr, TEXT("/Script/Engine.SoundCue'/Game/StarterContent/Audio/Explosion_Cue.Explosion_Cue'"));
+	if (MySound == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("엥?"));
+		return;
+	}
 
-    UParticleSystem* ParticleSystem = LoadObject<UParticleSystem>(nullptr, TEXT("/Script/Engine.ParticleSystem'/Game/FXVarietyPack/Particles/P_ky_lightning2.P_ky_lightning2'"));
-    if (ParticleSystem == nullptr)
-    {
-        UE_LOG(LogTemp, Warning, TEXT("번개가 안나오는데?"));
-        return;
-    }
-    
-    UGameplayStatics::SpawnEmitterAttached(ParticleSystem, RootComponent, TEXT("NoName"), FVector::Zero(), GetActorRotation(), EAttachLocation::KeepRelativeOffset);
+	UGameplayStatics::PlaySoundAtLocation(
+		this,           // World context (보통 Actor나 UObject)
+		MySound,    // USoundBase* 사운드
+		GetActorLocation(),  // 재생 위치
+		1.0f,           // 볼륨
+		1.0f            // 피치
+	);
+
+	UParticleSystem* ParticleSystem = LoadObject<UParticleSystem>(nullptr, TEXT("/Script/Engine.ParticleSystem'/Game/FXVarietyPack/Particles/P_ky_lightning2.P_ky_lightning2'"));
+	if (ParticleSystem == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("번개가 안나오는데?"));
+		return;
+	}
+
+	UGameplayStatics::SpawnEmitterAttached(ParticleSystem, RootComponent, TEXT("NoName"), FVector::Zero(), GetActorRotation(), EAttachLocation::KeepRelativeOffset);
 
 
-    // Sphere를 그리고 충돌 처리를 하는게 나을 듯?
-    // 충돌 채널 설정
-    TArray<FOverlapResult> Overlaps;
-    float Radius = 256.0f;
-    FCollisionShape Sphere = FCollisionShape::MakeSphere(Radius);
-    bool bHasOverlap = GetWorld()->OverlapMultiByObjectType(Overlaps, Location, FQuat::Identity, FCollisionObjectQueryParams(ECollisionChannel::ECC_Pawn), Sphere);
-    if (bHasOverlap)
-    {
-        for (auto& Result : Overlaps)
-        {
-            AActor* OverlappedActor = Result.GetActor();
-            if (OverlappedActor)
-            {
-                UE_LOG(LogTemp, Log, TEXT("Overlapped: %s"), *OverlappedActor->GetName());
-                FString Debug = FString::Printf(TEXT("Name: %s"), *OverlappedActor->GetName());
-                GEngine->AddOnScreenDebugMessage(
-                    -1,                 // Key, -1이면 새 메시지
-                    5.0f,               // 화면에 표시될 시간(초)
-                    FColor::Red,        // 텍스트 색상
-                    Debug // 출력할 문자열
-                );
+	// Sphere를 그리고 충돌 처리를 하는게 나을 듯?
+	// 충돌 채널 설정
+	TArray<FOverlapResult> Overlaps;
+	float Radius = 256.0f;
+	FCollisionShape Sphere = FCollisionShape::MakeSphere(Radius);
+	bool bHasOverlap = GetWorld()->OverlapMultiByObjectType(Overlaps, Location, FQuat::Identity, VM_HERO, Sphere);
+	if (bHasOverlap)
+	{
+		for (auto& Result : Overlaps)
+		{
+			AActor* OverlappedActor = Result.GetActor();
+			if (OverlappedActor)
+			{
+				UE_LOG(LogTemp, Log, TEXT("Overlapped: %s"), *OverlappedActor->GetName());
+				FString Debug = FString::Printf(TEXT("Name: %s"), *OverlappedActor->GetName());
+				GEngine->AddOnScreenDebugMessage(
+					-1,                 // Key, -1이면 새 메시지
+					5.0f,               // 화면에 표시될 시간(초)
+					FColor::Red,        // 텍스트 색상
+					Debug // 출력할 문자열
+				);
 
-                //Alpha의 CharacterMovement를 건들여보자.
-                AVMCharacterHeroBase* HeroPawn = Cast<AVMCharacterHeroBase>(OverlappedActor);
-                if (HeroPawn == nullptr)
-                {
-                    continue;
-                }
+				//Alpha의 CharacterMovement를 건들여보자.
+				AVMCharacterHeroBase* HeroPawn = Cast<AVMCharacterHeroBase>(OverlappedActor);
+				if (HeroPawn == nullptr)
+				{
+					continue;
+				}
 
-                BroadcastOverlapActor(HeroPawn, 20);
-            }
-        }
-    }
+				BroadcastOverlapActor(HeroPawn, 20);
+			}
+		}
+	}
 #pragma region Debug용 코드
-        DrawDebugSphere(GetWorld(), Location, Radius, 16, FColor::Green, false, 10.0f, 0, 1.0f);
+        //DrawDebugSphere(GetWorld(), Location, Radius, 16, FColor::Green, false, 10.0f, 0, 1.0f);
 #pragma endregion 
 }
 
 
 void AVMAOELightning::BroadcastOverlapActor(AActor* Actor, float InDamage)
 {
-    UE_LOG(LogTemp, Log, TEXT("AVMAOELightning::BroadcastOverlapActor"));
-    OnAOEThunderOverlapActor.Broadcast(Actor, InDamage);
+	UE_LOG(LogTemp, Log, TEXT("AVMAOELightning::BroadcastOverlapActor"));
+	OnAOEThunderOverlapActor.Broadcast(Actor, InDamage);
 }

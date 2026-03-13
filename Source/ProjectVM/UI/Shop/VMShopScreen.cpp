@@ -80,14 +80,15 @@ void UVMShopScreen::SetBuyMode()
 		UE_LOG(LogTemp, Log, TEXT("Item : %s"), *Item.ItemName);
 		UVMShopItemWidget* NewItemWidget = CreateWidget<UVMShopItemWidget>(this, ShopItemWidgetClass);
 
-		NewItemWidget->Setup(Item);
-		NewItemWidget->ShopScreen = this;
-		NewItemWidget->InventoryIndex = Index;
-
 		//그리드 5열
 		int32 Row = Index / GridRowNum;
 		int32 Col = Index % GridRowNum;
 		ShopGridPanel->AddChildToUniformGrid(NewItemWidget, Row, Col);
+		
+		NewItemWidget->Setup(Item);
+		NewItemWidget->ShopScreen = this;
+		NewItemWidget->InventoryIndex = Index;
+
 		Index++;
 	}
 

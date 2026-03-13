@@ -8,8 +8,6 @@
 #include "Engine/OverlapResult.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
-#include "ProjectVMCharacter.h"
-
 #include "Macro/VMAIMarco.h"
 #include "Macro/VMPhysics.h"
 
@@ -66,7 +64,7 @@ void UBTService_EnemyDetect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* 
 
 	// 2. 왜 overlap이면 반응을 안하는게 맞나.
 
-	UE_LOG(LogTemp, Warning, TEXT("OverlapMultiByChannel returned: %s, Count: %d"), bResult ? TEXT("True") : TEXT("False"), OverlapResults.Num());
+	//UE_LOG(LogTemp, Warning, TEXT("OverlapMultiByChannel returned: %s, Count: %d"), bResult ? TEXT("True") : TEXT("False"), OverlapResults.Num());
 	// 충돌이 감지됐으면,
 	if (bResult)
 	{
@@ -84,10 +82,10 @@ void UBTService_EnemyDetect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* 
 				OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGET, Pawn);
 
 				// 디버그 드로우를 활용해 감지 영역을 녹색으로 표시.
-				DrawDebugSphere(World, CurrentLocation, DetectRadius, 16, FColor::Green, false, 0.2f);
+				//DrawDebugSphere(World, CurrentLocation, DetectRadius, 16, FColor::Green, false, 0.2f);
 
 				// 감지된 지점을 녹색으로 표시.
-				DrawDebugPoint(World, Pawn->GetActorLocation(), 10.0f, FColor::Green, false, 0.2f);
+				//DrawDebugPoint(World, Pawn->GetActorLocation(), 10.0f, FColor::Green, false, 0.2f);
 
 				// 감지된 방향을 녹색으로 표시.
 				DrawDebugLine(World, PawnPtr->GetActorLocation(), Pawn->GetActorLocation(), FColor::Green, false, 0.27f);
@@ -100,7 +98,7 @@ void UBTService_EnemyDetect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* 
 	OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGET, nullptr);
 
 	// 감지 영역을 빨간색으로 표시.
-	DrawDebugSphere(World, CurrentLocation, DetectRadius, 16, FColor::Red, false, 0.2f);
+	//DrawDebugSphere(World, CurrentLocation, DetectRadius, 16, FColor::Red, false, 0.2f);
 }
 
 #pragma endregion

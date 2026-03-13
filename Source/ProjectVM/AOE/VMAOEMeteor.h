@@ -70,7 +70,7 @@ protected:
 	FVector DecalLocation;
 
 	UPROPERTY()
-	FVector Location;
+	FVector FloorLocation;
 
 	UPROPERTY()
 	FRotator DecalRotator;

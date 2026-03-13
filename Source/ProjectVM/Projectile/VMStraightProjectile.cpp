@@ -11,10 +11,8 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Sound/SoundBase.h"
 #include "Kismet/GameplayStatics.h"
-#include "ProjectVMCharacter.h"
-#include "AI/VMEnemyBase.h"
 
-#include "Interface/VMStatChangeable.h"
+#include "Hero/VMCharacterHeroBase.h"
 
 // Sets default values
 AVMStraightProjectile::AVMStraightProjectile()
@@ -101,24 +99,22 @@ void AVMStraightProjectile::Tick(float DeltaTime)
 
 void AVMStraightProjectile::HitAndDestroy(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	UE_LOG(LogTemp, Log, TEXT("AVMStraightProjectile::HitAndDestroy"));
-	
-	// 피격 시 이펙트 On
+	// 이펙트 재생
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitParticle, Hit.ImpactPoint, Hit.ImpactNormal.Rotation(), false);
 
-	// 피격 시 소리 재생 On
+	// 소리 재생
 	UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, Hit.ImpactPoint);
 	
 
-	IVMStatChangeable* PawnActor = Cast<IVMStatChangeable>(OtherActor);
+	AVMCharacterHeroBase* HeroPawn = Cast<AVMCharacterHeroBase>(OtherActor);
 	// TODO: 데미지 주는 거 필요. 일단 Base에 넣는걸로 하자.
-	if (PawnActor == nullptr)
+	if (HeroPawn == nullptr)
 	{
 		Destroy();
 		return;
 	}
 
-	PawnActor->HealthPointChange(10, OtherActor);
+	HeroPawn->HealthPointChange(1, OtherActor);
 
 	// 객체 파괴
 	Destroy();

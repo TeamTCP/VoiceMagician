@@ -11,7 +11,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Sound/SoundBase.h"
 #include "Kismet/GameplayStatics.h"
-#include "ProjectVMCharacter.h"
+
 #include "AI/VMEnemyBase.h"
 
 #include "Interface/VMStatChangeable.h"

@@ -80,10 +80,10 @@ protected:
 	//class UBoxComponent* InteractKeyBoxComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interact")
-	TObjectPtr<class UInteractComponent> InteractComponent;
+	TObjectPtr<class UVMInteractComponent> InteractComponent;
 
-	//대화 데이터 포인터로 저장
-	TArray<struct FVMNPCTalkData*> DialogueTexts;
+	//대화 데이터, 값으로 저장
+	TArray<struct FVMNPCTalkData> DialogueTexts;
 	int32 CurrentDialogueIndex = 0;
 
 	//일상 대화 총 갯수 

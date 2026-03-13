@@ -3,7 +3,7 @@
 #include "Components/CapsuleComponent.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
-#include "Core/InteractComponent.h"
+#include "Core/VMInteractComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/LevelStreamingDynamic.h"
 #include "Engine/LevelStreaming.h"
@@ -41,14 +41,19 @@ AVMPortal::AVMPortal()
 	}
 
 	//상호작용 컴포넌트 추가
-	InteractComponent = CreateDefaultSubobject<UInteractComponent>(TEXT("InteractComponent"));
+	InteractComponent = CreateDefaultSubobject<UVMInteractComponent>(TEXT("InteractComponent"));
 	InteractComponent->SetupAttachment(RootComponent);
 }
 
 void AVMPortal::Interact()
 {
 	UE_LOG(LogTemp, Log, TEXT("Portal 진입"));
+	TeleportPlayerToMap();
+}
 
+//자식에서 사용
+void AVMPortal::TeleportPlayerToMap()
+{
 	//이펙트 라인 활성화
 	if (EffectLineNiagaraSystem)
 	{
@@ -56,42 +61,35 @@ void AVMPortal::Interact()
 	}
 
 	//플레이어 점프 이동
-	ACharacter* PlayerCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-	if (!PlayerCharacter) return;
-
-	// 점프 높이
-	float JumpZ = 400.f; // Z축 점프 속도
-
-	// 플레이어가 바라보는 방향으로 이동 거리 조절
-	float ForwardSpeed = 1000.f; // 전방 이동 속도, 필요하면 조절
-	FVector ForwardVector = PlayerCharacter->GetActorForwardVector(); // 캐릭터 앞 방향
-
-	// 최종 점프 속도
-	FVector JumpVelocity = ForwardVector * ForwardSpeed + FVector(0.f, 0.f, JumpZ);
-
-	// 캐릭터 점프 실행
-	PlayerCharacter->LaunchCharacter(JumpVelocity, true, true);
-}
-
-void AVMPortal::TeleportPlayerToMap()
-{
-	//자식에서 사용
-
-	// 플레이어 가져오기
 	ACharacter* Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	if (Player == nullptr)
 	{
 		return;
 	}
 
+	// 점프 높이
+	float JumpZ = 400.f; // Z축 점프 속도
+
+	// 플레이어가 바라보는 방향으로 이동 거리 조절
+	float ForwardSpeed = 1000.f; // 전방 이동 속도, 필요하면 조절
+	FVector ForwardVector = Player->GetActorForwardVector(); // 캐릭터 앞 방향
+
+	// 최종 점프 속도
+	FVector JumpVelocity = ForwardVector * ForwardSpeed + FVector(0.f, 0.f, JumpZ);
+
+	// 캐릭터 점프 실행
+	Player->LaunchCharacter(JumpVelocity, true, true);
+
+
 	FVector NewLocation = MapTeleportPos + PlayerTeleportPos; // 보스맵 중앙 위쪽
 	Player->SetActorLocation(NewLocation);
-	//Player->SetActorRotation(PlayerTeleportRot);
 	UE_LOG(LogTemp, Log, TEXT("Player Teleport"));
 
-	//이동 위치에 포탈 생성 후 시간 지나면 사라지게 하기
+	//이동 위치에 포탈 잔상 생성 후 시간 지나면 사라지게 하기
 	TSubclassOf<AVMPortal> ActorToSpawn = AVMPortal::StaticClass();
 	AVMPortal* SpawnedPortal = GetWorld()->SpawnActor<AVMPortal>(ActorToSpawn, NewLocation, Player->GetActorRotation());
+	SpawnedPortal->InteractComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SpawnedPortal->EffectLineNiagaraSystem->Activate();
 
 	if (SpawnedPortal == nullptr)
 	{
@@ -100,17 +98,30 @@ void AVMPortal::TeleportPlayerToMap()
 
 	//2초 후에 나이아가라 비활성화
 	FTimerHandle FadeTimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(FadeTimerHandle, [SpawnedPortal]()
+	TWeakObjectPtr<AVMPortal> WeakThis(this);
+	GetWorld()->GetTimerManager().SetTimer(FadeTimerHandle, [WeakThis, SpawnedPortal]()
 		{
-			if (SpawnedPortal->GetPortalNiagaraSystem() == nullptr)
-			{
-				return;
-			}
 			// Deactivate로 비활성화. 나이아가라가 자체적으로 Fade 하면서 사라짐.
-			SpawnedPortal->GetPortalNiagaraSystem()->Deactivate();
+			if (SpawnedPortal->GetPortalNiagaraSystem() != nullptr)
+			{
+				SpawnedPortal->GetPortalNiagaraSystem()->Deactivate();
+			}
+			if (SpawnedPortal->GetEffectLineNiagaraSystem() != nullptr)
+			{
+				SpawnedPortal->GetEffectLineNiagaraSystem()->Deactivate();
+			}
+			// 넘어온 포탈도 이펙트 라인 비활성화
+			// this 체크. 파괴됐으면 접근하지 않음
+			if (WeakThis.IsValid())
+			{
+				if (WeakThis->EffectLineNiagaraSystem)
+				{
+					WeakThis->EffectLineNiagaraSystem->Deactivate();
+				}
+			}
 		}, 2.f, false);
 
-	//안전하게 텀을 주고 5초 후에 포탈 삭제
+	//안전하게 텀을 주고 5초 후에 포탈 잔상 삭제
 	FTimerHandle DestroyTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(DestroyTimerHandle, [SpawnedPortal]()
 		{

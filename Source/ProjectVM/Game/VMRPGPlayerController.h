@@ -100,9 +100,4 @@ protected:
 	TSubclassOf<class UUserWidget> QuestClearOverlayClass;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
 	TObjectPtr<class UUserWidget> QuestClearOverlay;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD")
-	TSubclassOf<class UVMSkillsCooldownWidget> SkillsCooldownWidgetClass;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "HUD")
-	TObjectPtr<class UVMSkillsCooldownWidget> SkillsCooldownWidget;
 };

@@ -14,6 +14,10 @@
 
 #include "Hero/VMCharacterHeroBase.h"
 
+#include "Core/VMLevelManager.h"
+
+#include "Kismet/GameplayStatics.h"
+
 UBTTask_MeteorAttack::UBTTask_MeteorAttack()
 {
 
@@ -57,8 +61,7 @@ EBTNodeResult::Type UBTTask_MeteorAttack::SpawnMeteorToTarget(UBehaviorTreeCompo
 
     // 초기화
     SpawnFinishedCount = 0;
-
-
+    SpawnTotalCount = FMath::RandRange(5, 10);
 
     // 나머지는 타이머로 순차 발사
     World->GetTimerManager().SetTimer(MeteorTimer,
@@ -86,25 +89,54 @@ EBTNodeResult::Type UBTTask_MeteorAttack::SpawnMeteorToTarget(UBehaviorTreeCompo
 
 
             FTransform Transform = HeroPawnTarget->GetActorTransform();
-            UE_LOG(LogTemp, Log, TEXT("Target Transform: (%f, %f, %f)"), Transform.GetLocation().X, Transform.GetLocation().Y, Transform.GetLocation().Z);
 
-            FActorSpawnParameters Params;
-            Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+            // BossMap Level 찾기
+            UVMLevelManager* LevelManager = World->GetGameInstance()->GetSubsystem<UVMLevelManager>();
 
-            //AVMAOEFire* SpawnMeteorActorPtr = World->SpawnActorDeferred<AVMAOEFire>(AVMAOEFire::StaticClass(), Transform, BossPtr, BossPtr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
-            AVMAOEMeteor* SpawnMeteorActorPtr = World->SpawnActorDeferred<AVMAOEMeteor>(AVMAOEMeteor::StaticClass(), Transform, BossPtr, BossPtr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+            ULevel* TargetLevel = nullptr;
+
+            if (LevelManager == nullptr)
+            {
+                FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+                return;
+            }
+            ULevelStreaming* BossLevel = LevelManager->GetLevel(FName("BossMap"));
+
+            if (BossLevel && BossLevel->GetLoadedLevel())
+            {
+                TargetLevel = BossLevel->GetLoadedLevel();
+            }
+
+            // SpawnParams 직접 구성
+            FActorSpawnParameters SpawnParams;
+            SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+            SpawnParams.Owner = BossPtr;
+            SpawnParams.Instigator = BossPtr;
+            SpawnParams.bDeferConstruction = true;
+
+            if (TargetLevel == nullptr)
+            {
+                FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+                return;
+            }
+            SpawnParams.OverrideLevel = TargetLevel;
+
+            // SpawnActor (Deferred 직접 구현)
+            AVMAOEMeteor* SpawnMeteorActorPtr = World->SpawnActor<AVMAOEMeteor>(AVMAOEMeteor::StaticClass(), Transform, SpawnParams);
             if (SpawnMeteorActorPtr == nullptr)
             {
                 FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
                 return;
             }
-            //RemoveDynamic
+            
+            // 이벤트 제거 후 다시 삽입.
             SpawnMeteorActorPtr->OnAOEMeteorOverlapActor.RemoveDynamic(HeroPawnTarget, &AVMCharacterHeroBase::OnHitMeteorByAOE);
             SpawnMeteorActorPtr->OnAOEMeteorOverlapActor.AddDynamic(HeroPawnTarget, &AVMCharacterHeroBase::OnHitMeteorByAOE);
 
 
             //SpawnMeteorActorPtr->SetDelay(3.0f);
-            SpawnMeteorActorPtr->FinishSpawning(Transform);
+            UGameplayStatics::FinishSpawningActor(SpawnMeteorActorPtr, Transform);
 
             SpawnFinishedCount++;
 
@@ -115,7 +147,7 @@ EBTNodeResult::Type UBTTask_MeteorAttack::SpawnMeteorToTarget(UBehaviorTreeCompo
                 FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
             }
         },
-        0.3f,
+        1.0f,
         true
     );
 

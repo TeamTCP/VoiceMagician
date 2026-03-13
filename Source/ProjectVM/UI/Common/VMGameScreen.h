@@ -20,4 +20,7 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UVMInteractKeyWidget> InteractKeyWidget;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UVMSkillsCooldownWidget> HeroSkillWidget;
 };

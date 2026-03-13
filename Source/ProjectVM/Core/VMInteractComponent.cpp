@@ -1,17 +1,17 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Core/InteractComponent.h"
+#include "Core/VMInteractComponent.h"
 #include "Components/PrimitiveComponent.h"
 #include "Hero/VMCharacterHeroBase.h"
-#include "Core/InteractionManager.h"
+#include "Core/VMInteractionManager.h"
 #include "Engine/GameInstance.h"
 
-void UInteractComponent::BeginPlay()
+void UVMInteractComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	OnComponentBeginOverlap.AddDynamic(this, &UInteractComponent::OnInteractTriggerOverlapBegin);
-	OnComponentEndOverlap.AddDynamic(this, &UInteractComponent::OnInteractTriggerOverlapEnd);
+	OnComponentBeginOverlap.AddDynamic(this, &UVMInteractComponent::OnInteractTriggerOverlapBegin);
+	OnComponentEndOverlap.AddDynamic(this, &UVMInteractComponent::OnInteractTriggerOverlapEnd);
 
 	// 루트 컴포넌트 가져오기
 	USceneComponent* RootComp = GetOwner()->GetRootComponent();
@@ -28,7 +28,7 @@ void UInteractComponent::BeginPlay()
 	SetRelativeLocation(FVector::ZeroVector);
 }
 
-void UInteractComponent::OnInteractTriggerOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void UVMInteractComponent::OnInteractTriggerOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	AVMCharacterHeroBase* Player = Cast<AVMCharacterHeroBase>(OtherActor);
 	if(Player == nullptr)
@@ -36,7 +36,7 @@ void UInteractComponent::OnInteractTriggerOverlapBegin(UPrimitiveComponent* Over
 		return;
 	}
 
-	UInteractionManager* InteractionManager = GetOwner()->GetGameInstance()->GetSubsystem<UInteractionManager>();
+	UVMInteractionManager* InteractionManager = GetOwner()->GetGameInstance()->GetSubsystem<UVMInteractionManager>();
 
 	if (InteractionManager == nullptr)
 	{
@@ -47,7 +47,7 @@ void UInteractComponent::OnInteractTriggerOverlapBegin(UPrimitiveComponent* Over
 	InteractionManager->RegisterInteractable(GetOwner());
 }
 
-void UInteractComponent::OnInteractTriggerOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+void UVMInteractComponent::OnInteractTriggerOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	AVMCharacterHeroBase* Player = Cast<AVMCharacterHeroBase>(OtherActor);
 	if (Player == nullptr)
@@ -55,7 +55,7 @@ void UInteractComponent::OnInteractTriggerOverlapEnd(UPrimitiveComponent* Overla
 		return;
 	}
 
-	UInteractionManager* InteractionManager = GetOwner()->GetGameInstance()->GetSubsystem<UInteractionManager>();
+	UVMInteractionManager* InteractionManager = GetOwner()->GetGameInstance()->GetSubsystem<UVMInteractionManager>();
 
 	if (InteractionManager == nullptr)
 	{

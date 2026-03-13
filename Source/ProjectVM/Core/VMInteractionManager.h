@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
-#include "InteractionManager.generated.h"
+#include "VMInteractionManager.generated.h"
 
 UCLASS()
-class PROJECTVM_API UInteractionManager : public UGameInstanceSubsystem
+class PROJECTVM_API UVMInteractionManager : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
 

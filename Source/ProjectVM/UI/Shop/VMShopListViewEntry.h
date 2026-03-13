@@ -13,6 +13,7 @@ class PROJECTVM_API UVMShopListViewEntry : public UUserWidget, public IUserObjec
 {
 	GENERATED_BODY()
 public:
+	UVMShopListViewEntry(const FObjectInitializer& ObjectInitializer);
 	//리스트뷰가 데이터를 연결할 때 마다 호출됨
 	virtual void NativeOnListItemObjectSet(UObject* ListItemObject) override;
 	virtual void NativeConstruct() override;
@@ -41,4 +42,10 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<class UVMShopItemDataObject> ShopItemDataObject;
+
+	//툴팁 위젯 관련
+	UPROPERTY()
+	TSubclassOf<class UVMShopItemTooltip> ItemTooltipClass;
+	UPROPERTY()
+	TObjectPtr<class UVMShopItemTooltip> ItemTooltip;
 };

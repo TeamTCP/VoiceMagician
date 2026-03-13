@@ -12,7 +12,7 @@
 
 #include "AOE/VMAOEMine.h"
 #include "AOE/VMAOETargetBomb.h"
-
+#include "Core/VMLevelManager.h"
 
 
 UBTTask_SpreadMines::UBTTask_SpreadMines()
@@ -82,7 +82,28 @@ EBTNodeResult::Type UBTTask_SpreadMines::ExecuteTask(UBehaviorTreeComponent& Own
 		FVector SpawnLoc = SpawnBase + SpawnDir * Radius;
 		FRotator SpawnRot = SpawnDir.Rotation();
 
-		AActor* SpawnedMine = World->SpawnActor<AActor>(SpawnClass, SpawnLoc, SpawnRot);
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+		UVMLevelManager* LevelManager = GetWorld()->GetGameInstance()->GetSubsystem<UVMLevelManager>();
+		if (LevelManager != nullptr)
+		{
+			ULevelStreaming* BossLevel = LevelManager->GetLevel(FName("BossMap"));
+			if (BossLevel != nullptr && BossLevel->GetLoadedLevel() != nullptr)
+			{
+				SpawnParams.OverrideLevel = BossLevel->GetLoadedLevel();
+				UE_LOG(LogTemp, Log, TEXT("Spawn location changed to BossMap"));
+			}
+			else
+			{
+				UE_LOG(LogTemp, Log, TEXT("BossLevel is nullptr"));
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("LevelManager is nullptr"));
+		}
+		
+		AActor* SpawnedMine = World->SpawnActor<AActor>(SpawnClass, SpawnLoc, SpawnRot, SpawnParams);
 		UE_LOG(LogTemp, Warning, TEXT("마인 들어왔다?"));
 		if (SpawnedMine)
 		{

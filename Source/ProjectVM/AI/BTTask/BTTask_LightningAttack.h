@@ -17,6 +17,8 @@ class PROJECTVM_API UBTTask_LightningAttack : public UBTTaskNode
 public:
 	UBTTask_LightningAttack();
 
+	virtual void OnTaskFinished(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, EBTNodeResult::Type TaskResult);
+
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
 private:
@@ -27,6 +29,6 @@ private:
 	void FireOneCircleProjectile(UBehaviorTreeComponent* OwnerComp, AVMEnemyBoss* BossPtr);
 
 	FTimerHandle ThunderTimer;
-	int32 SpawnTotalCount = 20;
+	int32 SpawnTotalCount = 1;
 	int32 SpawnFinishedCount = 0;
 };

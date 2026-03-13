@@ -406,7 +406,6 @@ void AVMEnemyBase::LaserAttackHitCheck()
 	const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
 	const FVector End = Start + GetActorForwardVector() * AttackRange;
 
-	//bool Result = GetWorld()->LineTraceMultiByChannel(OverlapResults, Start, End, ECC_GameTraceChannel1, Params);
 	bool Result = GetWorld()->SweepMultiByChannel(HitResults, Start, End, FQuat::Identity, VM_HERO_TARGET_ACTION, FCollisionShape::MakeSphere(AttackRadius), Params);
 	if (Result || HitResults.Num())
 	{
@@ -510,7 +509,7 @@ void AVMEnemyBase::TryMakeNoise()
 		5.0f,
 		false
 	);
-	DrawDebugSphere(GetWorld(), GetActorLocation(), 100.f, 16, FColor::Blue, false, 2.0f);
+	//DrawDebugSphere(GetWorld(), GetActorLocation(), 100.f, 16, FColor::Blue, false, 2.0f);
 }
 
 void AVMEnemyBase::ResetSoundCooldown()

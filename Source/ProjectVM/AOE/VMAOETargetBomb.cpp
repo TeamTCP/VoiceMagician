@@ -21,7 +21,7 @@ AVMAOETargetBomb::AVMAOETargetBomb()
 	CylinderCollision->InitCapsuleSize(50.f, 40.f);
 
 	CylinderCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	//CylinderCollision->SetSimulatePhysics(true);
+
 	CylinderCollision->SetEnableGravity(true);
 
 	// Mesh
@@ -39,7 +39,7 @@ AVMAOETargetBomb::AVMAOETargetBomb()
 void AVMAOETargetBomb::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	CylinderCollision->SetSimulatePhysics(true);
 	CylinderCollision->OnComponentBeginOverlap.AddDynamic(this, &AVMAOETargetBomb::OnBeginOverlap);
 }
 
@@ -74,7 +74,7 @@ void AVMAOETargetBomb::Detonate()
 	TArray<FOverlapResult> Overlaps;
 	FCollisionShape Sphere = FCollisionShape::MakeSphere(Radius);
 
-	DrawDebugSphere(
+	/*DrawDebugSphere(
 		GetWorld(),
 		GetActorLocation(),
 		Radius,
@@ -84,7 +84,7 @@ void AVMAOETargetBomb::Detonate()
 		5.f,                  // 지속 시간 (초)
 		0,                    // 두께
 		2.f                   // 선 두께
-	);
+	);*/
 
 	bool bHasOverlap = GetWorld()->OverlapMultiByObjectType(
 		Overlaps,

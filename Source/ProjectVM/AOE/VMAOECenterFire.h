@@ -59,7 +59,4 @@ protected:
 	float OverlapTick = 1;
 	float MaxDurationTime = 10;
 	float Radius = 3000.0;
-
-	bool bDrawDebugSphere = true;
-
 };

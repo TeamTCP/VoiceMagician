@@ -16,6 +16,8 @@ class PROJECTVM_API UVMShopItemWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	UVMShopItemWidget(const FObjectInitializer& ObjectInitializer);
+
 	void Setup(const FVMEquipmentInfo& Info);
 
 	virtual void NativeConstruct() override;
@@ -50,4 +52,10 @@ public:
 	int32 InventoryIndex = 0;
 private:
 	const FVMEquipmentInfo* EquipmentInfo; //아이템 구조체를 참조해서 가지고 있는다.
+
+	//툴팁 위젯 관련
+	UPROPERTY()
+	TSubclassOf<class UVMShopItemTooltip> ItemTooltipClass;
+	UPROPERTY()
+	TObjectPtr<class UVMShopItemTooltip> ItemTooltip;
 };

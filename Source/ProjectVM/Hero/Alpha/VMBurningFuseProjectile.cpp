@@ -10,13 +10,15 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Hero/VMCharacterHeroBase.h"
 
+#include "Macro/VMPhysics.h"
+
 AVMBurningFuseProjectile::AVMBurningFuseProjectile()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
 	SphereCollision = CreateDefaultSubobject<USphereComponent>(TEXT("SphereCollision"));
 	SphereCollision->SetSphereRadius(10.f);
-	SphereCollision->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
+	SphereCollision->SetCollisionProfileName(TEXT("NoCollision"));
 	SphereCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &AVMBurningFuseProjectile::HitTarget);
 	SphereCollision->SetEnableGravity(false);
@@ -48,15 +50,17 @@ void AVMBurningFuseProjectile::InitProjectile(AActor* InOwner, int32 InDamage)
 	SetOwner(InOwner);
 	Owner = InOwner;
 	Damage = InDamage;
+
+	SphereCollision->SetCollisionProfileName(VM_HERO_PROJECTILE_COLLISION);
 }
 
 void AVMBurningFuseProjectile::HitTarget(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (Cast<AVMCharacterHeroBase>(OtherActor) != nullptr)
+	if (OtherActor == nullptr || OtherActor->IsValidLowLevel() == false)
 	{
 		return;
 	}
-
+	
 	IVMStatChangeable* StatChangeable = Cast<IVMStatChangeable>(OtherActor);
 	
 	if (StatChangeable)
@@ -65,9 +69,10 @@ void AVMBurningFuseProjectile::HitTarget(UPrimitiveComponent* OverlappedComp, AA
 	}
 
 	SphereCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	ProjectileMovement->Velocity = FVector::Zero();
 	ProjectileMovement->MaxSpeed = 0.0f;
-	ProjectileEffect->SetVariableFloat(TEXT("SpawnRate"), 0.0f);
-
+	
+	GetWorld()->GetTimerManager().SetTimer(ProjectileEffectHandle, this, &AVMBurningFuseProjectile::RemoveEffectSpawn, 0.1f, false);
 	GetWorld()->GetTimerManager().SetTimer(ProjectileDestroyHandle, this, &AVMBurningFuseProjectile::DestroyProjectile, 5.0f, false);
 
 #if HERO_SKILL_DEBUG
@@ -93,6 +98,11 @@ void AVMBurningFuseProjectile::Tick(float DeltaTime)
 	{
 		DestroyProjectile();
 	}
+}
+
+void AVMBurningFuseProjectile::RemoveEffectSpawn()
+{
+	ProjectileEffect->SetVariableFloat(TEXT("SpawnRate"), 0.0f);
 }
 
 void AVMBurningFuseProjectile::DestroyProjectile()

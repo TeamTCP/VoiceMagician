@@ -6,7 +6,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/SplineComponent.h"
 
-#include "Core/InteractComponent.h"
+#include "Core/VMInteractComponent.h"
 #include "Item/Equipment/VMEquipment.h"
 #include "Item/Equipment/VMEquipmentInfo.h"
 #include "Item/ItemFactorySubsystem.h"
@@ -45,7 +45,7 @@ AVMItemCube::AVMItemCube()
     }
 
     //상호작용 컴포넌트 추가
-    InteractComponent = CreateDefaultSubobject<UInteractComponent>(TEXT("InteractComponent"));
+    InteractComponent = CreateDefaultSubobject<UVMInteractComponent>(TEXT("InteractComponent"));
     InteractComponent->SetupAttachment(RootComponent);
 
     SplinePath = CreateDefaultSubobject<USplineComponent>(TEXT("SplinePath"));

@@ -44,15 +44,12 @@ AVMAOEBomb::AVMAOEBomb()
         MeshComp->SetStaticMesh(MeshRef.Object);
     }
 
-    //MeshComp->SetSimulatePhysics(true);         // Physics Simulation 켬
     MeshComp->SetEnableGravity(true);          // 중력 적용
     MeshComp->SetNotifyRigidBodyCollision(true); // OnHit 이벤트 받기
     MeshComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
     MeshComp->SetCollisionObjectType(ECC_WorldDynamic); // 오브젝트 타입
     MeshComp->SetCollisionResponseToAllChannels(ECR_Block); // 모든 채널 Block
-    
-    
-    //MeshComp->SetMassOverrideInKg(NAME_None, 5.f); // 무게 설정
+
 }
 
 // Called when the game starts or when spawned
@@ -61,6 +58,8 @@ void AVMAOEBomb::BeginPlay()
 	Super::BeginPlay();
 	
     ExplosionTime = FMath::RandRange(2.0, 5.0);
+    MeshComp->SetSimulatePhysics(true);         // Physics Simulation 켬
+    MeshComp->SetMassOverrideInKg(NAME_None, 5.f); // 무게 설정
 }
 
 // Called every frame
@@ -111,7 +110,7 @@ void AVMAOEBomb::Explode()
     TArray<FOverlapResult> Overlaps;
     FCollisionShape Sphere = FCollisionShape::MakeSphere(Radius);
 
-    DrawDebugSphere(
+    /*DrawDebugSphere(
         GetWorld(),
         ExplosionLocation,
         Radius,
@@ -121,7 +120,7 @@ void AVMAOEBomb::Explode()
         5.f,                  // 지속 시간 (초)
         0,                    // 두께
         2.f                   // 선 두께
-    );
+    );*/
 
     bool bHasOverlap = GetWorld()->OverlapMultiByObjectType(
         Overlaps,
