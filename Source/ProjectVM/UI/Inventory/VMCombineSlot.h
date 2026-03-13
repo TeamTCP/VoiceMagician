@@ -21,7 +21,8 @@ class PROJECTVM_API UVMCombineSlot : public UUserWidget
 
 public:
     void RefreshFromStoredItem();
-	
+    void ClearItem();
+    
 public:
     // 실제로 조합에 사용할 아이템
     UPROPERTY(VisibleAnywhere, BlueprintReadwrite, Category = "Combine")

@@ -118,7 +118,7 @@ public:
 	void DropItemToWorld(class UVMEquipment* ItemToDrop, int32 Quantity = 1);
 
 	UFUNCTION(BlueprintCallable, Category = "Combine")
-	UVMEquipment* CombineItems(UVMEquipment* ItemA, UVMEquipment* ItemB);
+	UVMEquipment* CombineItems(UVMEquipment* ItemA, UVMEquipment* ItemB, UVMEquipment* NewItem);
 
 	UPROPERTY(EditDefaultsOnly, Category = "Inventory|Drop")
 	TSubclassOf<AVMPickup> DefaultPickupClass;

@@ -189,7 +189,7 @@ void UVMInventoryComponent::DropItemToWorld(UVMEquipment* ItemToDrop, int32 Quan
 	RemoveSingleInstanceOfItem(ItemToDrop);
 }
 
-UVMEquipment* UVMInventoryComponent::CombineItems(UVMEquipment* ItemA, UVMEquipment* ItemB)
+UVMEquipment* UVMInventoryComponent::CombineItems(UVMEquipment* ItemA, UVMEquipment* ItemB, UVMEquipment* NewItem)
 {
 	UE_LOG(LogTemp, Warning, TEXT("CombineItems CALLED"));
 	UE_LOG(LogTemp, Warning,
@@ -201,77 +201,13 @@ UVMEquipment* UVMInventoryComponent::CombineItems(UVMEquipment* ItemA, UVMEquipm
 		UE_LOG(LogTemp, Warning, TEXT("CombineItems FAILED: Null item detected."));
 		return nullptr;
 	}
-
-	// 2) ID 추출
-	const int32 ID_A = ItemA->EquipmentInfo.ItemID;
-	const int32 ID_B = ItemB->EquipmentInfo.ItemID;
-
-	// 3) 허용 ID 체크
-	const TArray<int32> AllowedIDs = { 1, 2, 4, 8, 16, 32 };
-	if (!AllowedIDs.Contains(ID_A) || !AllowedIDs.Contains(ID_B))
-	{
-		UE_LOG(LogTemp, Warning,
-			TEXT("CombineItems FAILED: ItemID not allowed. A=%d, B=%d"), ID_A, ID_B);
-		return nullptr;
-	}
-
-	// 4) NewID 계산
-	int32 NewID = 0;
-	if (ID_A == ID_B)
-	{
-		// 동일한 ID → *1000 조합식
-		NewID = ID_A * 1000;
-	}
-	else
-	{
-		// 서로 다른 ID → 둘의 합
-		NewID = ID_A + ID_B;
-	}
-
-	UE_LOG(LogTemp, Warning,
-		TEXT("CombineItems SUCCESS: (%d, %d) → NewID = %d"),
-		ID_A, ID_B, NewID);
-
-	// 5) DataTable에서 결과 아이템 정보 찾기
-	if (!EquipmentDataTable)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("CombineItems FAILED: EquipmentDataTable is NULL"));
-		return nullptr;
-	}
-
-	FVMEquipmentInfo* NewRow =
-		EquipmentDataTable->FindRow<FVMEquipmentInfo>(FName(*FString::FromInt(NewID)), TEXT("Combine"));
-
-
-
-	if (!NewRow)
-	{
-		UE_LOG(LogTemp, Warning,
-			TEXT("CombineItems FAILED: No item with NewID %d"),
-			NewID);
-		return nullptr;
-	}
-
-	UE_LOG(LogTemp, Warning,
-		TEXT("CombineItems: A=%s, B=%s"),
-		*GetNameSafe(ItemA),
-		*GetNameSafe(ItemB));
-
-	// 6) 결과 아이템 생성
-	UVMEquipment* NewItem = NewObject<UVMEquipment>(this, UVMEquipment::StaticClass());
-	NewItem->EquipmentInfo = *NewRow;
-
-	// 7) 인벤토리에서 재료 제거
-	// 여기 함수 이름은 프로젝트에 맞춰서 바꿔줘.
-	// 예: RemoveEquipmentFromInventory / RemoveItem 등
-	RemoveEquipmentFromInventory(ItemA);
-	RemoveEquipmentFromInventory(ItemB);
+	
+	RemoveItem(ItemA);
+	RemoveItem(ItemB);
+	
 
 	// 8) 결과 아이템 인벤토리에 추가
-	AddEquipmentToInventory(NewItem);
-
-	UE_LOG(LogTemp, Warning,
-		TEXT("CombineItems: Result item (ID=%d) added to inventory."), NewID);
+	AddNewItem(NewItem, 1);
 
 	return NewItem;
 }

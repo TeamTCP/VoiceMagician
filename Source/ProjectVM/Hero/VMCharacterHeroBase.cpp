@@ -335,7 +335,7 @@ void AVMCharacterHeroBase::Die()
 	CurState = EHeroState::Dead;
 
 	ChangeInputMode(EInputMode::Dead);
-	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Pawn"));
+	GetCapsuleComponent()->SetCollisionProfileName(TEXT("BlockAllDynamic"));
 	
 	OnHeroDeath.Broadcast();
 }

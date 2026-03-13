@@ -108,7 +108,7 @@ void AVMAOEMine::Detonate()
 	TArray<FOverlapResult> Overlaps;
 	FCollisionShape Sphere = FCollisionShape::MakeSphere(Radius);
 
-	DrawDebugSphere(
+	/*DrawDebugSphere(
 		GetWorld(),
 		GetActorLocation(),
 		Radius,
@@ -118,7 +118,7 @@ void AVMAOEMine::Detonate()
 		5.f,                  // 지속 시간 (초)
 		0,                    // 두께
 		2.f                   // 선 두께
-	);
+	);*/
 
 	bool bHasOverlap = GetWorld()->OverlapMultiByObjectType(
 		Overlaps,

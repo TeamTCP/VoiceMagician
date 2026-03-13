@@ -2,6 +2,8 @@
 
 
 #include "UI/Inventory/VMCombineItem.h"
+
+#include "VMInventoryItemSlot.h"
 #include "UI/Inventory/VMCombineSlot.h"
 
 #include "Inventory/VMInventoryComponent.h"
@@ -9,6 +11,7 @@
 
 #include "GameFramework/PlayerController.h"
 #include "Components/Button.h"
+#include "Item/ItemFactorySubsystem.h"
 
 void UVMCombineItem::NativeConstruct()
 {
@@ -44,5 +47,16 @@ void UVMCombineItem::HandleCombineClicked()
     if (!InvComp)
         return;
 
-    InvComp->CombineItems(CombineSlotA->StoredItem, CombineSlotB->StoredItem);
+    UItemFactorySubsystem* ItemFactory = GetGameInstance()->GetSubsystem<UItemFactorySubsystem>();
+
+    if (ItemFactory == nullptr)
+    {
+        return;
+    }
+
+    UVMEquipment* NewItem = ItemFactory->CraftEquipment(CombineSlotA->StoredItem, CombineSlotB->StoredItem);
+    InvComp->CombineItems(CombineSlotA->StoredItem, CombineSlotB->StoredItem, NewItem);
+
+    CombineSlotA->ClearItem();
+    CombineSlotB->ClearItem();
 }

@@ -110,7 +110,7 @@ void AVMAOEBomb::Explode()
     TArray<FOverlapResult> Overlaps;
     FCollisionShape Sphere = FCollisionShape::MakeSphere(Radius);
 
-    DrawDebugSphere(
+    /*DrawDebugSphere(
         GetWorld(),
         ExplosionLocation,
         Radius,
@@ -120,7 +120,7 @@ void AVMAOEBomb::Explode()
         5.f,                  // 지속 시간 (초)
         0,                    // 두께
         2.f                   // 선 두께
-    );
+    );*/
 
     bool bHasOverlap = GetWorld()->OverlapMultiByObjectType(
         Overlaps,
