@@ -17,6 +17,8 @@ class PROJECTVM_API UBTTask_FrozenAttack : public UBTTaskNode
 public:
 	UBTTask_FrozenAttack();
 	
+	virtual void OnTaskFinished(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, EBTNodeResult::Type TaskResult);
+
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
 private:

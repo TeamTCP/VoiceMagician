@@ -14,6 +14,10 @@
 
 #include "Hero/VMCharacterHeroBase.h"
 
+#include "Core/VMLevelManager.h"
+
+#include "Kismet/GameplayStatics.h"
+
 UBTTask_MeteorAttack::UBTTask_MeteorAttack()
 {
 
@@ -86,10 +90,40 @@ EBTNodeResult::Type UBTTask_MeteorAttack::SpawnMeteorToTarget(UBehaviorTreeCompo
 
             FTransform Transform = HeroPawnTarget->GetActorTransform();
 
-            FActorSpawnParameters Params;
-            Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-            
-            AVMAOEMeteor* SpawnMeteorActorPtr = World->SpawnActorDeferred<AVMAOEMeteor>(AVMAOEMeteor::StaticClass(), Transform, BossPtr, BossPtr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+            // BossMap Level 찾기
+            UVMLevelManager* LevelManager = World->GetGameInstance()->GetSubsystem<UVMLevelManager>();
+
+            ULevel* TargetLevel = nullptr;
+
+            if (LevelManager == nullptr)
+            {
+                FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+                return;
+            }
+            ULevelStreaming* BossLevel = LevelManager->GetLevel(FName("BossMap"));
+
+            if (BossLevel && BossLevel->GetLoadedLevel())
+            {
+                TargetLevel = BossLevel->GetLoadedLevel();
+            }
+
+            // SpawnParams 직접 구성
+            FActorSpawnParameters SpawnParams;
+            SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+            SpawnParams.Owner = BossPtr;
+            SpawnParams.Instigator = BossPtr;
+            SpawnParams.bDeferConstruction = true;
+
+            if (TargetLevel == nullptr)
+            {
+                FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+                return;
+            }
+            SpawnParams.OverrideLevel = TargetLevel;
+
+            // SpawnActor (Deferred 직접 구현)
+            AVMAOEMeteor* SpawnMeteorActorPtr = World->SpawnActor<AVMAOEMeteor>(AVMAOEMeteor::StaticClass(), Transform, SpawnParams);
             if (SpawnMeteorActorPtr == nullptr)
             {
                 FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
@@ -102,7 +136,7 @@ EBTNodeResult::Type UBTTask_MeteorAttack::SpawnMeteorToTarget(UBehaviorTreeCompo
 
 
             //SpawnMeteorActorPtr->SetDelay(3.0f);
-            SpawnMeteorActorPtr->FinishSpawning(Transform);
+            UGameplayStatics::FinishSpawningActor(SpawnMeteorActorPtr, Transform);
 
             SpawnFinishedCount++;
 

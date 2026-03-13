@@ -46,13 +46,13 @@ bool UVMCombineSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEv
 
     return true;
 
-    if (DropBorder)
-    {
-        DropBorder->SetBrushColor(FLinearColor::Yellow);
-    }
+    //if (DropBorder)
+    //{
+    //    DropBorder->SetBrushColor(FLinearColor::Yellow);
+    //}
 
-    UE_LOG(LogTemp, Warning, TEXT("NativeOnDrop: StoredItem SET OK"));
-    return true;
+    //UE_LOG(LogTemp, Warning, TEXT("NativeOnDrop: StoredItem SET OK"));
+    //return true;
 }
 
 void UVMCombineSlot::RefreshFromStoredItem()

@@ -44,6 +44,13 @@ void AVMAOEFrozen::BeginPlay()
         }, 3.0f, false);*/
 }
 
+void AVMAOEFrozen::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+    Super::EndPlay(EndPlayReason);
+    // 타이머가 남아있다면 제거
+    GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
+}
+
 void AVMAOEFrozen::CreateLogic()
 {
     DecalComp->DecalSize = FVector(256.f, 256.f, 256.f);
@@ -55,24 +62,31 @@ void AVMAOEFrozen::CreateLogic()
     //DecalMaterial, Size, Location, Rotation, 0
     DecalTimeHandle.Invalidate();
 
-    GetWorld()->GetTimerManager().SetTimer(DecalTimeHandle, [this]()
+    TWeakObjectPtr<AVMAOEFrozen> WeakThis(this);
+
+    GetWorld()->GetTimerManager().SetTimer(DecalTimeHandle, [WeakThis]()
         {
-            UE_LOG(LogTemp, Log, TEXT("Hello"));
-            if (DecalComp == nullptr)
+            if (WeakThis.IsValid() == false)
             {
-                UE_LOG(LogTemp, Log, TEXT("No Nullptr"));
+                return;
             }
-            if (IsValid(DecalComp))
+
+            AVMAOEFrozen* Self = WeakThis.Get();
+
+            UWorld* WorldPtr = Self->GetWorld();
+            if (WorldPtr == nullptr)
+            {
+                return;
+            }
+
+            if (IsValid(Self->DecalComp))
             {
                 UE_LOG(LogTemp, Log, TEXT("정상이니까 삭제"));
-                DecalComp->DestroyComponent();
+                Self->DecalComp->DestroyComponent();
             }
-            else
-            {
-                UE_LOG(LogTemp, Log, TEXT("비정상이니까 삭제 안함."));
-            }
-            InitAOEPosition();
-            SpawnAOE();
+
+            Self->InitAOEPosition();
+            Self->SpawnAOE();
         }, 3.0f, false);
 }
 
