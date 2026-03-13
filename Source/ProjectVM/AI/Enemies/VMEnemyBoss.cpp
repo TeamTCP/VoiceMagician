@@ -300,7 +300,8 @@ void AVMEnemyBoss::HealthPointChange(float Amount, AActor* Causer)
 		else if (PhaseIndex == 2)
 		{
 			BossWall->StartUpperingWall();
-			SetActorLocation(FVector(50, -40, 300));
+			//SetActorLocation(FVector(50, -40, 300));
+			SetActorLocation(FVector(12050, 11960, 300));
 		}
 		PhaseMinHp = HPPhase[PhaseIndex];
 		UE_LOG(LogTemp, Log, TEXT("변경"));
