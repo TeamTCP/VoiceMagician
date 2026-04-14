@@ -55,7 +55,7 @@
     </tr>  
     <tr>
       <td align="center"> <code> 프로그래머 4 </code> </td>
-      <td align="center"> <code> 2025.11 ~ 개발중 </code> </td>
+      <td align="center"> <code> 2025.11 ~ 2025.12 </code> </td>
     </tr>
   </table>
 </div>
